@@ -30,6 +30,9 @@ const save = Object.assign(
 );
 if ((save.v || 0) < 3) Object.assign(save, { autoRoll: false, v: 3 }); // auto-roll is off by default (toggle with R)
 save.quality ??= 'auto';
+save.sensitivity ??= 1; // multiplies the blob's turn speed
+save.colorblind ??= false;
+document.body.classList.toggle('cb', save.colorblind);
 quality.tier = save.quality === 'auto' ? detectTier() : save.quality;
 // trails were removed from the shop: give back any stardust spent on them
 if (save.trailsOwned) {
@@ -114,6 +117,9 @@ const particles = new Particles(scene);
 const blob = new Blob(scene);
 if (!SKINS[save.equipped]) save.equipped = 'classic';
 blob.setSkin(save.equipped);
+const BASE_TURN_RATE = blob.turnRate;
+const applySensitivity = () => { blob.turnRate = BASE_TURN_RATE * save.sensitivity; };
+applySensitivity();
 const BRUSH = 1.3;
 
 let planet = null;
@@ -300,6 +306,7 @@ const stick = { id: null, x0: 0, y0: 0, dx: 0, dy: 0 };
 
 window.addEventListener('keydown', (e) => {
   if (state === 'title') return start();
+  if (e.target instanceof HTMLInputElement) return; // arrow keys belong to a focused slider, not the blob
   if (KEYMAP[e.code]) {
     keys[KEYMAP[e.code]] = true;
     e.preventDefault();
@@ -590,8 +597,30 @@ function openSettings() {
     b.classList.toggle('active', b.dataset.q === save.quality);
     if (b.dataset.q === 'auto') b.textContent = `Auto (${quality.tier === 'smooth' ? 'Smooth' : 'Pretty'})`;
   });
+  showSensitivity();
+  $('colorblind').classList.toggle('on', save.colorblind);
+  $('colorblind').setAttribute('aria-checked', save.colorblind);
   $('settings').classList.remove('hidden');
 }
+function showSensitivity() {
+  const el = $('sensitivity');
+  el.value = save.sensitivity;
+  el.style.setProperty('--fill', `${((save.sensitivity - el.min) / (el.max - el.min)) * 100}%`);
+  $('sensitivity-value').textContent = `${Math.round(save.sensitivity * 100)}%`;
+}
+$('sensitivity').addEventListener('input', (e) => {
+  save.sensitivity = Number(e.target.value);
+  applySensitivity();
+  showSensitivity();
+});
+$('sensitivity').addEventListener('change', persist);
+$('colorblind').addEventListener('click', () => {
+  save.colorblind = !save.colorblind;
+  document.body.classList.toggle('cb', save.colorblind);
+  $('colorblind').classList.toggle('on', save.colorblind);
+  $('colorblind').setAttribute('aria-checked', save.colorblind);
+  persist();
+});
 // switching graphics rebuilds materials, so save everything and reload into the same planet
 $('quality-picker').addEventListener('click', (e) => {
   const q = e.target.closest('button')?.dataset.q;

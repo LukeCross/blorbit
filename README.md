@@ -74,6 +74,8 @@ Press any key, or click/tap anywhere on the title screen, to start.
 
 ### Settings
 - **Graphics:** *Auto* (default), *Smooth* or *Pretty*. See [Performance](#performance) below.
+- **Turning sensitivity:** a slider from 40% to 160% that scales how fast the blob turns.
+- **Colorblind mode:** swaps meaningful colours to a blue/orange palette that stays distinct for protanopia, deuteranopia and tritanopia. It adds ✓ badges on finished biomes, a pulse on nearly-finished ones and ◆/★ markers on rare/legendary finds, so nothing relies on colour alone. It also raises secondary text contrast above the WCAG AA guideline of 4.5:1.
 - **Reset all progress:** wipes skins, finds, stardust and the current planet (asks you to confirm).
 
 ---
