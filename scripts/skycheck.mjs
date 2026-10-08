@@ -1,0 +1,21 @@
+// Dev helper: screenshots of the space backdrop (title + play, with a forced shooting star).
+import puppeteer from 'puppeteer-core';
+const browser = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: 'new', args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+const page = await browser.newPage();
+await page.setViewport({ width: 1280, height: 800 });
+page.on('pageerror', (e) => console.log('[pageerror]', e.message));
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+await page.goto('http://localhost:5173/?seed=' + (process.env.SEED || 11), { waitUntil: 'networkidle0' });
+await page.evaluate(() => localStorage.clear());
+await wait(2000);
+await page.evaluate(() => { document.getElementById('title').style.display = 'none'; });
+await wait(800);
+await page.screenshot({ path: '/tmp/sky-title.png' });
+await page.evaluate(() => { document.getElementById('title').style.display = ''; });
+await page.click('#start-btn');
+await wait(2500);
+await page.evaluate(() => { const b = window.blorbit; for (let i = 0; i < 6; i++) b.backdrop.spawnShootingStar(b.camera, 0); b.backdrop.shooting.forEach((s) => (s.age = 0.35)); });
+await wait(300);
+await page.screenshot({ path: '/tmp/sky-play.png' });
+await page.screenshot({ path: '/tmp/sky-corner.png', clip: { x: 0, y: 60, width: 420, height: 300 } });
+await browser.close();

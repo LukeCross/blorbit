@@ -1,0 +1,44 @@
+// Dev helper: screenshots of every screen on a phone-sized viewport (touch emulated).
+// usage: node scripts/mobilecheck.mjs [portrait|landscape]
+import puppeteer from 'puppeteer-core';
+const landscape = process.argv[2] === 'landscape';
+const vp = landscape ? { width: 844, height: 390 } : { width: 390, height: 844 };
+const tag = landscape ? 'land' : 'port';
+const browser = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: 'new', args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+const page = await browser.newPage();
+await page.setViewport({ ...vp, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+await page.setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1');
+page.on('pageerror', (e) => console.log('[pageerror]', e.message));
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const shot = (n) => page.screenshot({ path: `/tmp/m-${tag}-${n}.png` });
+await page.goto('http://localhost:5173/', { waitUntil: 'load', timeout: 120000 });
+await page.evaluate(() => { localStorage.clear(); localStorage.setItem('blorbit-save-v1', JSON.stringify({ v: 3, stardust: 260, unlocked: ['classic', 'fox', 'frog', 'bunny'], equipped: 'fox', finds: { 'meadow:Daisy': 1 } })); });
+await page.goto('http://localhost:5173/?seed=42', { waitUntil: 'load', timeout: 120000 });
+await page.waitForFunction(() => window.blorbit, { timeout: 120000 });
+await wait(2500);
+await shot('1-title');
+await page.tap('#start-btn');
+await wait(4000);
+await page.evaluate(() => { const b = window.blorbit; const p = b.planet(); const k = p.patches.findIndex((q) => q.region === p.regionAt(b.blob.p)); b.completePatch(k); });
+await wait(1500);
+await shot('2-play');
+await page.tap('#shop-btn');
+await wait(800);
+await shot('3-shop');
+await page.evaluate(() => document.querySelector('button[data-type="standard"]').click());
+await wait(800);
+await page.tap('.pack-box');
+await wait(1800);
+for (const i of [0, 1, 2]) { await page.tap(`.card[data-i="${i}"]`); await wait(300); }
+await wait(1200);
+await shot('4-pack');
+await page.evaluate(() => document.getElementById('pack-done').click());
+await wait(300);
+await page.tap('#book-btn');
+await wait(800);
+await shot('5-book');
+await page.evaluate(() => document.getElementById('book-close').click());
+await page.tap('#settings-btn');
+await wait(800);
+await shot('6-settings');
+await browser.close();

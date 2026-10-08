@@ -1,0 +1,37 @@
+// Dev helper: buy a pack and a trail, screenshot each step.
+import puppeteer from 'puppeteer-core';
+const browser = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: 'new', args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+const page = await browser.newPage();
+await page.setViewport({ width: 1280, height: 800 });
+page.on('pageerror', (e) => console.log('[pageerror]', e.message));
+page.on('console', (m) => m.type() === 'error' && console.log('[console]', m.text()));
+await page.goto('http://localhost:5173/', { waitUntil: 'networkidle0' });
+await page.evaluate(() => { localStorage.clear(); localStorage.setItem('blorbit-save-v1', JSON.stringify({ stardust: 400 })); });
+await page.reload({ waitUntil: 'networkidle0' });
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+await page.keyboard.press('Space');
+await wait(800);
+await page.keyboard.press('KeyP');
+await wait(600);
+await page.screenshot({ path: '/tmp/blorbit-shop.png' });
+await page.click('button[data-action="pack"][data-type="premium"][data-id="meadow"]');
+await wait(800);
+await page.screenshot({ path: '/tmp/blorbit-pack1.png' });
+await page.click('.pack-box');
+await wait(1600);
+await page.screenshot({ path: '/tmp/blorbit-pack2.png' });
+for (const i of [0, 1, 2]) { await page.click(`.card[data-i="${i}"]`); await wait(400); }
+await wait(1200);
+await page.screenshot({ path: '/tmp/blorbit-pack3.png' });
+await page.click('#pack-shop');
+await wait(300);
+await page.click('.shop-tab[data-tab="trails"]');
+await page.click('button[data-action="trail"][data-id="rainbow"]');
+await wait(300);
+await page.screenshot({ path: '/tmp/blorbit-trails.png' });
+await page.keyboard.press('Escape');
+await page.keyboard.down('ArrowLeft');
+await wait(3000);
+await page.screenshot({ path: '/tmp/blorbit-rainbow.png' });
+console.log(await page.evaluate(() => { const s = JSON.parse(localStorage.getItem('blorbit-save-v1')); return `dust ${s.stardust}, finds ${Object.keys(s.finds).length}, trail ${s.trail}, owned ${s.trailsOwned}`; }));
+await browser.close();

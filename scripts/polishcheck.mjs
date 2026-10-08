@@ -1,0 +1,23 @@
+// Dev helper: screenshots of the main screens for visual review.
+import puppeteer from 'puppeteer-core';
+const browser = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: 'new', args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+const page = await browser.newPage();
+await page.setViewport({ width: 1280, height: 800 });
+page.on('pageerror', (e) => console.log('[pageerror]', e.message));
+page.on('console', (m) => m.type() === 'error' && console.log('[console]', m.text()));
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+await page.goto('http://localhost:5173/', { waitUntil: 'networkidle0' });
+await page.evaluate(() => { localStorage.clear(); localStorage.setItem('blorbit-save-v1', JSON.stringify({ stardust: 240, unlocked: ['classic', 'bunny', 'fox'] })); });
+await page.goto('http://localhost:5173/?seed=' + (process.env.SEED || 42), { waitUntil: 'networkidle0' });
+await wait(2500);
+await page.screenshot({ path: '/tmp/polish-1-title.png' });
+await page.click('#start-btn');
+await wait(4000);
+await page.screenshot({ path: '/tmp/polish-2-play.png' });
+await page.evaluate(() => { const b = window.blorbit; const p = b.planet(); const r = p.regionAt(b.blob.p); b.completeRegion(r); });
+await wait(12000);
+await page.screenshot({ path: '/tmp/polish-3-restored.png' });
+await page.keyboard.press('KeyP');
+await wait(700);
+await page.screenshot({ path: '/tmp/polish-4-shop.png' });
+await browser.close();

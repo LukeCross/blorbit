@@ -1,0 +1,198 @@
+// Biome + patch definitions. Each planet picks 4 biomes; each biome is home to one
+// creature and is packed with small named "patches" that complete with their own ping.
+//
+// Patch shapes: 'blob' (organic circle, r in radians) or 'path' (wandering trail).
+// water: patch fills with water when completed. emissive: restored patch glows.
+// props: [kind, density per vertex, place ('any' | 'rim' | 'inner')]
+// critters: [kind, count] spawned when the patch / biome is restored.
+// finds: collectibles rolled when a patch completes. rarity c(ommon) / r(are) / l(egendary).
+// particles: ambient motes drifting around you [colours, gravity (negative rises), rate/sec]
+
+const S = { r: [0.06, 0.08] }; // small: one swipe
+const M = { r: [0.09, 0.12] }; // medium
+const L = { r: [0.12, 0.15] }; // large
+
+export const BIOMES = {
+  meadow: {
+    name: 'Bunny Meadow', creature: 'bunny', weight: 0.12, terrain: 'rolling',
+    dead: 0x6d6a5a, alive: 0x72d35a, sky: ['#8c9ee6', '#ffe8d4'], style: [0, 0, 0],
+    small: [['grass', 0.12], ['flower', 0.04], ['pebble', 0.004]],
+    big: [['tree', 0.004]],
+    critters: [['butterfly', 4], ['bird', 2]],
+    particles: [[0xfff3a0, 0xffffff], -0.6, 6],
+    patches: [
+      { name: 'Flower bed', shape: 'blob', ...M, dead: 0x564a48, alive: 0x8fe070, props: [['tulip', 0.5]], critters: [['butterfly', 2]] },
+      { name: 'Old dirt road', shape: 'path', dead: 0x857a70, alive: 0xdcc59a, props: [['pathStone', 0.12], ['lantern', 0.025, 'rim']] },
+      { name: 'Little orchard', shape: 'blob', ...L, dead: 0x635a5e, alive: 0x5fc24f, props: [['appleTree', 0.05]], critters: [['bird', 1]] },
+      { name: 'Beehive', shape: 'blob', ...S, dead: 0x6a5d4a, alive: 0xb8e05a, props: [['beehive', 0.03, 'inner'], ['flower', 0.3]], critters: [['bee', 3]] },
+      { name: 'Hay field', shape: 'blob', ...M, dead: 0x7a705a, alive: 0xe8d57a, props: [['haybale', 0.05]] },
+      { name: 'Sunflower row', shape: 'path', dead: 0x6a6450, alive: 0x9adf6a, props: [['sunflower', 0.25, 'rim']], critters: [['bee', 1]] },
+    ],
+    patchCount: 10,
+    finds: [['🌼', 'Daisy', 'c'], ['🐞', 'Ladybug', 'c'], ['🌷', 'Tulip', 'c'], ['🐝', 'Bumblebee', 'c'], ['🌻', 'Sunflower', 'r'], ['🍯', 'Honey pot', 'r'], ['🪺', 'Bird nest', 'r'], ['🍀', 'Four-leaf clover', 'l']],
+  },
+  pond: {
+    name: 'Sleepy Pond', creature: 'frog', weight: -0.12, terrain: 'basin',
+    dead: 0x5e5048, alive: 0x4fbf86, sky: ['#7fa9e0', '#d4f7ea'], style: [0, 0, 0],
+    small: [['grass', 0.1], ['reed', 0.008], ['pebble', 0.006]],
+    big: [['reed', 0.006], ['willow', 0.002]],
+    critters: [['dragonfly', 4], ['fish', 3]],
+    particles: [[0x9ff0ff, 0xd0ffd0], -0.3, 5],
+    patches: [
+      { name: 'The pond', shape: 'blob', center: true, rFrac: 0.5, water: 0x3aa6c9, dead: 0x4d4038, alive: 0x3f9f7a, props: [['lily', 0.08, 'inner'], ['reed', 0.05, 'rim']], critters: [['fish', 3], ['dragonfly', 2]] },
+      { name: 'Reed bank', shape: 'blob', ...S, dead: 0x5a5148, alive: 0x5fb36a, props: [['reed', 0.35]], critters: [['dragonfly', 1]] },
+      { name: 'Lily cove', shape: 'blob', ...M, water: 0x4ab8c0, dead: 0x4f443c, alive: 0x4aa880, props: [['lily', 0.2, 'inner']], critters: [['fish', 1]] },
+      { name: 'Mossy rocks', shape: 'blob', ...S, dead: 0x5c5650, alive: 0x5aa860, props: [['mossRock', 0.12]] },
+      { name: 'Frog log', shape: 'blob', ...S, dead: 0x5a4e46, alive: 0x6ab86a, props: [['log', 0.03, 'inner'], ['shroom', 0.1]] },
+      { name: 'Willow bend', shape: 'blob', ...M, dead: 0x554c46, alive: 0x5fbf7a, props: [['willow', 0.03]] },
+    ],
+    patchCount: 7,
+    finds: [['🪷', 'Lotus', 'c'], ['🐟', 'Minnow', 'c'], ['🪨', 'Smooth pebble', 'c'], ['🪲', 'Water beetle', 'c'], ['🦆', 'Duckling', 'r'], ['🐠', 'Koi', 'r'], ['🦢', 'Swan', 'r'], ['🦪', 'Pond pearl', 'l']],
+  },
+  desert: {
+    name: 'Dusty Dunes', creature: 'fox', weight: 0.02, terrain: 'dunes',
+    dead: 0x9c8b74, alive: 0xf2cf86, sky: ['#c48fb8', '#ffe4c4'], style: [1, 0, 0],
+    small: [['shrub', 0.012], ['desertRock', 0.008]],
+    big: [['cactus', 0.006]],
+    critters: [['bird', 3]],
+    particles: [[0xf5d9a0, 0xe0b880], 0.4, 8],
+    patches: [
+      { name: 'Oasis', shape: 'blob', ...M, water: 0x2fd6c6, dead: 0x6f6158, alive: 0x7fcf6a, props: [['palm', 0.05, 'rim']], critters: [['bird', 1]] },
+      { name: 'Cactus garden', shape: 'blob', ...M, dead: 0x7d6e66, alive: 0xe8c478, props: [['cactus', 0.09]] },
+      { name: 'Dune trail', shape: 'path', dead: 0x9a8f86, alive: 0xffe0a0, props: [['desertRock', 0.06, 'rim']] },
+      { name: 'Sandstone arch', shape: 'blob', ...S, dead: 0x8a7a6a, alive: 0xf0b070, props: [['arch', 0.02, 'inner']] },
+      { name: 'Desert bloom', shape: 'blob', ...S, dead: 0x86786c, alive: 0xd8c070, props: [['flower', 0.35], ['cactus', 0.03]], critters: [['butterfly', 1]] },
+      { name: 'Old ruins', shape: 'blob', ...M, dead: 0x7e7064, alive: 0xe0c090, props: [['pillar', 0.06]] },
+    ],
+    patchCount: 8,
+    finds: [['🪶', 'Feather', 'c'], ['🦂', 'Scorpion', 'c'], ['🐍', 'Sand snake', 'c'], ['🌵', 'Cactus fruit', 'c'], ['🏺', 'Old vase', 'r'], ['🦴', 'Fossil', 'r'], ['🐪', 'Camel', 'r'], ['👑', 'Lost crown', 'l']],
+  },
+  snow: {
+    name: 'Frosty Peaks', creature: 'penguin', weight: 0.04, terrain: 'peaks',
+    dead: 0x8690a8, alive: 0xd5dfee, sky: ['#8fa0dc', '#eef4ff'], style: [0, 1, 0],
+    small: [['snowdrop', 0.02], ['crystal', 0.005]],
+    big: [['pine', 0.006]],
+    critters: [['bird', 3]],
+    particles: [[0xffffff, 0xe0f0ff], 0.8, 14],
+    patches: [
+      { name: 'Frozen lake', shape: 'blob', ...M, water: 0xbfe9ff, dead: 0x6a6c78, alive: 0xdff2ff, props: [['crystal', 0.06, 'rim']] },
+      { name: 'Pine grove', shape: 'blob', ...L, dead: 0x6f707c, alive: 0xd0dcec, props: [['pine', 0.07]], critters: [['bird', 1]] },
+      { name: 'Snowman hill', shape: 'blob', ...S, dead: 0x767884, alive: 0xdde6f2, props: [['snowman', 0.04]] },
+      { name: 'Sled run', shape: 'path', dead: 0x8a8d99, alive: 0xd6ecff, props: [['lantern', 0.03, 'rim']] },
+      { name: 'Igloo', shape: 'blob', ...S, dead: 0x7a7e8c, alive: 0xe6eef8, props: [['igloo', 0.02, 'inner'], ['crystal', 0.05, 'rim']] },
+      { name: 'Ice spires', shape: 'blob', ...M, dead: 0x6e7484, alive: 0xc8e0f4, props: [['iceSpire', 0.06]] },
+    ],
+    patchCount: 8,
+    finds: [['❄️', 'Snowflake', 'c'], ['🧤', 'Lost mitten', 'c'], ['🧣', 'Scarf', 'c'], ['🫐', 'Frost berries', 'c'], ['⛸️', 'Ice skate', 'r'], ['🦭', 'Seal pup', 'r'], ['🦌', 'Reindeer', 'r'], ['💠', 'Ice heart', 'l']],
+  },
+  grove: {
+    name: 'Moonlit Grove', creature: 'moth', weight: -0.04, terrain: 'hillocks',
+    dead: 0x433c52, alive: 0x6a58cc, sky: ['#8a78d8', '#ffcdea'], style: [0, 0, 1],
+    small: [['fern', 0.03], ['glowShroom', 0.012]],
+    big: [['glowShroom', 0.02], ['moonTree', 0.003]],
+    critters: [['firefly', 10]],
+    particles: [[0xd0ff80, 0xa0ffe0], -0.2, 6],
+    patches: [
+      { name: 'Mushroom ring', shape: 'blob', ...M, dead: 0x413c4c, alive: 0x5a48b8, props: [['glowShroom', 0.25, 'rim']], critters: [['firefly', 3]] },
+      { name: 'Firefly path', shape: 'path', dead: 0x5a5466, alive: 0x9f8cff, props: [['glowStone', 0.08, 'rim']], critters: [['firefly', 4]] },
+      { name: 'Fern hollow', shape: 'blob', ...M, dead: 0x46414f, alive: 0x4fa88a, props: [['fern', 0.35]] },
+      { name: 'Moonflower patch', shape: 'blob', ...S, dead: 0x48425a, alive: 0x7a6ad8, props: [['moonflower', 0.4]], critters: [['moth', 2]] },
+      { name: 'Crystal spire', shape: 'blob', ...S, dead: 0x4a4458, alive: 0x8a70e0, props: [['bigCrystal', 0.03, 'inner'], ['crystal', 0.1, 'rim']] },
+      { name: 'Moon trees', shape: 'blob', ...L, dead: 0x3f3a4a, alive: 0x5a4ab0, props: [['moonTree', 0.04]], critters: [['firefly', 2]] },
+    ],
+    patchCount: 8,
+    finds: [['🍄', 'Glowcap', 'c'], ['🪻', 'Moonflower', 'c'], ['🕯️', 'Candle', 'c'], ['🌿', 'Silver fern', 'c'], ['🌙', 'Moonstone', 'r'], ['🦉', 'Owl', 'r'], ['🔮', 'Crystal ball', 'r'], ['🧚', 'Fairy', 'l']],
+  },
+  garden: {
+    name: 'Snail Garden', creature: 'snail', weight: 0.06, terrain: 'gentle',
+    dead: 0x6e6256, alive: 0x9ad46a, sky: ['#86aed6', '#fff0dc'], style: [0, 0, 0],
+    small: [['grass', 0.1], ['flower', 0.05]],
+    big: [['bush', 0.006]],
+    critters: [['butterfly', 3], ['bird', 2], ['bee', 2]],
+    particles: [[0xffb0d0, 0xffffff], 0.25, 5],
+    patches: [
+      { name: 'Rose garden', shape: 'blob', ...M, dead: 0x5c5250, alive: 0x7cc45a, props: [['bush', 0.12]], critters: [['butterfly', 2]] },
+      { name: 'Stepping stones', shape: 'path', dead: 0x7a7470, alive: 0xb7e08a, props: [['pathStone', 0.14]] },
+      { name: 'Old oak', shape: 'blob', ...S, dead: 0x5e5752, alive: 0x6cba4f, props: [['bigOak', 0.012, 'inner'], ['shroom', 0.1, 'rim']], critters: [['bird', 1]] },
+      { name: 'Veggie patch', shape: 'blob', ...M, dead: 0x5a4a40, alive: 0x6a4a34, props: [['cabbage', 0.15], ['carrot', 0.15]] },
+      { name: 'Birdbath', shape: 'blob', ...S, dead: 0x6a625a, alive: 0x8acc6a, props: [['birdbath', 0.02, 'inner'], ['flower', 0.3]], critters: [['bird', 2]] },
+      { name: 'Gnome corner', shape: 'blob', ...S, dead: 0x645a54, alive: 0x90d070, props: [['gnome', 0.04], ['shroom', 0.08]] },
+    ],
+    patchCount: 9,
+    finds: [['🥕', 'Carrot', 'c'], ['🥬', 'Cabbage', 'c'], ['🍓', 'Strawberry', 'c'], ['🐛', 'Caterpillar', 'c'], ['🌹', 'Rose', 'r'], ['🐦', 'Robin', 'r'], ['🪴', 'Potted fern', 'r'], ['🍉', 'Prize melon', 'l']],
+  },
+  shore: {
+    name: 'Sunny Shore', creature: 'turtle', weight: 0.02, terrain: 'beach',
+    dead: 0x8e8676, alive: 0xf5dfa6, sky: ['#6fb0dd', '#ffecc8'], style: [1, 0, 0],
+    small: [['shell', 0.01], ['seaGrass', 0.01]],
+    big: [['palm', 0.004]],
+    critters: [['crab', 4], ['fish', 2], ['bird', 2]],
+    particles: [[0xffffff, 0xbff4ff], -0.4, 6],
+    patches: [
+      { name: 'Lagoon', shape: 'blob', center: true, rFrac: 0.45, water: 0x3fd8e0, dead: 0x5e5a50, alive: 0xe8d6a0, props: [['coral', 0.06, 'inner'], ['palm', 0.04, 'rim']], critters: [['fish', 3]] },
+      { name: 'Shell beach', shape: 'blob', ...M, dead: 0x8a8272, alive: 0xffe8b8, props: [['shell', 0.25]], critters: [['crab', 1]] },
+      { name: 'Starfish shallows', shape: 'blob', ...S, water: 0x5ae0e0, dead: 0x6e685c, alive: 0xf0d8a0, props: [['starfish', 0.2]] },
+      { name: 'Sandcastle', shape: 'blob', ...S, dead: 0x8a8272, alive: 0xf8e0a8, props: [['sandcastle', 0.025, 'inner'], ['shell', 0.1, 'rim']] },
+      { name: 'Coral garden', shape: 'blob', ...M, dead: 0x7a7266, alive: 0xf0c8a0, props: [['coral', 0.15]], critters: [['crab', 1]] },
+      { name: 'Boardwalk', shape: 'path', dead: 0x857d70, alive: 0xc89a68, props: [['plank', 0.2]] },
+    ],
+    patchCount: 8,
+    finds: [['🐚', 'Seashell', 'c'], ['⭐', 'Starfish', 'c'], ['🦀', 'Hermit crab', 'c'], ['🦐', 'Shrimp', 'c'], ['🪸', 'Coral', 'r'], ['🐙', 'Octopus', 'r'], ['🐬', 'Dolphin', 'r'], ['🗝️', 'Treasure key', 'l']],
+  },
+  volcano: {
+    name: 'Ember Crags', creature: 'lizard', weight: 0, terrain: 'volcano',
+    dead: 0x4a4448, alive: 0x6e3a30, sky: ['#c47a9a', '#ffd8bf'], style: [0, 0, 0],
+    small: [['lavaRock', 0.01], ['fireFlower', 0.01]],
+    big: [['obsidian', 0.006]],
+    critters: [['ember', 8]],
+    particles: [[0xff8a30, 0xffc040], -1.2, 14],
+    patches: [
+      { name: 'Lava lake', shape: 'blob', center: true, rFrac: 0.22, water: 0xff6a1a, emissive: 1, dead: 0x3a3436, alive: 0x5a2a22, props: [['lavaRock', 0.08, 'rim']], critters: [['ember', 3]] },
+      { name: 'Lava river', shape: 'path', water: 0xff7a2a, emissive: 1, dead: 0x3e3a3c, alive: 0x6a3020, props: [['lavaRock', 0.05, 'rim']] },
+      { name: 'Fire flowers', shape: 'blob', ...M, dead: 0x464044, alive: 0x7a3a2a, props: [['fireFlower', 0.35]], critters: [['ember', 2]] },
+      { name: 'Obsidian field', shape: 'blob', ...M, dead: 0x403a40, alive: 0x4a3048, props: [['obsidian', 0.1]] },
+      { name: 'Dragon nest', shape: 'blob', ...S, dead: 0x4a4246, alive: 0x8a5a3a, props: [['dragonEgg', 0.04, 'inner'], ['haybale', 0.03, 'rim']] },
+      { name: 'Ember vents', shape: 'blob', ...S, dead: 0x443e42, alive: 0x6a2a20, emissive: 0.5, props: [['vent', 0.05]], critters: [['ember', 2]] },
+    ],
+    patchCount: 8,
+    finds: [['🔥', 'Ember', 'c'], ['🌶️', 'Fire pepper', 'c'], ['🪙', 'Molten coin', 'c'], ['⚱️', 'Ash urn', 'c'], ['🌋', 'Tiny volcano', 'r'], ['☄️', 'Meteorite', 'r'], ['💎', 'Fire gem', 'r'], ['🥚', 'Dragon egg', 'l']],
+  },
+  candy: {
+    name: 'Sugar Hills', creature: 'bear', weight: 0.02, terrain: 'bumps',
+    dead: 0x7a6f78, alive: 0xffa8d0, sky: ['#c48ad8', '#d4e8ff'], style: [0, 0.6, 0],
+    small: [['gumdrop', 0.008], ['sprinkle', 0.04]],
+    big: [['lollipop', 0.005]],
+    critters: [['butterfly', 4], ['bee', 2]],
+    particles: [[0xff8fd0, 0x8fe8ff, 0xfff080], -0.4, 8],
+    patches: [
+      { name: 'Lollipop lane', shape: 'path', dead: 0x7e7480, alive: 0xfff0f6, props: [['lollipop', 0.06, 'rim']] },
+      { name: 'Gumdrop grove', shape: 'blob', ...M, dead: 0x766c76, alive: 0xff9ac8, props: [['gumdrop', 0.25]] },
+      { name: 'Cupcake corner', shape: 'blob', ...S, dead: 0x786e76, alive: 0xffc0dc, props: [['cupcake', 0.08]] },
+      { name: 'Candy cane forest', shape: 'blob', ...M, dead: 0x6e6670, alive: 0xffb8d8, props: [['candyCane', 0.08]] },
+      { name: 'Chocolate pond', shape: 'blob', ...M, water: 0x8a5232, dead: 0x6a5a5a, alive: 0xff9ac0, props: [['gumdrop', 0.08, 'rim']] },
+      { name: 'Donut den', shape: 'blob', ...S, dead: 0x746a72, alive: 0xffd0e4, props: [['donut', 0.06]] },
+    ],
+    patchCount: 8,
+    finds: [['🍭', 'Lollipop', 'c'], ['🍬', 'Sweetie', 'c'], ['🧁', 'Cupcake', 'c'], ['🍪', 'Cookie', 'c'], ['🍩', 'Donut', 'r'], ['🍫', 'Chocolate bar', 'r'], ['🎂', 'Birthday cake', 'r'], ['🌈', 'Rainbow drop', 'l']],
+  },
+  autumn: {
+    name: 'Maple Hollow', creature: 'hedgehog', weight: 0.08, terrain: 'rolling',
+    dead: 0x6a625c, alive: 0xd98a3a, sky: ['#b88aa8', '#ffe6cf'], style: [0, 0, 0],
+    small: [['leafPile', 0.008], ['shroom', 0.006], ['grass', 0.04]],
+    big: [['maple', 0.003]],
+    critters: [['bird', 3], ['butterfly', 2]],
+    particles: [[0xff8a30, 0xffc040, 0xe05030], 0.5, 8],
+    patches: [
+      { name: 'Maple grove', shape: 'blob', ...L, dead: 0x5e5650, alive: 0xc87830, props: [['maple', 0.045]], critters: [['bird', 1]] },
+      { name: 'Pumpkin patch', shape: 'blob', ...M, dead: 0x5e5048, alive: 0x7a5a30, props: [['pumpkin', 0.12]] },
+      { name: 'Leaf piles', shape: 'blob', ...S, dead: 0x645c56, alive: 0xe0903a, props: [['leafPile', 0.2]] },
+      { name: 'Apple orchard', shape: 'blob', ...M, dead: 0x5c5650, alive: 0x9ab04a, props: [['appleTree', 0.06]], critters: [['bird', 1]] },
+      { name: 'Mushroom log', shape: 'blob', ...S, dead: 0x5a524e, alive: 0xb8702e, props: [['log', 0.03, 'inner'], ['shroom', 0.15]] },
+      { name: 'Forest trail', shape: 'path', dead: 0x746a62, alive: 0xb08a5a, props: [['pathStone', 0.1], ['lantern', 0.02, 'rim']] },
+    ],
+    patchCount: 9,
+    finds: [['🍂', 'Fallen leaf', 'c'], ['🌰', 'Chestnut', 'c'], ['🎃', 'Pumpkin', 'c'], ['🍎', 'Apple', 'c'], ['🐿️', 'Squirrel', 'r'], ['🧺', 'Picnic basket', 'r'], ['🥧', 'Apple pie', 'r'], ['🍁', 'Golden maple', 'l']],
+  },
+};
+
+export const BIOME_IDS = Object.keys(BIOMES);
