@@ -629,6 +629,20 @@ const shop = new Shop({
   save, persist, sound,
   onCollection: updateBookCount,
   onDust: refreshDust,
+  onClose: () => {
+    // opened from the "Planet restored" card: come back to it afterwards
+    if (shopFromFinale) {
+      $('finale-dust').textContent = save.stardust;
+      $('finale').classList.remove('hidden');
+    }
+    shopFromFinale = false;
+  },
+});
+let shopFromFinale = false;
+$('finale-shop').addEventListener('click', () => {
+  $('finale').classList.add('hidden');
+  shopFromFinale = true;
+  shop.open();
 });
 $('shop-btn').addEventListener('click', () => shop.toggle());
 $('dust').addEventListener('click', () => shop.open());
@@ -720,6 +734,7 @@ function finale() {
     }, k * 220);
   }
   $('finale-creatures').textContent = regions.map((r) => SKINS[r.id].emoji).join('');
+  $('finale-dust').textContent = save.stardust;
   setTimeout(() => $('finale').classList.remove('hidden'), 1800);
 }
 

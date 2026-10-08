@@ -14,8 +14,8 @@ const $ = (id) => document.getElementById(id);
 const pct = (x) => `${Math.round(x * 100)}%`;
 
 export class Shop {
-  constructor({ save, persist, sound, onCollection, onDust }) {
-    Object.assign(this, { save, persist, sound, onCollection, onDust });
+  constructor({ save, persist, sound, onCollection, onDust, onClose }) {
+    Object.assign(this, { save, persist, sound, onCollection, onDust, onClose });
     $('shop-close').addEventListener('click', () => this.close());
     $('shop-body').addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-action]');
@@ -42,6 +42,7 @@ export class Shop {
   close() {
     $('shop').classList.add('hidden');
     $('pack').classList.add('hidden');
+    this.onClose?.();
   }
 
   render() {

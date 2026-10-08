@@ -240,6 +240,8 @@
       .finale-card { padding: 34px 40px; border-radius: 36px; text-align: center; }
       .finale-card h2 { font: 700 clamp(36px, 6vw, 58px) var(--font-display); margin: 0 0 6px; background: linear-gradient(90deg, #6fd8b8, #9d86f5, #ff8fc4); -webkit-background-clip: text; background-clip: text; color: transparent; }
       .finale-card p { color: var(--ink-soft); margin: 4px 0; }
+      .finale-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 14px; }
+      .finale-dust { margin-left: 6px; padding: 2px 10px; border-radius: 99px; background: rgba(255, 255, 255, 0.7); font-size: 0.9em; }
       .big-emoji { font-size: 46px; letter-spacing: 10px; margin: 14px 0 20px; }
 
       /* collection book */
@@ -421,7 +423,8 @@
         .tagline { font-size: 16px; margin: 8px 0 20px; }
         .controls { gap: 10px 14px; font-size: 13px; }
         .finale-card { width: min(92vw, 420px); padding: 26px 20px; }
-        .finale-card .btn { display: block; width: 100%; margin: 8px 0 0; }
+        .finale-actions { flex-direction: column; gap: 8px; }
+        .finale-card .btn { display: block; width: 100%; margin: 0; }
         .big-emoji { font-size: 34px; letter-spacing: 6px; }
 
         .pack-box { width: 170px; height: 240px; }
@@ -548,8 +551,11 @@
         <h2>Planet restored</h2>
         <p>Everyone's awake and the whole world is in bloom.</p>
         <div class="big-emoji" id="finale-creatures"></div>
-        <button class="btn" id="next-planet">Next planet</button>
-        <button class="btn secondary" id="keep-rolling">Keep rolling here</button>
+        <div class="finale-actions">
+          <button class="btn" id="next-planet">Next planet</button>
+          <button class="btn secondary" id="finale-shop">🛍️ Open some packs <span class="finale-dust">✨ <span id="finale-dust">0</span></span></button>
+          <button class="btn secondary" id="keep-rolling">Keep rolling here</button>
+        </div>
       </div>
     </div>
 
