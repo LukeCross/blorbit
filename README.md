@@ -91,6 +91,11 @@ npm run preview  # serve the production build locally
 
 The `dist/` folder is fully static. Drop it on any static host (GitHub Pages, Netlify, Vercel, S3, etc.).
 
+### Deploying to GitHub Pages
+`.github/workflows/deploy.yml` builds the game and publishes `dist/` to GitHub Pages on every push to `main`. You can also run it by hand from the **Actions** tab.
+
+To turn it on, open the repo's **Settings → Pages** and set **Source** to **GitHub Actions**. The game will be live at `https://<user>.github.io/<repo>/`. `vite.config.js` uses relative asset paths, so it works under any repo name.
+
 ---
 
 ## How it was built
