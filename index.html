@@ -4,8 +4,52 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#cbbcff" />
-    <title>Blorbit</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💧</text></svg>" />
+    <title>Blorbit – A cosy, relaxing game about restoring tiny planets</title>
+    <meta name="description" content="Roll a wobbly alien blob around tiny planets in this cosy, relaxing browser game. Bring 20 biomes back to life, wake sleepy creatures and collect 160 cards." />
+    <link rel="canonical" href="https://blorbit.io/" />
+
+    <!-- icons + "add to home screen" -->
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./site.webmanifest" />
+
+    <!-- link previews (Discord, Reddit, X, iMessage, WhatsApp…). Image URLs must be absolute. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Blorbit" />
+    <meta property="og:url" content="https://blorbit.io/" />
+    <meta property="og:title" content="Blorbit – A cosy, relaxing game about restoring tiny planets" />
+    <meta property="og:description" content="Roll a wobbly alien blob around tiny planets in this cosy, relaxing browser game. Bring 20 biomes back to life, wake sleepy creatures and collect 160 cards." />
+    <meta property="og:image" content="https://blorbit.io/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="A tiny restored planet with candy hills, a pond and a flower meadow, next to the Blorbit logo" />
+    <meta property="og:locale" content="en_GB" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Blorbit – A cosy, relaxing game about restoring tiny planets" />
+    <meta name="twitter:description" content="Roll a wobbly alien blob around tiny planets in this cosy, relaxing browser game. Bring 20 biomes back to life, wake sleepy creatures and collect 160 cards." />
+    <meta name="twitter:image" content="https://blorbit.io/og-image.png" />
+    <meta name="twitter:image:alt" content="A tiny restored planet with candy hills, a pond and a flower meadow, next to the Blorbit logo" />
+
+    <!-- tells search engines what this page is: a free, single-player browser game -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "VideoGame",
+        "name": "Blorbit",
+        "url": "https://blorbit.io/",
+        "description": "Roll a wobbly alien blob around tiny planets in this cosy, relaxing browser game. Bring 20 biomes back to life, wake sleepy creatures and collect 160 cards.",
+        "image": "https://blorbit.io/og-image.png",
+        "genre": ["Casual", "Relaxing", "Collecting"],
+        "keywords": "cosy game, relaxing game, collecting game, browser game",
+        "gamePlatform": "Web browser",
+        "applicationCategory": "Game",
+        "operatingSystem": "Any",
+        "playMode": "SinglePlayer",
+        "inLanguage": "en",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
@@ -470,7 +514,8 @@
       .privacy-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; flex: none; }
       .privacy-actions a.btn { text-decoration: none; display: inline-block; }
       .privacy-note { color: #b0466a !important; }
-      .title-privacy { margin-top: 10px; font-size: 12px; font-weight: 800; color: var(--ink-soft); }
+      .title-links { display: flex; gap: 8px; justify-content: center; margin-top: 10px; font-size: 12px; font-weight: 800; color: var(--ink-soft); }
+      .title-links a { color: var(--ink-soft); }
       .toggle { flex: none; display: block; padding: 8px; border: none; border-radius: 99px; background: rgba(61,53,96,0.08); cursor: pointer; }
       .slider { display: flex; align-items: center; gap: 12px; flex: none; }
       .slider output { min-width: 44px; text-align: right; font: 800 14px var(--font); font-variant-numeric: tabular-nums; }
@@ -838,7 +883,11 @@
           <span><i class="key">P</i> shop</span>
         </div>
         <div class="calm">No timers. No rush. Take as long as you like.</div>
-        <a class="title-privacy" href="./privacy.html" target="_blank" rel="noopener">Privacy policy</a>
+        <div class="title-links">
+          <a href="./about.html" target="_blank" rel="noopener">About &amp; how to play</a>
+          <span aria-hidden="true">·</span>
+          <a href="./privacy.html" target="_blank" rel="noopener">Privacy policy</a>
+        </div>
       </div>
     </div>
 

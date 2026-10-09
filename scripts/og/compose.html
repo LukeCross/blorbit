@@ -1,0 +1,47 @@
+<!doctype html>
+<!-- Dev helper: lays out the 1200x630 social share image. scripts/og/compose.mjs screenshots it to public/og-image.png -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=block" rel="stylesheet" />
+    <style>
+      html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+      body {
+        position: relative; font-family: 'Nunito', system-ui, sans-serif; color: #3d3560;
+        background: radial-gradient(ellipse at 78% 50%, #f6eaff 0%, #e2d4ff 45%, #c9b6ff 100%);
+      }
+      /* the restored planet, cropped from a 2400x1260 capture and faded into the background */
+      .planet {
+        position: absolute; right: -40px; top: 50%; width: 760px; height: 760px; transform: translateY(-50%);
+        background: url('./planet.png') center / 1448px auto no-repeat;
+        filter: saturate(1.3) contrast(1.08) brightness(1.02);
+        -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 52%, transparent 70%);
+        mask-image: radial-gradient(circle at 50% 50%, #000 52%, transparent 70%);
+      }
+      .sparkle { position: absolute; color: #fff; text-shadow: 0 0 12px rgba(255,255,255,0.9); font-size: 22px; }
+      .copy { position: absolute; left: 70px; top: 50%; transform: translateY(-50%); width: 520px; }
+      .logo {
+        font: 700 128px / 1 'Fredoka', sans-serif; letter-spacing: -0.02em; margin: 0;
+        background: linear-gradient(180deg, #8fe8cc 0%, #a99bff 55%, #ff9fd0 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+        filter: drop-shadow(0 6px 0 rgba(255,255,255,0.95)) drop-shadow(0 16px 26px rgba(120,100,220,0.35));
+      }
+      .tag { font: 600 30px / 1.3 'Fredoka', sans-serif; margin: 18px 0 22px; color: #4a4170; }
+      .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+      .chips span { padding: 8px 16px; border-radius: 99px; background: rgba(255,255,255,0.8); box-shadow: 0 6px 16px rgba(120,100,220,0.18); font-weight: 800; font-size: 19px; }
+      .url { margin-top: 26px; font: 700 22px 'Nunito', sans-serif; color: #6a4fd8; letter-spacing: 0.02em; }
+    </style>
+  </head>
+  <body>
+    <div class="planet"></div>
+    <span class="sparkle" style="left: 640px; top: 90px">✦</span>
+    <span class="sparkle" style="left: 1130px; top: 70px; font-size: 16px">✦</span>
+    <span class="sparkle" style="left: 1150px; top: 520px">✦</span>
+    <span class="sparkle" style="left: 600px; top: 540px; font-size: 14px">✦</span>
+    <div class="copy">
+      <h1 class="logo">Blorbit</h1>
+      <div class="tag">A cosy, relaxing game: roll, slime and bring tiny planets back to life</div>
+      <div class="chips"><span>🌸 3 galaxies</span><span>🪐 20 biomes</span><span>🃏 160 cards to collect</span></div>
+      <div class="url">Play free at blorbit.io</div>
+    </div>
+  </body>
+</html>

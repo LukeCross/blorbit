@@ -124,6 +124,27 @@ To turn it on, open the repo's **Settings → Pages** and set **Source** to **Gi
 
 ---
 
+## Search & sharing (SEO)
+
+The site lives at **https://blorbit.io**, and the build is set up for search engines and link previews:
+
+- **Page details:** every page (`index.html`, `about.html`, `privacy.html`) has a descriptive title, a meta description and a canonical link to its blorbit.io address. The canonical link stops `?seed=` links and the old github.io address counting as duplicates.
+- **Link previews:** Open Graph and Twitter card tags use `public/og-image.png` (1200×630), so links shared on Discord, Reddit, X, iMessage and WhatsApp show a picture.
+- **Icons:** `public/favicon.svg`, an Apple touch icon, and `public/site.webmanifest` with 192px and 512px icons, for "Add to Home Screen".
+- **Structured data:** a JSON-LD block marks the game page as a free, single-player web-browser video game.
+- **`robots.txt` and `sitemap.xml`:** generated at build time, listing every page with the build date. The `SITE` and `PAGES` values in `vite.config.js` control them.
+- **About & how to play page:** `about.html` gives search engines real text to rank, and is linked from the title screen.
+
+**Regenerating the share image:** with the dev server running, run `node scripts/og/capture.mjs`, which photographs a fully restored planet, then copy the frame you like to `scripts/og/planet.png` and run `node scripts/og/compose.mjs`. The layout is in `scripts/og/compose.html`. To redraw the icons after editing `public/favicon.svg`, run `node scripts/og/icons.mjs`.
+
+**After the first deploy to blorbit.io:**
+1. **Google Search Console** ([search.google.com/search-console](https://search.google.com/search-console)):
+   - Add a **Domain** property for `blorbit.io`.
+   - Google gives you a **TXT** record. Add it in Porkbun's DNS records (host blank) and click Verify.
+   - Under **Sitemaps**, submit `https://blorbit.io/sitemap.xml`.
+2. **Bing Webmaster Tools** ([bing.com/webmasters](https://www.bing.com/webmasters)): you can import the site straight from Search Console.
+3. **Check the link preview:** paste `https://blorbit.io` into a Discord or Slack message, or into [opengraph.xyz](https://www.opengraph.xyz).
+
 ## Rewarded video ads (Google Ad Manager)
 
 The free-pack videos use **Google Ad Manager rewarded ads** through the Google Publisher Tag (GPT), in `src/ads.js`.
@@ -211,7 +232,8 @@ Touch devices also get touch-specific hints instead of keyboard shortcuts.
 ## Project structure
 
 ```
-index.html          UI markup and all CSS (design tokens, HUD, panels, responsive layout)
+index.html          UI markup and all CSS (design tokens, HUD, panels, responsive layout), plus SEO/share tags
+about.html          About & how to play page
 privacy.html        The privacy policy page
 src/
   main.js           Game loop, state, input, UI, saving and orchestration
@@ -235,5 +257,6 @@ src/
   names.js          Planet name generator and time-based seeds
   noise.js          Seeded noise and PRNG
   shadow.js         Soft contact shadows
-scripts/            Puppeteer screenshot and regression checks used during development
+public/             Static files copied as-is: share image, favicon and app icons, web app manifest
+scripts/            Puppeteer screenshot and regression checks used during development (scripts/og/ makes the share image and icons)
 ```
