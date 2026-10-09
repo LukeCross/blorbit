@@ -951,6 +951,7 @@ const shop = new Shop({
   save, persist, sound, ads,
   currentGalaxy: () => planet?.galaxy ?? save.galaxy,
   onCollection: updateBookCount,
+  onOpenBook: (g) => toggleBook(g),
   onDust: refreshDust,
   onClose: () => {
     // opened from the "Planet restored" card: come back to it afterwards
@@ -981,10 +982,10 @@ function spawnDrips(dt, moving) {
 }
 
 let bookTab = 'wild';
-function toggleBook() {
+function toggleBook(tab) {
   const book = $('book');
   if (!book.classList.contains('hidden')) return book.classList.add('hidden');
-  bookTab = planet.galaxy;
+  bookTab = typeof tab === 'string' ? tab : planet.galaxy;
   renderBook();
   book.classList.remove('hidden');
 }
@@ -1010,8 +1011,9 @@ $('book-grid').addEventListener('click', (e) => {
   const tab = e.target.closest('[data-action="tab"]');
   if (tab) { bookTab = tab.dataset.id; renderBook(); }
 });
-$('book-btn').addEventListener('click', toggleBook);
-$('book-close').addEventListener('click', toggleBook);
+$('book-btn').addEventListener('click', () => toggleBook());
+$('book-close').addEventListener('click', () => toggleBook());
+$('book-shop').addEventListener('click', () => { $('book').classList.add('hidden'); shop.open(bookTab); });
 updateBookCount();
 
 function completeRegion(i) {

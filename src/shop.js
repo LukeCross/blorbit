@@ -61,8 +61,8 @@ function oddsTable() {
 }
 
 export class Shop {
-  constructor({ save, persist, sound, onCollection, onDust, onClose, currentGalaxy, ads }) {
-    Object.assign(this, { save, persist, sound, onCollection, onDust, onClose, currentGalaxy, ads });
+  constructor({ save, persist, sound, onCollection, onDust, onClose, onOpenBook, currentGalaxy, ads }) {
+    Object.assign(this, { save, persist, sound, onCollection, onDust, onClose, onOpenBook, currentGalaxy, ads });
     // keep the free-pack buttons in step with whether a video is ready
     ads?.onChange(() => this.refreshFreeButtons());
     $('ad-no').addEventListener('click', () => this.closeOffer());
@@ -75,6 +75,7 @@ export class Shop {
       if (action === 'pack') this.buyPack(id, type);
       if (action === 'tab') { this.tab = id; this.render(); }
       if (action === 'free') this.offerFree(id);
+      if (action === 'book') { this.close(); this.onOpenBook?.(this.tab); }
     });
   }
 
@@ -87,8 +88,8 @@ export class Shop {
     else this.open();
   }
 
-  open() {
-    this.tab = this.currentGalaxy();
+  open(tab = this.currentGalaxy()) {
+    this.tab = tab;
     $('shop').classList.remove('hidden');
     this.render();
   }
@@ -116,7 +117,7 @@ export class Shop {
         const found = def.finds.filter(([, n]) => this.save.finds[`${b}:${n}`]).length;
         return `<div class="pack-row">
           <span class="pack-icon">${SKINS[def.creature].emoji}</span>
-          <div class="pack-name"><b>${def.name}</b><small>${found}/${def.finds.length} found</small></div>
+          <div class="pack-name"><b>${def.name}</b><button class="link" data-action="book" title="Open the collection">${found}/${def.finds.length} collected</button></div>
           ${this.adsOn() ? `<button class="buy free" data-action="free" data-id="${b}" title="Watch a video for a free Card pack" aria-label="Watch a video for a free ${def.name} Card pack">🎬 Free</button>` : ''}
           ${Object.entries(PACKS).map(([type, pk]) => `<button class="buy ${BUY_CLASS[type]}" data-action="pack" data-id="${b}" data-type="${type}" title="${pk.name}" aria-label="${pk.name} for ${def.name}, ${pk.cost} stardust" ${dust < pk.cost ? 'disabled' : ''}>${pk.icon} ✨${pk.cost}</button>`).join('')}
         </div>`;

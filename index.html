@@ -454,6 +454,8 @@
       .book-head span { font-size: 20px; }
       .book-head b { font: 600 17px var(--font-display); }
       .book-head .dim { opacity: 0.35; filter: grayscale(1); }
+      .pack-name .link { background: none; border: 0; padding: 0; display: block; color: var(--ink-faint); font: 800 12px var(--font-body, inherit); text-decoration: underline; cursor: pointer; text-align: left; }
+      .pack-name .link:hover { color: var(--ink); }
       .book-head em { color: var(--ink-faint); font-style: normal; font-size: 13px; margin-left: auto; font-weight: 800; }
       .slots { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
       .slot { position: relative; aspect-ratio: 1; border-radius: 16px; display: grid; place-items: center; font-size: 28px; background: #fff; box-shadow: var(--shadow-sm); border: 2px solid transparent; }
@@ -944,6 +946,7 @@
       <div class="panel">
         <div class="panel-head">
           <h2>📖 Collection</h2><span class="spacer"></span>
+          <button class="btn small" id="book-shop">🛍️ Shop</button>
           <button class="btn secondary small" id="book-close">Close</button>
         </div>
         <div id="book-total"></div>
