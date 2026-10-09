@@ -265,3 +265,8 @@ src/
 public/             Static files copied as-is: share image, favicon and app icons, web app manifest
 scripts/            Puppeteer screenshot and regression checks used during development (scripts/og/ makes the share image and icons)
 ```
+
+## Credits
+
+- Emoji are drawn with [Noto Color Emoji](https://github.com/googlefonts/noto-emoji), © Google, under the [SIL Open Font License 1.1](public/fonts/emoji/OFL.txt). A trimmed copy is self-hosted in `public/fonts/emoji/` (regenerate it with `scripts/emoji-font.py`).
+- Fredoka and Nunito are loaded from Google Fonts (SIL Open Font License).

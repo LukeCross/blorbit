@@ -110,7 +110,7 @@ print([w for w in want if st(w) in U])           # must print []
 - Check **finds, skin emojis and galaxy emojis** together (all three are in those two reads).
 - Beware filter mistakes when enumerating free emojis: substring filters on Unicode names can accidentally drop valid candidates (e.g. "EAR" drops the globes, "FACE" drops animal faces). Cross-check by hand.
 - Roughly exhausted themes (as of Feastvale): ocean life, plants/flowers, weather/sky, gems, most tools/office. Still plentiful: spooky/fantasy (👻 🦇 🕷️ 🕸️ 🧙 🧛 🧟 🐺 🧹 ⚰️ 🏚️ 🗡️), sports (🏀 🏐 🏈 🏏 🏒 🥊 🎿 🏂 🏎️ 🏍️ 🎳), music (🎹 🎺 🎻 🥁 🎤 🪕 🪗), retro tech/games (🕹️ 🎮 🎰 📺 📻 💾 👾 🤖), and many animals (🐯 🐴 🦓 🦍 🦏 🐘 🦙 🦚 🦩 🦘 🦥 🦡 🦨 🦬 🦖 🦕 🦣 🐜 🦗). Re-verify before relying on this list.
-- **Emojis are drawn with a bundled font** (Noto Color Emoji, trimmed to the emojis in the source) so they look the same on every device. After adding or changing any emoji (finds, skins, galaxy icons, UI text), regenerate it and commit `src/emoji.css` and `public/fonts/emoji/`:
+- **Emojis are drawn with a bundled font** (Noto Color Emoji, trimmed to the emojis in the source) so they look the same on every device. After adding or changing any emoji (finds, skins, galaxy icons, UI text), regenerate it and commit `src/emoji.css` and `public/fonts/emoji/` (including `OFL.txt`, the font's licence, which the script refreshes and which must ship with the font):
   ```bash
   python3 -m venv /tmp/fv && /tmp/fv/bin/pip install fonttools brotli lxml   # once
   /tmp/fv/bin/python scripts/emoji-font.py
