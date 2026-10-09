@@ -741,12 +741,11 @@
       <p class="ltext" id="loader-text">Rolling in<span>.</span><span>.</span><span>.</span></p>
     </div>
     <script>
-      // if the game can't start (error, or a very slow connection), say so instead of rolling forever
-      (function () {
-        var say = function (t) { var el = document.getElementById('loader-text'); if (el && document.body.classList.contains('booting')) el.textContent = t; };
-        window.addEventListener('error', function () { say('Something went wrong loading Blorbit. Try refreshing the page.'); });
-        setTimeout(function () { say('Still rolling in… this is taking a while. Check your connection or try refreshing.'); }, 30000);
-      })();
+      // on a very slow connection, reassure the player rather than rolling silently forever
+      setTimeout(function () {
+        var el = document.getElementById('loader-text');
+        if (el && document.body.classList.contains('booting')) el.textContent = 'Still rolling in… this is taking a while. Check your connection or try refreshing.';
+      }, 30000);
     </script>
     <script>
       // Pick touch vs keyboard hints before the first paint. The game code takes a moment to load
