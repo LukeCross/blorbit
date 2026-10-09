@@ -53,6 +53,16 @@ export const GALAXIES = {
     unlockedBy: 'safari',
     unlockAt: 0.8,
   },
+  feast: {
+    name: 'Feastvale',
+    emoji: '🥘',
+    blurb: 'Bakeries, orchards, noodle markets and spice bazaars. Wake the hungry hearts.',
+    art: ['#ffd8a8', '#ffb8c8'],
+    biomes: ['bakery', 'orchard', 'market', 'veggie', 'bazaar'],
+    // unlocked by waking 80% of Seaglow's creatures (4 of 5)
+    unlockedBy: 'sea',
+    unlockAt: 0.8,
+  },
 };
 export const GALAXY_IDS = Object.keys(GALAXIES);
 

@@ -38,9 +38,14 @@ export const SKINS = {
   shark: { name: 'Shark Blob', emoji: '🦈', body: 0x8ea4bc, slime: 0xc0e0f0 },
   jellyfish: { name: 'Jellyfish Blob', emoji: '🪼', body: 0xff9ae0, slime: 0xffd0f4 },
   squid: { name: 'Squid Blob', emoji: '🦑', body: 0xff7a8c, slime: 0xffb8c4 },
+  rooster: { name: 'Rooster Blob', emoji: '🐓', body: 0xfff2e0, slime: 0xffd8b0 },
+  monkey: { name: 'Monkey Blob', emoji: '🐒', body: 0xb88a5e, slime: 0xf0d0a0 },
+  rat: { name: 'Rat Blob', emoji: '🐀', body: 0xb4aec4, slime: 0xe0d8f0 },
+  pig: { name: 'Pig Blob', emoji: '🐖', body: 0xffb4c4, slime: 0xffd8e0 },
+  camel: { name: 'Camel Blob', emoji: '🐫', body: 0xe0b070, slime: 0xffe0a8 },
 };
 
-export const CREATURE_IDS = ['bunny', 'frog', 'fox', 'penguin', 'moth', 'snail', 'turtle', 'lizard', 'bear', 'hedgehog', 'squirrel', 'cat', 'dog', 'raccoon', 'seagull', 'sheep', 'goat', 'unicorn', 'eagle', 'owl', 'lion', 'parrot', 'hippo', 'panda', 'koala', 'otter', 'pufferfish', 'shark', 'jellyfish', 'squid'];
+export const CREATURE_IDS = ['bunny', 'frog', 'fox', 'penguin', 'moth', 'snail', 'turtle', 'lizard', 'bear', 'hedgehog', 'squirrel', 'cat', 'dog', 'raccoon', 'seagull', 'sheep', 'goat', 'unicorn', 'eagle', 'owl', 'lion', 'parrot', 'hippo', 'panda', 'koala', 'otter', 'pufferfish', 'shark', 'jellyfish', 'squid', 'rooster', 'monkey', 'rat', 'pig', 'camel'];
 
 // ---------------------------------------------------------------- materials
 
@@ -51,7 +56,7 @@ const gummy = (color) => shiny(color, { transparent: true, opacity: 0.88 });
 const soft = (color, extra = {}) => matte(color, { roughness: 0.6, ...extra });
 
 // what each sleeping creature's body is made of
-const BODY_STYLE = { fox: fur, bunny: fur, hedgehog: fur, moth: fur, penguin: soft, turtle: soft, frog: gloss, lizard: gloss, snail: gloss, bear: gummy, squirrel: fur, cat: fur, dog: fur, raccoon: fur, seagull: soft, sheep: fur, goat: fur, unicorn: soft, eagle: soft, owl: fur, lion: fur, parrot: soft, hippo: soft, panda: fur, koala: fur, otter: fur, pufferfish: gloss, shark: gloss, jellyfish: gummy, squid: gloss };
+const BODY_STYLE = { fox: fur, bunny: fur, hedgehog: fur, moth: fur, penguin: soft, turtle: soft, frog: gloss, lizard: gloss, snail: gloss, bear: gummy, squirrel: fur, cat: fur, dog: fur, raccoon: fur, seagull: soft, sheep: fur, goat: fur, unicorn: soft, eagle: soft, owl: fur, lion: fur, parrot: soft, hippo: soft, panda: fur, koala: fur, otter: fur, pufferfish: gloss, shark: gloss, jellyfish: gummy, squid: gloss, rooster: soft, monkey: fur, rat: fur, pig: soft, camel: fur };
 export const bodyMaterial = (id) => (BODY_STYLE[id] || soft)(SKINS[id].body);
 
 // ---------------------------------------------------------------- shape helpers
@@ -1024,6 +1029,158 @@ export function buildAccessories(id) {
       arms.push(tg);
     }
     anims.push((t) => arms.forEach((tg, i) => (tg.rotation.x = Math.sin(t * 1.8 + i) * 0.1)));
+  }
+
+
+  // ---------------------------------------------------------------- Feastvale
+
+  if (id === 'rooster') {
+    const red = soft(0xe83a3a);
+    const gold = soft(0xffb830);
+    // a red comb and wattle, little beak, folded wings and a fan of tail feathers
+    for (let i = 0; i < 3; i++) {
+      const bump = mesh(sphere(0.1 - Math.abs(i - 1) * 0.02, 20, 14), red, 0, 0.95 - Math.abs(i - 1) * 0.05, 0.3 - i * 0.2);
+      g.add(bump);
+    }
+    const beak = mesh(roundedCone(0.08, 0.2, 0.35, 16), gloss(0xffa82a), 0, 0.3, 0.92);
+    beak.rotation.x = Math.PI / 2 + 0.5;
+    g.add(beak);
+    const wattle = mesh(sphere(0.08, 16, 12), red, 0, 0.06, 0.96);
+    wattle.scale.set(0.8, 1.5, 0.8);
+    g.add(wattle);
+    for (const s of [-1, 1]) {
+      const pivot = new THREE.Group();
+      pivot.position.set(s * 0.86, 0.1, -0.05);
+      const wing = mesh(sphere(0.46, 28, 18), soft(0xfff0e0), s * 0.1, -0.08, -0.2);
+      wing.scale.set(0.24, 0.6, 1.2);
+      wing.rotation.x = -0.3;
+      pivot.add(wing);
+      g.add(pivot);
+      anims.push((t) => (pivot.rotation.z = s * (0.08 + Math.max(0, Math.sin(t * 1.3 + s)) ** 8 * 0.5)));
+      const foot = mesh(sphere(0.14, 20, 14), gloss(0xffb830), s * 0.3, -0.88, 0.34);
+      foot.scale.set(1, 0.35, 1.25);
+      g.add(foot);
+    }
+    [[-0.3, 0.55, red], [-0.15, 0.25, gold], [0, 0, soft(0x38a868)], [0.15, -0.25, gold], [0.3, -0.55, red]].forEach(([x, r, m]) => {
+      const f = mesh(roundedCone(0.09, 0.62, 0.4, 14), m, x * 0.6, 0.0, -0.9);
+      f.rotation.set(-0.6, 0, r);
+      f.scale.set(1, 1, 0.4);
+      g.add(f);
+    });
+  }
+
+  if (id === 'monkey') {
+    const brown = fur(skin.body);
+    const tan = fur(0xf0d4a8);
+    // pale heart-shaped face, round ears, and a curling tail
+    for (const s of [-1, 1]) {
+      g.add(surfacePatch(tan, [s * 0.18, 0.5, 0.82], 0.3, 1.0, 1.05, 0.93));
+      const ear = mesh(sphere(0.18, 24, 16), brown, s * 0.78, 0.55, 0.12);
+      ear.scale.set(0.6, 1, 1);
+      g.add(ear, mesh(sphere(0.1, 16, 12), tan, s * 0.84, 0.55, 0.14));
+      const hand = mesh(sphere(0.14, 20, 14), tan, s * 0.5, -0.42, 0.92);
+      g.add(hand);
+    }
+    g.add(surfacePatch(tan, [0, 0.08, 0.96], 0.34, 1.2, 0.85, 0.9));
+    for (const s of [-1, 1]) g.add(onSurface(mesh(sphere(0.025), gloss(0x3a2e34)), [s * 0.06, 0.2, 0.95], 1.01));
+    const tail = new THREE.Group();
+    tail.position.set(0, -0.45, -0.92);
+    const tube = taperedTube([[0, 0, 0], [0.05, 0.05, -0.3], [0.25, 0.2, -0.5], [0.3, 0.55, -0.4], [0.15, 0.7, -0.2]], (t) => 0.06 - t * 0.02, 28, 8);
+    tail.add(tubeGroup(tube, brown));
+    g.add(tail);
+    anims.push((t) => (tail.rotation.z = Math.sin(t * 1.8) * 0.15));
+  }
+
+  if (id === 'rat') {
+    const grey = fur(skin.body);
+    const pink = soft(0xffb8c8);
+    // big round pink-lined ears, a pointed pink nose, whiskers, long tail and a tiny chef's hat
+    for (const s of [-1, 1]) {
+      const ear = mesh(sphere(0.3, 28, 20), grey, s * 0.62, 0.68, 0.04);
+      ear.scale.set(1, 1, 0.5);
+      const inner = mesh(sphere(0.2, 24, 16), pink, s * 0.62, 0.68, 0.08);
+      inner.scale.set(1, 1, 0.5);
+      g.add(ear, inner);
+      for (const k of [-1, 0, 1]) {
+        const w = mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.3, 4), matte(0xfaf6f0), s * 0.34, 0.12 + k * 0.05, 0.98);
+        w.rotation.z = Math.PI / 2 + s * k * 0.15;
+        w.rotation.y = s * 0.25;
+        g.add(w);
+      }
+      const foot = mesh(sphere(0.14, 20, 14), pink, s * 0.3, -0.88, 0.34);
+      foot.scale.set(1, 0.4, 1.2);
+      g.add(foot);
+    }
+    const nose = onSurface(mesh(sphere(0.09, 20, 14), gloss(0xff8aa8)), [0, 0.22, 0.95], 1.0);
+    nose.scale.set(1, 0.8, 1.2);
+    g.add(nose);
+    const tail = new THREE.Group();
+    tail.position.set(0, -0.5, -0.9);
+    tail.add(tubeGroup(taperedTube([[0, 0, 0], [0.1, 0.0, -0.4], [-0.15, 0.1, -0.8], [0.1, 0.15, -1.1]], (t) => 0.045 - t * 0.03, 28, 8), soft(0xf0b8c4)));
+    g.add(tail);
+    anims.push((t) => (tail.rotation.y = Math.sin(t * 1.5) * 0.25));
+    const hat = new THREE.Group();
+    hat.position.set(0, 0.98, 0.1);
+    hat.add(mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.1, 16), soft(0xffffff), 0, 0.05, 0), mesh(sphere(0.25, 20, 14), soft(0xffffff), 0, 0.22, 0));
+    g.add(hat);
+  }
+
+  if (id === 'pig') {
+    const pink = soft(skin.body);
+    const snout = soft(0xff90a8);
+    // a round flat snout with nostrils, floppy triangle ears and a curly tail
+    const nose = mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.18, 24), snout, 0, 0.1, 0.94);
+    nose.rotation.x = Math.PI / 2;
+    nose.scale.set(1.2, 1, 0.85);
+    g.add(nose);
+    for (const s of [-1, 1]) {
+      g.add(mesh(sphere(0.045, 12, 8), matte(0xb8506a), s * 0.1, 0.1, 1.03));
+      const ear = new THREE.Group();
+      ear.position.set(s * 0.52, 0.8, 0.2);
+      const flap = mesh(roundedCone(0.2, 0.34, 0.3, 20), pink);
+      flap.scale.set(1, 1, 0.4);
+      flap.rotation.set(0.5, 0, -s * 1.1);
+      ear.add(flap);
+      g.add(ear);
+      anims.push((t) => (ear.rotation.z = s * Math.max(0, Math.sin(t * 1.5 + s)) ** 8 * 0.3));
+      const foot = mesh(sphere(0.15, 20, 14), snout, s * 0.3, -0.88, 0.34);
+      foot.scale.set(1, 0.4, 1.2);
+      g.add(foot);
+    }
+    const tail = new THREE.Group();
+    tail.position.set(0, -0.1, -0.97);
+    tail.add(tubeGroup(taperedTube([[0, 0, 0], [0.1, 0.1, -0.1], [0.0, 0.2, -0.1], [-0.1, 0.12, -0.05], [0, 0.02, -0.12]], (t) => 0.04 - t * 0.015, 24, 8), pink));
+    g.add(tail);
+    anims.push((t) => (tail.rotation.z = Math.sin(t * 3) * 0.2));
+  }
+
+  if (id === 'camel') {
+    const sand = fur(skin.body);
+    const dark = fur(0xa87a48);
+    // two soft humps, a long-lashed sleepy look, small ears and a woolly muzzle
+    for (const z of [-0.12, -0.65]) {
+      const hump = mesh(sphere(0.38, 28, 20), sand, 0, 0.88 - z * 0.15, z);
+      hump.scale.set(0.9, 1, 0.9);
+      g.add(hump);
+    }
+    const saddle = mesh(sphere(0.3, 24, 16), dark, 0, 1.0, -0.12);
+    saddle.scale.set(0.7, 0.5, 0.7);
+    g.add(saddle);
+    g.add(surfacePatch(fur(0xf4dcb4), [0, 0.04, 0.96], 0.4, 1.3, 0.9, 0.9));
+    for (const s of [-1, 1]) {
+      g.add(onSurface(mesh(sphere(0.045), gloss(0x5a4030)), [s * 0.12, 0.18, 0.95], 1.01));
+      const ear = mesh(roundedCone(0.1, 0.22, 0.4, 14), sand, s * 0.5, 0.82, 0.12);
+      ear.rotation.z = -s * 0.5;
+      g.add(ear, mesh(roundedCone(0.05, 0.14, 0.4, 12), soft(0xffc8b8), s * 0.5, 0.84, 0.16));
+      const foot = mesh(sphere(0.15, 20, 14), dark, s * 0.3, -0.88, 0.34);
+      foot.scale.set(1, 0.4, 1.2);
+      g.add(foot);
+    }
+    const tail = new THREE.Group();
+    tail.position.set(0, -0.3, -0.97);
+    tail.add(tubeGroup(taperedTube([[0, 0, 0], [0, -0.1, -0.12], [0, -0.3, -0.14]], (t) => 0.035, 12, 6), sand), mesh(sphere(0.07, 12, 8), dark, 0, -0.34, -0.14));
+    g.add(tail);
+    anims.push((t) => (tail.rotation.x = Math.sin(t * 2) * 0.15));
   }
 
   g.userData.animate = (t) => anims.forEach((a) => a(t));

@@ -587,4 +587,101 @@ Object.assign(BIOMES, {
   },
 });
 
+
+// ---------------------------------------------------------------- Feastvale galaxy
+// A world of food. Withered ground is dull and cold; restored it turns warm and golden, and steam drifts up.
+
+Object.assign(BIOMES, {
+  bakery: {
+    name: 'Bakery Village', creature: 'rooster', weight: 0.08, terrain: 'gentle',
+    dead: 0x6a625a, alive: 0xe8c488, sky: ['#ffb890', '#ffe8c8'], style: [0, 0, 0, 0.5],
+    small: [['grass', 0.06], ['flourSack', 0.006], ['flower', 0.01]],
+    big: [['breadOven', 0.0014], ['windmill', 0.0008]],
+    critters: [['bird', 3], ['bee', 2]],
+    particles: [[0xffffff, 0xfff0d8], -0.9, 8],
+    patches: [
+      { name: 'Bread ovens', shape: 'blob', ...M, dead: 0x68605a, alive: 0xe0b078, pave: 0.6, props: [['breadOven', 0.06]] },
+      { name: 'Flour mill', shape: 'blob', ...S, dead: 0x6c645e, alive: 0xf0dcb0, props: [['windmill', 0.03, 'inner'], ['flourSack', 0.08]] },
+      { name: 'Cobbled lane', shape: 'path', dead: 0x7a726a, alive: 0xd8bc90, pave: 1, props: [['lantern', 0.03, 'rim'], ['flourSack', 0.03, 'rim']] },
+      { name: 'Wheat field', shape: 'blob', ...L, dead: 0x6a6252, alive: 0xe8cc68, props: [['haybale', 0.05], ['grass', 0.3]], critters: [['bird', 2]] },
+      { name: 'Market square', shape: 'blob', ...M, dead: 0x6e6862, alive: 0xf0d8a8, pave: 1, props: [['stall', 0.04], ['bunting', 0.03], ['flourSack', 0.04]] },
+      { name: 'Beehive garden', shape: 'blob', ...S, dead: 0x68625a, alive: 0xd8c860, props: [['beehive', 0.04, 'inner'], ['flower', 0.3]], critters: [['bee', 3]] },
+    ],
+    patchCount: 10,
+    finds: [['🥐', 'Croissant', 'c'], ['🥖', 'Baguette', 'c'], ['🥞', 'Pancake stack', 'c'], ['🧇', 'Waffle', 'u'], ['🥯', 'Bagel', 'u'], ['🧈', 'Butter pat', 'r'], ['🍳', 'Sunny-side egg', 'e'], ['🍮', 'Golden flan', 'l']],
+  },
+  orchard: {
+    name: 'Orchard Lane', creature: 'monkey', weight: 0.1, terrain: 'rolling',
+    dead: 0x645e5a, alive: 0x84d058, sky: ['#9ed0ff', '#ffe0d0'], style: [0, 0, 0, 0],
+    small: [['grass', 0.1], ['flower', 0.03], ['melon', 0.005]],
+    big: [['fruitTree', 0.005]],
+    critters: [['butterfly', 3], ['bee', 2], ['bird', 2]],
+    particles: [[0xffd8e8, 0xfff0a0], -0.4, 6],
+    patches: [
+      { name: 'Cherry grove', shape: 'blob', ...M, dead: 0x5e5a56, alive: 0x78cc60, props: [['fruitTree', 0.06]], critters: [['bird', 2]] },
+      { name: 'Vineyard rows', shape: 'path', dead: 0x666054, alive: 0x90c860, props: [['grapeArbor', 0.06, 'rim']] },
+      { name: 'Melon patch', shape: 'blob', ...S, dead: 0x625c52, alive: 0x88c868, props: [['melon', 0.15]] },
+      { name: 'Peach orchard', shape: 'blob', ...L, dead: 0x605a56, alive: 0x8ad068, props: [['fruitTree', 0.05], ['grass', 0.2]], critters: [['butterfly', 2]] },
+      { name: 'Picnic corner', shape: 'blob', ...S, dead: 0x666258, alive: 0xa0dc78, props: [['picnicBlanket', 0.05, 'inner'], ['melon', 0.05]], critters: [['bee', 2]] },
+      { name: 'Orchard path', shape: 'path', dead: 0x7a7266, alive: 0xdcc898, props: [['pathStone', 0.1], ['lantern', 0.02, 'rim']] },
+    ],
+    patchCount: 10,
+    finds: [['🍒', 'Cherries', 'c'], ['🍑', 'Peach', 'c'], ['🍇', 'Grapes', 'c'], ['🍊', 'Orange', 'u'], ['🥝', 'Kiwi', 'u'], ['🍈', 'Honeydew melon', 'r'], ['🍏', 'Green apple', 'e'], ['🍐', 'Golden pear', 'l']],
+  },
+  market: {
+    name: 'Noodle Night Market', creature: 'rat', weight: 0.06, terrain: 'gentle',
+    dead: 0x4a4658, alive: 0xf0a868, sky: ['#3a2a6a', '#ff9a8a'], style: [0, 0, 0.1, 0.8],
+    small: [['lantern', 0.004], ['pebble', 0.004]],
+    big: [['noodleCart', 0.002], ['steamerStack', 0.002]],
+    critters: [['firefly', 4], ['moth', 1]],
+    particles: [[0xffffff, 0xffe8d0], -1.0, 9],
+    patches: [
+      { name: 'Noodle carts', shape: 'blob', ...M, emissive: 0.15, dead: 0x4c485a, alive: 0xf0b078, pave: 1, props: [['noodleCart', 0.05]], critters: [['firefly', 2]] },
+      { name: 'Dumpling steamers', shape: 'blob', ...S, dead: 0x504c5c, alive: 0xf4d0a0, pave: 1, props: [['steamerStack', 0.08]] },
+      { name: 'Lantern street', shape: 'path', emissive: 0.3, dead: 0x504c5c, alive: 0xf0a090, pave: 1, props: [['lantern', 0.05, 'rim'], ['bunting', 0.03, 'rim']], critters: [['firefly', 3]] },
+      { name: 'Giant bowls', shape: 'blob', ...M, dead: 0x4e4a5c, alive: 0xf8c8a0, pave: 0.6, props: [['giantBowl', 0.05]] },
+      { name: 'Stall row', shape: 'blob', ...M, dead: 0x504c5a, alive: 0xe8a888, pave: 1, props: [['stall', 0.05], ['bunting', 0.04]] },
+      { name: 'Back alley', shape: 'path', emissive: 0.2, dead: 0x4a4658, alive: 0xd89098, pave: 1, props: [['neonSign', 0.04, 'rim']] },
+    ],
+    patchCount: 9,
+    finds: [['🍝', 'Spaghetti', 'c'], ['🍲', 'Hotpot', 'c'], ['🍛', 'Curry', 'c'], ['🥟', 'Dumpling', 'u'], ['🍢', 'Oden skewer', 'u'], ['🍱', 'Bento box', 'r'], ['🍡', 'Dango', 'e'], ['🥠', 'Fortune cookie', 'l']],
+  },
+  veggie: {
+    name: 'Veggie Valley', creature: 'pig', weight: 0.1, terrain: 'bumps',
+    dead: 0x645a50, alive: 0x68c85a, sky: ['#98d0e8', '#fff2c8'], style: [0, 0, 0, 0],
+    small: [['cabbage', 0.04], ['carrot', 0.04], ['broccoli', 0.015], ['grass', 0.06]],
+    big: [['cornStalk', 0.006], ['scarecrow', 0.0012]],
+    critters: [['bird', 3], ['butterfly', 2], ['bee', 1]],
+    particles: [[0xe8ffd0, 0xffffff], -0.3, 5],
+    patches: [
+      { name: 'Corn rows', shape: 'blob', ...L, dead: 0x645a4a, alive: 0x90cc58, props: [['cornStalk', 0.12]], critters: [['bird', 2]] },
+      { name: 'Tomato trellis', shape: 'blob', ...S, dead: 0x62584c, alive: 0x78c85a, props: [['tomatoPlant', 0.15]] },
+      { name: 'Broccoli bed', shape: 'blob', ...M, dead: 0x605848, alive: 0x70c860, props: [['broccoli', 0.2]] },
+      { name: 'Scarecrow hill', shape: 'blob', ...S, dead: 0x666054, alive: 0x98d068, props: [['scarecrow', 0.05, 'inner'], ['grass', 0.2]], critters: [['bird', 2]] },
+      { name: 'Cabbage & carrots', shape: 'blob', ...M, dead: 0x5a4c40, alive: 0x6a4e36, props: [['cabbage', 0.15], ['carrot', 0.15]] },
+      { name: 'Garden path', shape: 'path', dead: 0x78706a, alive: 0xd8c496, props: [['pathStone', 0.12], ['pumpkin', 0.02, 'rim']] },
+    ],
+    patchCount: 10,
+    finds: [['🥔', 'Potato', 'c'], ['🥒', 'Cucumber', 'c'], ['🥑', 'Avocado', 'c'], ['🥦', 'Broccoli', 'u'], ['🧄', 'Garlic bulb', 'u'], ['🍆', 'Aubergine', 'r'], ['🍅', 'Giant tomato', 'e'], ['🥗', 'Golden salad', 'l']],
+  },
+  bazaar: {
+    name: 'Spice Bazaar', creature: 'camel', weight: 0.02, terrain: 'dunes',
+    dead: 0x6e6058, alive: 0xe8a050, sky: ['#ff9a58', '#ffe0a0'], style: [0.4, 0, 0, 0.4],
+    small: [['desertRock', 0.006], ['shrub', 0.02], ['pebble', 0.004]],
+    big: [['palm', 0.002], ['tagine', 0.0016]],
+    critters: [['bird', 2], ['butterfly', 1]],
+    particles: [[0xffd890, 0xffa860, 0xffe8c0], -0.5, 6],
+    patches: [
+      { name: 'Spice sacks', shape: 'blob', ...S, dead: 0x6c5e54, alive: 0xe8b068, props: [['spiceSacks', 0.1]] },
+      { name: 'Tagine row', shape: 'blob', ...M, dead: 0x6a5c52, alive: 0xe09858, props: [['tagine', 0.08]] },
+      { name: 'Bazaar lane', shape: 'path', dead: 0x7a6a5e, alive: 0xf0c890, pave: 0.7, props: [['stall', 0.04, 'rim'], ['lantern', 0.03, 'rim']] },
+      { name: 'Oasis shade', shape: 'blob', ...M, dead: 0x645a50, alive: 0xd8b468, props: [['palm', 0.05], ['safariTent', 0.02, 'inner']] },
+      { name: 'Carpet corner', shape: 'blob', ...S, dead: 0x6a5c52, alive: 0xe8a878, props: [['picnicBlanket', 0.06, 'inner'], ['spiceSacks', 0.04]] },
+      { name: 'Camel stop', shape: 'blob', ...S, dead: 0x68584e, alive: 0xdcb070, props: [['haybale', 0.05], ['desertRock', 0.06]], critters: [['bird', 1]] },
+    ],
+    patchCount: 9,
+    finds: [['🌮', 'Taco', 'c'], ['🌯', 'Burrito', 'c'], ['🧆', 'Falafel', 'c'], ['🫚', 'Ginger root', 'u'], ['🧂', 'Salt shaker', 'u'], ['🥙', 'Kebab pita', 'r'], ['🫔', 'Tamale', 'e'], ['🫕', 'Golden fondue', 'l']],
+  },
+});
+
 export const BIOME_IDS = Object.keys(BIOMES);

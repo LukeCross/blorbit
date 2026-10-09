@@ -7,8 +7,8 @@ await page.setViewport({ width: 1280, height: 800 });
 page.on('pageerror', (e) => console.log('[pageerror]', e.message));
 page.setDefaultTimeout(120000);
 await page.goto('http://localhost:5173/', { waitUntil: 'load' });
-// every Wildbloom, Citylight, Skyhaven and Sunroam friend awake, so every galaxy is open
-await page.evaluate(() => { localStorage.clear(); localStorage.setItem('blorbit-save-v1', JSON.stringify({ unlocked: ['classic', 'bunny', 'frog', 'fox', 'penguin', 'moth', 'snail', 'turtle', 'lizard', 'bear', 'hedgehog', 'squirrel', 'cat', 'dog', 'raccoon', 'seagull', 'sheep', 'goat', 'unicorn', 'eagle', 'owl', 'lion', 'parrot', 'hippo', 'panda', 'koala'], v: 3 })); });
+// every Wildbloom, Citylight, Skyhaven, Sunroam and Seaglow friend awake, so every galaxy is open
+await page.evaluate(() => { localStorage.clear(); localStorage.setItem('blorbit-save-v1', JSON.stringify({ unlocked: ['classic', 'bunny', 'frog', 'fox', 'penguin', 'moth', 'snail', 'turtle', 'lizard', 'bear', 'hedgehog', 'squirrel', 'cat', 'dog', 'raccoon', 'seagull', 'sheep', 'goat', 'unicorn', 'eagle', 'owl', 'lion', 'parrot', 'hippo', 'panda', 'koala', 'otter', 'pufferfish', 'shark', 'jellyfish', 'squid'], v: 3 })); });
 await page.reload({ waitUntil: 'load' });
 await page.waitForSelector('#title-galaxies .galaxy-card', { visible: true });
 // keep rolling new planets in the biome's galaxy until one has the biome we want, then play it

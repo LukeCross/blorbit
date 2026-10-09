@@ -1368,6 +1368,131 @@ export const PROP_KINDS = {
       { geo: merge(new THREE.TorusGeometry(0.128, 0.01, 4, 12).rotateX(Math.PI / 2).translate(0, 0.1, 0), new THREE.TorusGeometry(0.128, 0.01, 4, 12).rotateX(Math.PI / 2).translate(0, 0.3, 0)), mat: lambert(0x5a606a) },
     ],
   },
+
+  // ---------------------------------------------------------------- Feastvale galaxy
+  // A world of food: withered, dull and cold; restored, warm, golden and steaming.
+
+  // Bakery Village
+  breadOven: {
+    scale: [0.9, 1.2],
+    parts: () => [
+      { geo: merge(lathe([[0.3, 0], [0.3, 0.12], [0.26, 0.3], [0.18, 0.43], [0.08, 0.5], [0, 0.52]], 14), rbox(0.2, 0.3, 0.2, 0.03, 0.22, 0.15, 0)), mat: lambert(0xffffff), color: pick([0xd8a888, 0xc8987a, 0xe0b898]) },
+      { geo: merge(new THREE.CircleGeometry(0.1, 14, 0, Math.PI).translate(0, 0.08, 0.286), new THREE.CylinderGeometry(0.05, 0.06, 0.28, 8).translate(-0.12, 0.62, -0.05)), mat: lambert(0x3a2e2c) },
+      { geo: new THREE.CircleGeometry(0.07, 12, 0, Math.PI).translate(0, 0.08, 0.289), mat: unlit(0xff9a3a) },
+    ],
+  },
+  flourSack: {
+    scale: [0.8, 1.2],
+    parts: () => [
+      { geo: merge(new THREE.SphereGeometry(0.15, 10, 8).scale(1, 1.15, 0.8).translate(0, 0.17, 0), new THREE.CylinderGeometry(0.06, 0.09, 0.08, 8).translate(0, 0.37, 0)), mat: lambert(0xffffff), color: pick([0xf4ead8, 0xeadfc8, 0xf8f0e0]) },
+      { geo: new THREE.TorusGeometry(0.065, 0.012, 5, 10).rotateX(Math.PI / 2).translate(0, 0.32, 0), mat: lambert(0xb86a4a) },
+    ],
+  },
+
+  // Orchard Lane
+  fruitTree: {
+    scale: [0.9, 1.4],
+    parts: () => {
+      const pts = [[0.2, 0.9, 0.2], [-0.25, 0.8, 0.1], [0.05, 1.18, -0.18], [-0.12, 0.7, -0.3], [0.32, 0.7, -0.08], [0.0, 0.95, 0.34], [-0.34, 1.0, -0.05]];
+      return [
+        { geo: new THREE.CylinderGeometry(0.06, 0.1, 0.7, 8).translate(0, 0.35, 0), mat: lambert(0x7a5236) },
+        { geo: merge(new THREE.IcosahedronGeometry(0.42, 2).translate(0, 0.95, 0), new THREE.IcosahedronGeometry(0.3, 2).translate(0.22, 1.12, 0.05)), mat: lambert(0xffffff), color: fromGround(0.7, 1.0) },
+        { geo: merge(...pts.map(([x, y, z]) => new THREE.SphereGeometry(0.06, 8, 6).translate(x, y, z))), mat: lambert(0xffffff), color: pick([0xe8384a, 0xff9a4a, 0xffb090, 0x9a58c8, 0xffd84a, 0xa8d048]) },
+      ];
+    },
+  },
+  grapeArbor: {
+    scale: [0.9, 1.2],
+    parts: () => [
+      { geo: merge(box(0.04, 0.6, 0.04, -0.26, 0.3, 0), box(0.04, 0.6, 0.04, 0.26, 0.3, 0), box(0.6, 0.04, 0.06, 0, 0.62, 0), box(0.5, 0.03, 0.03, 0, 0.3, 0)), mat: lambert(0x8a6a48) },
+      { geo: merge(new THREE.SphereGeometry(0.2, 8, 6).scale(1.5, 0.5, 0.8).translate(0, 0.66, 0)), mat: lambert(0xffffff), color: fromGround(0.7, 0.95) },
+      { geo: merge(...[-0.18, -0.05, 0.1, 0.2].map((x, i) => merge(...[0, 1, 2, 3].map((k) => new THREE.SphereGeometry(0.04, 7, 5).translate(x + (k % 2) * 0.03, 0.52 - k * 0.05, (k % 2) * 0.03 - 0.01 + i * 0.005))))), mat: lambert(0xffffff), color: pick([0x8a48c8, 0x9ad048, 0xb838a0]) },
+    ],
+  },
+  melon: {
+    scale: [0.7, 1.2],
+    parts: () => [{
+      geo: merge(new THREE.SphereGeometry(0.15, 12, 8).scale(1, 0.85, 1).translate(0, 0.12, 0), new THREE.CylinderGeometry(0.012, 0.012, 0.06, 4).translate(0, 0.27, 0)),
+      mat: lambert(0xffffff), color: pick([0x78c050, 0xa8d878, 0xf0a850, 0x58a848]),
+    }],
+  },
+
+  // Noodle Night Market
+  steamerStack: {
+    scale: [0.9, 1.2],
+    parts: () => [
+      { geo: merge(...[0, 1, 2].map((i) => new THREE.CylinderGeometry(0.15, 0.15, 0.1, 14).translate(0, 0.05 + i * 0.1, 0)), new THREE.CylinderGeometry(0.16, 0.12, 0.06, 14).translate(0, 0.33, 0)), mat: lambert(0xffffff), color: pick([0xd8b078, 0xe0be88, 0xc8a068]) },
+      { geo: merge(...[0, 1, 2].map((i) => new THREE.TorusGeometry(0.152, 0.008, 4, 14).rotateX(Math.PI / 2).translate(0, 0.1 + i * 0.1, 0))), mat: lambert(0x7a5a3a) },
+      { geo: new THREE.SphereGeometry(0.05, 8, 6).scale(1.4, 0.8, 1.4).translate(0, 0.39, 0), mat: unlit(0xffffff), color: pick([0xf4f0e8]) },
+    ],
+  },
+  noodleCart: {
+    scale: [0.9, 1.1],
+    parts: () => [
+      { geo: merge(rbox(0.5, 0.22, 0.28, 0.03, 0, 0.28, 0), box(0.05, 0.2, 0.05, -0.2, 0.1, 0.1), box(0.05, 0.2, 0.05, 0.2, 0.1, 0.1), box(0.05, 0.2, 0.05, -0.2, 0.1, -0.1), box(0.05, 0.2, 0.05, 0.2, 0.1, -0.1)), mat: lambert(0xffffff), color: pick([0xe8584a, 0x4a8ae8, 0xe8b84a, 0x58b878]) },
+      { geo: merge(new THREE.CylinderGeometry(0.045, 0.045, 0.45, 6).rotateZ(Math.PI / 2).translate(0, 0.62, 0.12), new THREE.CylinderGeometry(0.045, 0.045, 0.45, 6).rotateZ(Math.PI / 2).translate(0, 0.62, -0.12), new THREE.CylinderGeometry(0.4, 0.4, 0.02, 4, 1).rotateY(Math.PI / 4).scale(0.9, 1, 0.9).translate(0, 0.7, 0)), mat: lambert(0xfff4e0) },
+      { geo: merge(...[-0.14, 0, 0.14].map((x) => new THREE.CylinderGeometry(0.05, 0.035, 0.05, 10).translate(x, 0.42, 0.02))), mat: lambert(0xf0f0f8) },
+      { geo: merge(...[-0.14, 0, 0.14].map((x) => new THREE.SphereGeometry(0.035, 8, 5).scale(1.2, 0.5, 1.2).translate(x, 0.45, 0.02))), mat: lambert(0xf4d078) },
+      { geo: merge(new THREE.SphereGeometry(0.025, 6, 5).translate(-0.19, 0.58, 0.14), new THREE.SphereGeometry(0.025, 6, 5).translate(0.19, 0.58, 0.14)), mat: unlit(0xffd890) },
+    ],
+  },
+  giantBowl: {
+    scale: [0.9, 1.3],
+    parts: () => [
+      { geo: lathe([[0.1, 0], [0.18, 0.05], [0.27, 0.18], [0.3, 0.26], [0.27, 0.27], [0.22, 0.18], [0.12, 0.06], [0, 0.04]], 14), mat: lambert(0xffffff), color: pick([0xf4f0f8, 0xe8584a, 0xf0e0b8]) },
+      { geo: new THREE.CylinderGeometry(0.26, 0.26, 0.02, 14).translate(0, 0.21, 0), mat: lambert(0xf4d078) },
+      { geo: merge(box(0.02, 0.4, 0.02, 0.1, 0.4, 0.04, 0, 0, 0.4), box(0.02, 0.4, 0.02, 0.15, 0.4, 0.0, 0, 0, 0.5)), mat: lambert(0x7a5a3a) },
+      { geo: merge(new THREE.SphereGeometry(0.05, 8, 6).translate(-0.06, 0.24, 0.05), new THREE.CylinderGeometry(0.045, 0.045, 0.02, 10).translate(0.05, 0.23, -0.08)), mat: lambert(0xff8a6a) },
+    ],
+  },
+
+  // Veggie Valley
+  cornStalk: {
+    scale: [0.9, 1.5],
+    parts: () => [
+      { geo: merge(new THREE.CylinderGeometry(0.02, 0.03, 0.9, 6).translate(0, 0.45, 0), ...[0, 1, 2, 3].map((i) => new THREE.ConeGeometry(0.04, 0.4, 3).scale(1, 1, 0.3).rotateZ(0.9 * (i % 2 ? 1 : -1)).translate((i % 2 ? 0.15 : -0.15), 0.4 + i * 0.12, 0).rotateY(i * 1.1))), mat: lambert(0xffffff), color: fromGround(0.8, 1.1) },
+      { geo: merge(new THREE.CapsuleGeometry(0.035, 0.18, 3, 8).rotateZ(0.2).translate(0.06, 0.55, 0), new THREE.CapsuleGeometry(0.03, 0.14, 3, 8).rotateZ(-0.2).translate(-0.05, 0.7, 0.02)), mat: lambert(0xffd84a) },
+    ],
+  },
+  tomatoPlant: {
+    scale: [0.8, 1.3],
+    parts: () => [
+      { geo: merge(box(0.015, 0.55, 0.015, 0, 0.275, 0), new THREE.SphereGeometry(0.17, 8, 6).scale(1, 1.2, 1).translate(0, 0.28, 0)), mat: lambert(0xffffff), color: fromGround(0.7, 1.0) },
+      { geo: merge(...[[0.1, 0.22, 0.08], [-0.1, 0.34, 0.04], [0.04, 0.42, -0.1], [-0.05, 0.16, -0.1], [0.12, 0.4, -0.02]].map(([x, y, z]) => new THREE.SphereGeometry(0.045, 8, 6).translate(x, y, z))), mat: lambert(0xffffff), color: pick([0xe83a3a, 0xff5a3a, 0xffa83a]) },
+    ],
+  },
+  broccoli: {
+    scale: [0.8, 1.3],
+    parts: () => [
+      { geo: new THREE.CylinderGeometry(0.035, 0.05, 0.22, 6).translate(0, 0.11, 0), mat: lambert(0xa8d078) },
+      { geo: merge(new THREE.IcosahedronGeometry(0.1, 1).translate(0, 0.3, 0), new THREE.IcosahedronGeometry(0.075, 1).translate(0.1, 0.25, 0.02), new THREE.IcosahedronGeometry(0.075, 1).translate(-0.1, 0.25, -0.02), new THREE.IcosahedronGeometry(0.07, 1).translate(0.02, 0.26, 0.1)), mat: lambert(0xffffff), color: fromGround(0.7, 1.0) },
+    ],
+  },
+  scarecrow: {
+    scale: [0.9, 1.2],
+    parts: () => [
+      { geo: merge(box(0.04, 0.9, 0.04, 0, 0.45, 0), box(0.5, 0.04, 0.04, 0, 0.62, 0)), mat: lambert(0x7a5a3a) },
+      { geo: merge(new THREE.CylinderGeometry(0.1, 0.12, 0.3, 8).translate(0, 0.5, 0), box(0.46, 0.1, 0.07, 0, 0.62, 0)), mat: lambert(0xffffff), color: pick([0x5a78c8, 0xc85a5a, 0x5ab878]) },
+      { geo: new THREE.SphereGeometry(0.1, 10, 8).translate(0, 0.8, 0), mat: lambert(0xf0d8a0) },
+      { geo: merge(new THREE.CylinderGeometry(0.16, 0.16, 0.02, 12).translate(0, 0.88, 0), new THREE.CylinderGeometry(0.08, 0.09, 0.1, 10).translate(0, 0.94, 0)), mat: lambert(0x8a6a3a) },
+    ],
+  },
+
+  // Spice Bazaar
+  spiceSacks: {
+    scale: [0.8, 1.2],
+    parts: () => [
+      { geo: merge(...[[-0.15, 0], [0.12, 0.05], [0, -0.14]].map(([x, z], i) => new THREE.CylinderGeometry(0.1, 0.12, 0.16 + i * 0.02, 10).translate(x, 0.08 + i * 0.01, z))), mat: lambert(0xffffff), color: pick([0xe8d8b0, 0xd8c498, 0xf0e4c4]) },
+      { geo: merge(...[[-0.15, 0], [0.12, 0.05], [0, -0.14]].map(([x, z], i) => new THREE.SphereGeometry(0.095, 10, 6).scale(1, 0.4, 1).translate(x, 0.17 + i * 0.015, z))), mat: lambert(0xffffff), color: pick([0xe85a2a, 0xe8b02a, 0xa83a2a, 0x78a83a]) },
+    ],
+  },
+  tagine: {
+    scale: [0.8, 1.2],
+    parts: () => [
+      { geo: lathe([[0.18, 0], [0.2, 0.06], [0.17, 0.1], [0, 0.1]], 12), mat: lambert(0xffffff), color: pick([0xd87a4a, 0xc8683a, 0xe08a58]) },
+      { geo: lathe([[0.17, 0.1], [0.12, 0.2], [0.05, 0.3], [0.025, 0.4], [0.04, 0.42], [0, 0.43]], 12), mat: lambert(0xffffff), color: pick([0x4a9ab8, 0xd8a83a, 0xc85a4a]) },
+    ],
+  },
 };
 
 // kinds too small/plentiful to have a withered stand-in

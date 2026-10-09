@@ -19,6 +19,20 @@ const pct = (x) => `${Math.round(x * 100)}%`;
 
 // tab strip for switching galaxies (shared by the shop and the collection book). Every galaxy
 // gets a tab so you know what's out there; locked ones are disabled and show their unlock progress.
+// Rebuilds a panel that holds the tabs without losing the tab strip's scroll position, then makes sure
+// the active tab is fully in view (the strip scrolls sideways when the tabs don't all fit).
+export function renderKeepingTabs(root, render) {
+  const old = root.querySelector('.galaxy-tabs')?.scrollLeft || 0;
+  render();
+  const tabs = root.querySelector('.galaxy-tabs');
+  if (!tabs) return;
+  tabs.scrollLeft = old;
+  const a = tabs.querySelector('.active');
+  if (!a) return;
+  if (a.offsetLeft < tabs.scrollLeft) tabs.scrollLeft = a.offsetLeft - 4;
+  else if (a.offsetLeft + a.offsetWidth > tabs.scrollLeft + tabs.clientWidth) tabs.scrollLeft = a.offsetLeft + a.offsetWidth - tabs.clientWidth + 4;
+}
+
 export function galaxyTabs(save, active, current) {
   return `<div class="galaxy-tabs" role="tablist">${GALAXY_IDS.map((g) => {
     const def = GALAXIES[g];
@@ -86,6 +100,10 @@ export class Shop {
   }
 
   render() {
+    renderKeepingTabs($('shop-body'), () => this.renderBody());
+  }
+
+  renderBody() {
     $('shop-dust').textContent = this.save.stardust;
     const dust = this.save.stardust;
     $('shop-body').innerHTML = `

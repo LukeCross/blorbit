@@ -19,7 +19,7 @@ import { GALAXIES, GALAXY_IDS, creaturesOf, wokenIn, isGalaxyUnlocked, unlockPro
 import { Critters } from './critters.js';
 import { Stardust } from './stardust.js';
 import { RARITY, RATES, TOTAL_FINDS, drawFind, foundCount, foundIn, totalFindsIn } from './collection.js';
-import { Shop, galaxyTabs } from './shop.js';
+import { Shop, galaxyTabs, renderKeepingTabs } from './shop.js';
 import { RewardedAds } from './ads.js';
 import { planetName, timeSeed } from './names.js';
 
@@ -989,6 +989,9 @@ function toggleBook() {
   book.classList.remove('hidden');
 }
 function renderBook() {
+  renderKeepingTabs($('book-grid'), renderBookBody);
+}
+function renderBookBody() {
   const g = bookTab;
   $('book-grid').innerHTML = galaxyTabs(save, g, planet.galaxy) + GALAXIES[g].biomes.map((b) => {
     const def = BIOMES[b];
