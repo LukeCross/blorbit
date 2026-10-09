@@ -219,7 +219,7 @@ There are no models, textures or sound assets. Everything you see and hear is ge
 ### Performance
 The game is tuned to run on low-end laptops and phones:
 - **Quality tiers:** *Smooth* renders at native resolution with Lambert/Phong materials and no post-processing. *Pretty* adds 1.5× resolution, MSAA, a subtle bloom and a colour-grade pass, with PBR materials.
-- **Auto mode** picks a tier based on the device (mobile, CPU cores, memory). It also drops to Smooth if the frame rate stays below about 42 fps.
+- **Auto mode** always uses Smooth. Pretty is only used when you choose it in Settings.
 - Frame rate is capped at 60 fps, geometry detail scales with prop size, hidden instances are packed out of draw calls, and expensive material features (transmission, clearcoat, sheen) are avoided entirely.
 
 ### Responsive UI

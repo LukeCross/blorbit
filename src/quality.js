@@ -10,13 +10,8 @@ export const TIERS = {
   pretty: { pixelRatio: 1.5, post: true },
 };
 
-export function detectTier() {
-  const ua = navigator.userAgent;
-  const mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua) || (navigator.maxTouchPoints > 1 && window.innerWidth < 1100);
-  const cores = navigator.hardwareConcurrency || 4;
-  const memory = navigator.deviceMemory || 8;
-  return mobile || cores <= 4 || memory <= 4 ? 'smooth' : 'pretty';
-}
+// Auto always starts on Smooth; Pretty is only used when the player picks it in Settings.
+export const detectTier = () => 'smooth';
 
 export const isSmooth = () => quality.tier === 'smooth';
 

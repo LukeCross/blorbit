@@ -200,7 +200,7 @@ grep -rnE "[0-9]+ biomes|[0-9]+ galaxies|[0-9]+ cards|biome definitions" index.h
 
 1. `npm run build` must pass (it also catches bad imports). The galaxy data checks in `galaxies.js` run at runtime, so a page load is the real test for data errors.
 2. Start the dev server: `npx vite --port 5173 &` (kill it afterwards: `pkill -f "vite --port 5173"`).
-3. **Render each new biome**, before and after restoring: `BIOME=<id> node scripts/biome.mjs` writes `/tmp/blorbit-<id>-dead.png` and `-restored.png` (~15s each; run biomes in parallel with `&` + `wait`). Look at them. A `[pageerror]` line means a runtime error. Graphics may auto-switch to Smooth in headless mode ("Switched to Smooth graphics" toast): that's fine.
+3. **Render each new biome**, before and after restoring: `BIOME=<id> node scripts/biome.mjs` writes `/tmp/blorbit-<id>-dead.png` and `-restored.png` (~15s each; run biomes in parallel with `&` + `wait`). Look at them. A `[pageerror]` line means a runtime error. Auto graphics always resolve to Smooth.
 4. Check the **title screen** with all galaxy cards at several widths (see 6.9), and the shop/collection tabs (`#shop .galaxy-tabs`, `#book .galaxy-tabs`).
 5. Other helpers in `scripts/` (many are older, galaxy-specific regression checks): `galaxycheck.mjs`, `shot.mjs`, `mobilecheck.mjs [portrait|landscape]`, `propbooth.mjs` (props restored vs withered), `creaturebooth.mjs` / `skinbooth.mjs` (creature skins up close), `shopcheck.mjs`, `resetcheck.mjs`, `consentcheck.mjs`, `accesscheck.mjs`. Read each file's header comment for usage.
 6. Honest reporting: say what you rendered and what you did not (sound, close-up skins, real devices).

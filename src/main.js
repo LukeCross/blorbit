@@ -1277,30 +1277,12 @@ function updateCamera(dt) {
 }
 let last = performance.now();
 
-// Auto quality: if Pretty can't hold ~42fps on this machine, drop to Smooth once.
-const perf = { time: 0, frames: 0, warmup: 3 };
-function watchPerformance(realDt) {
-  if (save.quality !== 'auto' || quality.tier !== 'pretty' || document.hidden) return;
-  if ((perf.warmup -= realDt) > 0) return;
-  perf.time += realDt;
-  perf.frames++;
-  if (perf.time < 4) return;
-  const fps = perf.frames / perf.time;
-  perf.time = perf.frames = 0;
-  if (fps < 42) {
-    quality.tier = 'smooth';
-    applyQuality();
-    toast('Switched to Smooth graphics<small>to keep things running nicely on this device · change it in Settings</small>');
-  }
-}
-
 function frame() {
   requestAnimationFrame(frame);
   const nowMs = performance.now();
   // cap at ~60fps: on 120Hz screens drawing every refresh just doubles the work
   if (nowMs - last < 1000 / 62) return;
   const realDt = Math.min((nowMs - last) / 1000, 1 / 20);
-  watchPerformance(Math.min((nowMs - last) / 1000, 0.25));
   last = nowMs;
   if (hitstop > 0) {
     hitstop -= realDt;
