@@ -359,6 +359,28 @@ export class Sound {
           this.tone({ f: midi(n), t, dur: 1.4, vol: 0.02, verb: 0.95, pan });
         }
         break;
+      // ---- Sunroam
+      case 'savanna':
+        if (Math.random() < 0.4) this.tone({ type: 'sawtooth', f: 110, f2: 80, t, dur: 1.3, vol: 0.012, attack: 0.15, verb: 0.7, pan }); // distant roar
+        else if (Math.random() < 0.5) this.noiseBurst({ t, dur: 2, vol: 0.02, f: 900, f2: 1500, q: 0.5, verb: 0.4 }); // dry grass in the breeze
+        else this.birdChirp();
+        break;
+      case 'canopy':
+        if (Math.random() < 0.5) for (let i = 0; i < 3; i++) this.tone({ type: 'square', f: 900 - i * 120, f2: 1200 - i * 150, t: t + i * 0.14, dur: 0.12, vol: 0.006, verb: 0.4, pan }); // parrot squawk
+        else this.birdChirp();
+        break;
+      case 'riverbank':
+        if (Math.random() < 0.5) this.noiseBurst({ t, dur: 1.2, vol: 0.02, f: 500, f2: 300, q: 0.8, type: 'lowpass', verb: 0.5 }); // a splash
+        else this.tone({ type: 'sawtooth', f: 90, f2: 70, t, dur: 0.7, vol: 0.012, attack: 0.1, verb: 0.6, pan }); // hippo grumble
+        break;
+      case 'bamboo':
+        if (Math.random() < 0.5) for (let i = 0; i < 2; i++) this.tone({ type: 'triangle', f: midi(76 + pentaStep(i * 2)), t: t + i * 0.25, dur: 0.5, vol: 0.016, verb: 0.9, pan }); // bamboo chime
+        else this.noiseBurst({ t, dur: 2, vol: 0.025, f: 1600, f2: 1000, q: 0.6, type: 'highpass', verb: 0.4 }); // leaves rustle
+        break;
+      case 'outback':
+        if (Math.random() < 0.5) for (let i = 0; i < 4; i++) this.tone({ type: 'square', f: 640 + (i % 2) * 90, f2: 540, t: t + i * 0.16, dur: 0.1, vol: 0.005, verb: 0.5, pan }); // kookaburra laugh
+        else this.noiseBurst({ t, dur: 2.4, vol: 0.025, f: 700, f2: 1300, q: 0.5, verb: 0.4 }); // hot wind
+        break;
       default:
         this.birdChirp();
     }
@@ -448,7 +470,7 @@ export class Sound {
   // rolling timbre per surface: [filter centre, Q, low thump]
   setBiome(id) {
     this.biome = id;
-    this.rollTimbre = { snow: [1700, 0.9, 0.3], desert: [2600, 0.6, 0.2], pond: [320, 1.6, 1.3], grove: [500, 1.2, 1], shore: [2200, 0.6, 0.4], volcano: [700, 1, 1.5], candy: [600, 2.2, 1.2], autumn: [2000, 0.8, 0.5], park: [800, 1.1, 0.8], downtown: [1400, 0.8, 0.6], suburbs: [600, 1.3, 0.9], funfair: [1100, 1, 1.1], harbour: [700, 1.1, 1], pastures: [500, 1.3, 1], cliffs: [800, 1, 0.8], rainbow: [450, 1.5, 1.2], balloons: [500, 1.3, 1], stargazer: [1200, 0.9, 0.6] }[id] || [450, 1.4, 1];
+    this.rollTimbre = { snow: [1700, 0.9, 0.3], desert: [2600, 0.6, 0.2], pond: [320, 1.6, 1.3], grove: [500, 1.2, 1], shore: [2200, 0.6, 0.4], volcano: [700, 1, 1.5], candy: [600, 2.2, 1.2], autumn: [2000, 0.8, 0.5], park: [800, 1.1, 0.8], downtown: [1400, 0.8, 0.6], suburbs: [600, 1.3, 0.9], funfair: [1100, 1, 1.1], harbour: [700, 1.1, 1], pastures: [500, 1.3, 1], cliffs: [800, 1, 0.8], rainbow: [450, 1.5, 1.2], balloons: [500, 1.3, 1], stargazer: [1200, 0.9, 0.6], savanna: [1400, 0.8, 0.7], canopy: [450, 1.5, 1.1], riverbank: [350, 1.5, 1.2], bamboo: [900, 1, 0.8], outback: [2200, 0.7, 0.4] }[id] || [450, 1.4, 1];
   }
 
   setLife(x) {

@@ -33,6 +33,16 @@ export const GALAXIES = {
     unlockedBy: 'city',
     unlockAt: 0.8,
   },
+  safari: {
+    name: 'Sunroam',
+    emoji: '🦒',
+    blurb: 'Savanna, jungle, river, bamboo and outback. Wake the big-hearted wanderers.',
+    art: ['#ffe0a0', '#b8e8a8'],
+    biomes: ['savanna', 'canopy', 'riverbank', 'bamboo', 'outback'],
+    // unlocked by waking 80% of Skyhaven's creatures (4 of 5)
+    unlockedBy: 'sky',
+    unlockAt: 0.8,
+  },
 };
 export const GALAXY_IDS = Object.keys(GALAXIES);
 

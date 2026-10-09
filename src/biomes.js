@@ -392,4 +392,101 @@ Object.assign(BIOMES, {
   },
 });
 
+
+// ---------------------------------------------------------------- Sunroam galaxy
+// Sun-baked savanna, jungle, river, bamboo and outback. Withered grey-brown ground warms back to gold.
+
+Object.assign(BIOMES, {
+  savanna: {
+    name: 'Golden Savanna', creature: 'lion', weight: 0.1, terrain: 'rolling',
+    dead: 0x6e665a, alive: 0xe0c460, sky: ['#ffb870', '#ffe8b0'], style: [0, 0, 0],
+    small: [['grass', 0.14], ['flower', 0.015], ['pebble', 0.004]],
+    big: [['acacia', 0.003], ['baobab', 0.0012]],
+    critters: [['bird', 3], ['butterfly', 2]],
+    particles: [[0xffe8a0, 0xffd080], -0.4, 6],
+    patches: [
+      { name: 'Lookout rock', shape: 'blob', center: true, rFrac: 0.26, dead: 0x6a625a, alive: 0xd8b878, props: [['cliffRock', 0.05, 'inner'], ['grass', 0.12]] },
+      { name: 'Acacia grove', shape: 'blob', ...M, dead: 0x645e52, alive: 0xdcc060, props: [['acacia', 0.05]], critters: [['bird', 1]] },
+      { name: 'Termite towers', shape: 'blob', ...S, dead: 0x6a5e52, alive: 0xd0a870, props: [['termiteMound', 0.1]] },
+      { name: 'Tall grass sea', shape: 'blob', ...L, dead: 0x666054, alive: 0xe8cc68, props: [['grass', 0.4]], critters: [['butterfly', 2]] },
+      { name: 'Safari camp', shape: 'blob', ...S, dead: 0x6e665c, alive: 0xe4cc88, props: [['safariTent', 0.04, 'inner'], ['jeep', 0.025], ['lantern', 0.03, 'rim']] },
+      { name: 'Elephant trail', shape: 'path', dead: 0x7c7266, alive: 0xd8b880, props: [['pathStone', 0.1], ['desertRock', 0.03, 'rim']] },
+    ],
+    patchCount: 10,
+    finds: [['🪘', 'Hand drum', 'c'], ['🐾', 'Pawprints', 'c'], ['🍵', 'Bush tea', 'c'], ['📷', 'Field camera', 'u'], ['🎒', "Explorer's pack", 'u'], ['🚙', 'Safari jeep', 'r'], ['🏕️', 'Sunset camp', 'e'], ['🌅', 'Golden sunrise', 'l']],
+  },
+  canopy: {
+    name: 'Parrot Canopy', creature: 'parrot', weight: 0.06, terrain: 'hillocks',
+    dead: 0x4a5048, alive: 0x3fc470, sky: ['#6ed8b0', '#fff4c0'], style: [0, 0.1, 0],
+    small: [['fern', 0.12], ['flower', 0.03], ['shroom', 0.006]],
+    big: [['bananaTree', 0.004], ['palm', 0.0024]],
+    critters: [['butterfly', 4], ['bird', 3]],
+    particles: [[0xfff0a0, 0xb8ffc8], -0.3, 7],
+    patches: [
+      { name: 'Banana grove', shape: 'blob', ...M, dead: 0x4e544a, alive: 0x58c868, props: [['bananaTree', 0.06]], critters: [['bird', 2]] },
+      { name: 'Fern floor', shape: 'blob', ...L, dead: 0x464c44, alive: 0x3fb870, props: [['fern', 0.35]] },
+      { name: 'Hibiscus thicket', shape: 'blob', ...S, dead: 0x50544c, alive: 0x68d070, props: [['flower', 0.4], ['bush', 0.05]], critters: [['butterfly', 3]] },
+      { name: 'Jungle stream', shape: 'path', water: 0x3ac0b8, dead: 0x484c46, alive: 0x48b878, props: [['lily', 0.06, 'inner'], ['fern', 0.06, 'rim']], critters: [['dragonfly', 2]] },
+      { name: 'Palm cove', shape: 'blob', ...M, dead: 0x565648, alive: 0x78d070, props: [['palm', 0.05]] },
+      { name: 'Mango tree', shape: 'blob', ...S, dead: 0x4c5248, alive: 0x50c060, props: [['tree', 0.07], ['shroom', 0.08, 'rim']], critters: [['bird', 1]] },
+    ],
+    patchCount: 10,
+    finds: [['🥭', 'Mango', 'c'], ['🍌', 'Banana', 'c'], ['🥥', 'Coconut', 'c'], ['🍍', 'Pineapple', 'u'], ['🌺', 'Hibiscus', 'u'], ['🌴', 'Giant palm leaf', 'r'], ['🍹', 'Tropical punch', 'e'], ['🏝️', 'Secret island', 'l']],
+  },
+  riverbank: {
+    name: 'Hippo River', creature: 'hippo', weight: -0.08, terrain: 'basin',
+    dead: 0x5e5a50, alive: 0x8ccc60, sky: ['#80c8e8', '#fff0d0'], style: [0, 0, 0],
+    small: [['reed', 0.05], ['grass', 0.08], ['mossRock', 0.004]],
+    big: [['acacia', 0.002], ['palm', 0.0015]],
+    critters: [['dragonfly', 3], ['fish', 2], ['bird', 2]],
+    particles: [[0xd8f4ff, 0xffffff], -0.2, 5],
+    patches: [
+      { name: 'The waterhole', shape: 'blob', center: true, rFrac: 0.45, water: 0x4ab0b8, dead: 0x50483e, alive: 0x78b860, props: [['reed', 0.06, 'rim'], ['mossRock', 0.03, 'rim']], critters: [['fish', 3], ['dragonfly', 2]] },
+      { name: 'Muddy wallow', shape: 'blob', ...S, water: 0x8a6a48, dead: 0x4e463c, alive: 0x7a6a50, props: [['reed', 0.08, 'rim']] },
+      { name: 'Reed bank', shape: 'blob', ...M, dead: 0x56524a, alive: 0x84c868, props: [['reed', 0.35]], critters: [['dragonfly', 2]] },
+      { name: 'Lily bay', shape: 'blob', ...S, water: 0x58bcc0, dead: 0x504a40, alive: 0x70b868, props: [['lily', 0.2, 'inner']], critters: [['fish', 1]] },
+      { name: 'Fishing jetty', shape: 'path', dead: 0x6e665a, alive: 0xc8a070, props: [['plank', 0.2], ['bollard', 0.03, 'rim']] },
+      { name: 'Boulder bend', shape: 'blob', ...M, dead: 0x5c5850, alive: 0x90c070, props: [['mossRock', 0.1]] },
+    ],
+    patchCount: 10,
+    finds: [['🌊', 'Ripple', 'c'], ['🛶', 'Little canoe', 'c'], ['🎣', 'Fishing rod', 'c'], ['🪣', 'Mud bucket', 'u'], ['🫧', 'Bubble bath', 'u'], ['🏞️', 'River bend', 'r'], ['⛵', 'Toy sailboat', 'e'], ['💰', "Hippo's treasure", 'l']],
+  },
+  bamboo: {
+    name: 'Bamboo Highlands', creature: 'panda', weight: 0.02, terrain: 'peaks',
+    dead: 0x585e58, alive: 0x88d878, sky: ['#9ed0c0', '#f0f4e0'], style: [0, 0.1, 0.1],
+    small: [['grass', 0.06], ['fern', 0.04], ['mossRock', 0.004]],
+    big: [['bamboo', 0.006], ['pine', 0.0012]],
+    critters: [['bird', 2], ['butterfly', 2]],
+    particles: [[0xe8ffe8, 0xffffff], -0.2, 6],
+    patches: [
+      { name: 'Bamboo thicket', shape: 'blob', ...L, dead: 0x4e564e, alive: 0x78d070, props: [['bamboo', 0.22]], critters: [['bird', 1]] },
+      { name: 'Stone steps', shape: 'path', dead: 0x727870, alive: 0xc8d4c0, props: [['pathStone', 0.14], ['lantern', 0.03, 'rim']] },
+      { name: 'Panda picnic', shape: 'blob', ...S, dead: 0x58605a, alive: 0x90e080, props: [['picnicBlanket', 0.05, 'inner'], ['bamboo', 0.06, 'rim']] },
+      { name: 'Misty pond', shape: 'blob', ...M, water: 0x7ccac8, dead: 0x505850, alive: 0x70c8a0, props: [['reed', 0.08, 'rim'], ['lily', 0.06, 'inner']], critters: [['dragonfly', 1]] },
+      { name: 'Lantern grove', shape: 'blob', ...S, emissive: 0.25, dead: 0x545c56, alive: 0x98e088, props: [['lantern', 0.08], ['fern', 0.15]], critters: [['firefly', 2]] },
+      { name: 'Mossy shrine', shape: 'blob', ...S, dead: 0x5c625c, alive: 0xa8d890, props: [['pillar', 0.05], ['mossRock', 0.08]] },
+    ],
+    patchCount: 9,
+    finds: [['🎍', 'Bamboo shoot', 'c'], ['🍜', 'Noodle bowl', 'c'], ['🥢', 'Chopsticks', 'c'], ['🏮', 'Paper lantern', 'u'], ['🪭', 'Folding fan', 'u'], ['⛩️', 'Mountain shrine', 'r'], ['🎋', 'Wishing tree', 'e'], ['🐉', 'Mist dragon', 'l']],
+  },
+  outback: {
+    name: 'Red Outback', creature: 'koala', weight: 0.04, terrain: 'dunes',
+    dead: 0x6e6058, alive: 0xe0905a, sky: ['#ff9a6a', '#ffe0a8'], style: [0, 0, 0],
+    small: [['shrub', 0.05], ['grass', 0.05], ['desertRock', 0.008]],
+    big: [['mesaRock', 0.0016], ['eucalyptus', 0.0024]],
+    critters: [['bird', 3], ['butterfly', 1]],
+    particles: [[0xffc890, 0xffe0b0], -0.3, 6],
+    patches: [
+      { name: 'Red mesa', shape: 'blob', center: true, rFrac: 0.24, dead: 0x6c5c54, alive: 0xd88a58, props: [['mesaRock', 0.02, 'inner'], ['desertRock', 0.05, 'rim']] },
+      { name: 'Gum grove', shape: 'blob', ...M, dead: 0x5e5a50, alive: 0xc8a068, props: [['eucalyptus', 0.06]], critters: [['bird', 1]] },
+      { name: 'Billabong', shape: 'blob', ...S, water: 0x4ab8c0, dead: 0x5c5048, alive: 0xb8a068, props: [['reed', 0.08, 'rim'], ['eucalyptus', 0.03, 'rim']], critters: [['bird', 2]] },
+      { name: 'Dry creek bed', shape: 'path', dead: 0x7a6a5e, alive: 0xe0b48a, props: [['desertRock', 0.06, 'rim']] },
+      { name: 'Wildflower plain', shape: 'blob', ...L, dead: 0x645a50, alive: 0xe8a868, props: [['flower', 0.3], ['shrub', 0.08]], critters: [['butterfly', 2]] },
+      { name: 'Rocky outcrop', shape: 'blob', ...S, dead: 0x6a5c54, alive: 0xd0805a, props: [['desertRock', 0.12], ['mesaRock', 0.01]] },
+    ],
+    patchCount: 9,
+    finds: [['🪃', 'Boomerang', 'c'], ['🌱', 'Gumnut seedling', 'c'], ['🥩', 'Barbie snag', 'c'], ['🏜️', 'Red earth', 'u'], ['🛖', 'Bush hut', 'u'], ['⛺', 'Swag tent', 'r'], ['🎸', 'Campfire guitar', 'e'], ['🌠', 'Southern shooting star', 'l']],
+  },
+});
+
 export const BIOME_IDS = Object.keys(BIOMES);

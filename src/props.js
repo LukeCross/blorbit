@@ -1148,6 +1148,94 @@ export const PROP_KINDS = {
       ];
     },
   },
+
+  // ---------------------------------------------------------------- Sunroam galaxy
+  // Sun-baked savanna, jungle, river, bamboo and outback: warm earth tones and big leaves.
+
+  // Golden Savanna
+  acacia: {
+    scale: [1.0, 1.5],
+    parts: () => [
+      { geo: merge(new THREE.CylinderGeometry(0.045, 0.07, 0.6, 8).translate(0, 0.3, 0), rod(new THREE.Vector3(0, 0.5, 0), new THREE.Vector3(-0.2, 0.78, 0), 0.03), rod(new THREE.Vector3(0, 0.5, 0), new THREE.Vector3(0.18, 0.76, 0.04), 0.03)), mat: lambert(0x7a5a3a) },
+      { geo: merge(new THREE.SphereGeometry(0.4, 14, 8).scale(1, 0.26, 1).translate(0.02, 0.88, 0), new THREE.SphereGeometry(0.24, 12, 8).scale(1, 0.3, 1).translate(-0.3, 0.8, 0.06), new THREE.SphereGeometry(0.22, 12, 8).scale(1, 0.3, 1).translate(0.3, 0.76, -0.04)), mat: lambert(0xffffff), color: fromGround(0.75, 1.0) },
+    ],
+  },
+  baobab: {
+    scale: [1.1, 1.6],
+    parts: () => [
+      { geo: merge(new THREE.CylinderGeometry(0.2, 0.3, 0.7, 14).translate(0, 0.35, 0), new THREE.CylinderGeometry(0.17, 0.2, 0.28, 14).translate(0, 0.84, 0), ...[0, 1, 2, 3, 4].map((i) => { const a = i * 1.26; return rod(new THREE.Vector3(0, 0.95, 0), new THREE.Vector3(Math.cos(a) * 0.3, 1.25, Math.sin(a) * 0.3), 0.035); })), mat: lambert(0xffffff), color: pick([0xa88a6a, 0x9a7e66, 0xb89a78]) },
+      { geo: merge(...[0, 1, 2, 3, 4].map((i) => { const a = i * 1.26; return new THREE.IcosahedronGeometry(0.14, 1).translate(Math.cos(a) * 0.32, 1.3, Math.sin(a) * 0.32); })), mat: lambert(0xffffff), color: fromGround(0.7, 0.95) },
+    ],
+  },
+  termiteMound: {
+    scale: [0.8, 1.4],
+    parts: () => [{
+      geo: lathe([[0.26, 0], [0.22, 0.14], [0.17, 0.3], [0.12, 0.46], [0.06, 0.56], [0.02, 0.6], [0, 0.6]], 10),
+      mat: lambert(0xffffff), color: pick([0xc8946a, 0xd8a47a, 0xb8845a]),
+    }],
+  },
+  safariTent: {
+    scale: [0.9, 1.1],
+    parts: () => {
+      const tri = new THREE.Shape([new THREE.Vector2(-0.34, 0), new THREE.Vector2(0.34, 0), new THREE.Vector2(0, 0.44)]);
+      return [
+        { geo: new THREE.ExtrudeGeometry(tri, { depth: 0.6, bevelEnabled: false }).translate(0, 0, -0.3), mat: lambert(0xffffff), color: pick([0xf0e0b8, 0xe8d0a0, 0xf4e8cc]) },
+        { geo: merge(box(0.02, 0.5, 0.02, 0, 0.25, 0.32), box(0.5, 0.02, 0.02, 0, 0.45, 0.32), new THREE.PlaneGeometry(0.18, 0.3).translate(0, 0.16, 0.302)), mat: lambert(0x6a4a34) },
+        { geo: merge(new THREE.PlaneGeometry(0.1, 0.1).rotateY(Math.PI / 2).translate(0.172, 0.2, 0), new THREE.PlaneGeometry(0.1, 0.1).rotateY(-Math.PI / 2).translate(-0.172, 0.2, 0)), mat: unlit(0xfff0c0) },
+      ];
+    },
+  },
+  jeep: {
+    scale: [0.9, 1.1],
+    parts: () => [
+      { geo: merge(rbox(0.64, 0.17, 0.34, 0.05, 0, 0.17, 0), rbox(0.22, 0.14, 0.3, 0.03, -0.1, 0.31, 0)), mat: lambert(0xffffff), color: pick([0xd8b878, 0xc8a064, 0xe0c48a]) },
+      { geo: merge(box(0.025, 0.2, 0.025, -0.2, 0.4, 0.14), box(0.025, 0.2, 0.025, -0.2, 0.4, -0.14), box(0.3, 0.02, 0.32, -0.04, 0.5, 0)), mat: lambert(0x5a4a3a) },
+      { geo: merge(...[[-0.2, 0.17], [0.2, 0.17], [-0.2, -0.17], [0.2, -0.17]].map(([x, z]) => new THREE.CylinderGeometry(0.085, 0.085, 0.07, 10).rotateX(Math.PI / 2).translate(x, 0.085, z))), mat: lambert(0x3d3a4a) },
+      { geo: merge(new THREE.IcosahedronGeometry(0.03, 0).translate(0.33, 0.2, 0.1), new THREE.IcosahedronGeometry(0.03, 0).translate(0.33, 0.2, -0.1)), mat: unlit(0xfff4c0) },
+    ],
+  },
+
+  // Parrot Canopy
+  bananaTree: {
+    scale: [0.9, 1.4],
+    parts: () => [
+      { geo: new THREE.CylinderGeometry(0.06, 0.09, 0.62, 8).translate(0, 0.31, 0), mat: lambert(0x9aae5a) },
+      { geo: radial(6, (a) => new THREE.ConeGeometry(0.15, 0.7, 6).scale(1, 1, 0.22).rotateZ(-1.55).translate(0.34, 0.74, 0).rotateY(a)), mat: lambert(0xffffff), color: fromGround(0.8, 1.1) },
+      { geo: merge(...[0, 1, 2, 3].map((i) => new THREE.CapsuleGeometry(0.025, 0.12, 2, 6).rotateZ(0.5).translate(0.1 + i * 0.015, 0.54 - i * 0.04, i * 0.03 - 0.04))), mat: lambert(0xffd84a) },
+    ],
+  },
+  bamboo: {
+    scale: [0.9, 1.5],
+    parts: () => {
+      const stalks = [], nodes = [], leaves = [];
+      [[0, 0, 1.1], [0.09, 0.05, 0.95], [-0.08, 0.06, 1.25], [0.02, -0.09, 0.8]].forEach(([x, z, h], k) => {
+        stalks.push(new THREE.CylinderGeometry(0.03, 0.036, h, 8).translate(x, h / 2, z));
+        for (let n = 1; n < 4; n++) nodes.push(new THREE.CylinderGeometry(0.04, 0.04, 0.018, 8).translate(x, (h * n) / 4, z));
+        leaves.push(new THREE.ConeGeometry(0.05, 0.22, 4).scale(1, 1, 0.3).rotateZ(1.2 + k * 0.1).translate(x + 0.1, h * 0.9, z).rotateY(k * 1.4));
+      });
+      return [
+        { geo: merge(...stalks), mat: lambert(0xffffff), color: fromGround(0.8, 1.05) },
+        { geo: merge(...nodes), mat: lambert(0x6a8a3a) },
+        { geo: merge(...leaves), mat: lambert(0x7fc45a) },
+      ];
+    },
+  },
+
+  // Outback
+  eucalyptus: {
+    scale: [1.0, 1.5],
+    parts: () => [
+      { geo: merge(new THREE.CylinderGeometry(0.05, 0.08, 0.9, 8).translate(0, 0.45, 0), rod(new THREE.Vector3(0, 0.7, 0), new THREE.Vector3(0.14, 1.0, 0), 0.025)), mat: lambert(0xffffff), color: pick([0xe8dccc, 0xd8c8b4, 0xf0e4d4]) },
+      { geo: merge(new THREE.IcosahedronGeometry(0.22, 1).scale(1, 0.8, 1).translate(-0.04, 1.0, 0), new THREE.IcosahedronGeometry(0.17, 1).translate(0.16, 1.08, 0.04), new THREE.IcosahedronGeometry(0.14, 1).translate(-0.18, 0.88, 0.06)), mat: lambert(0xffffff), color: pick([0x8fb89a, 0x9ac4a0, 0x7fa88a]) },
+    ],
+  },
+  mesaRock: {
+    scale: [1.0, 1.5],
+    parts: () => [{
+      geo: merge(new THREE.CylinderGeometry(0.3, 0.42, 0.7, 12).translate(0, 0.35, 0), new THREE.CylinderGeometry(0.34, 0.3, 0.1, 12).translate(0, 0.75, 0), new THREE.CylinderGeometry(0.16, 0.22, 0.3, 10).translate(0.34, 0.15, 0.12)),
+      mat: lambert(0xffffff), color: pick([0xd8764a, 0xc8683e, 0xe08a58]),
+    }],
+  },
 };
 
 // kinds too small/plentiful to have a withered stand-in
