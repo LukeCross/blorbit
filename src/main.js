@@ -221,7 +221,15 @@ function buildSkinBar() {
     })
     .join('');
   $('skins').querySelectorAll('.skin').forEach((b) => b.addEventListener('click', () => equip(b.dataset.id)));
+  $('skins').querySelector('.active')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
 }
+
+// a vertical mouse wheel scrolls the skin bar sideways
+$('skins').addEventListener('wheel', (e) => {
+  if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+  $('skins').scrollLeft += e.deltaY;
+  e.preventDefault();
+}, { passive: false });
 
 function equip(id) {
   if (!id || !save.unlocked.includes(id) || id === blob.skinId) return;

@@ -18,24 +18,25 @@ When you boot the game you **choose your galaxy**. Each galaxy is its own set of
 
 - **🌸 Wildbloom:** 10 wild biomes, 10 creatures and 80 finds. Open from the start.
 - **🌆 Citylight:** 5 city biomes, 5 creatures and 40 finds. Abandoned grey streets light back up: windows glow, awnings unfurl and the traffic returns. It **unlocks once you've woken 8 of the 10 Wildbloom creatures** (80%).
+- **☁️ Skyhaven:** 5 sky-island biomes, 5 creatures and 40 finds. Grassy islands drift in a sea of cloud that's grey and stormy until you restore it, then soft and sunlit. It **unlocks once you've woken 4 of the 5 Citylight creatures** (80%).
 
 Travel between unlocked galaxies is **free**. Tap the galaxy icon next to the planet name or press `G`, or go **🏠 Menu** (top left, also on the planet-restored screen) to get back to the galaxy picker. Each galaxy keeps its own half-finished planet, so you can leave one and come back to it later. Your stardust, skins and collection are shared across every galaxy, so a cat can roll around Wildbloom.
 
 ### Biomes and spots
 Every planet is split into **4 biomes**, picked at random from its galaxy:
 
-| Wildbloom biome | Sleeping creature | | Citylight biome | Sleeping creature |
-| --- | --- | --- | --- | --- |
-| Bunny Meadow | 🐰 Bunny | | Plaza Park | 🐿️ Squirrel |
-| Sleepy Pond | 🐸 Frog | | Neon Downtown | 🐱 Cat |
-| Dusty Dunes | 🦊 Fox | | Sleepy Suburbs | 🐶 Dog |
-| Frosty Peaks | 🐧 Penguin | | Funfair Pier | 🦝 Raccoon |
-| Moonlit Grove | 🦋 Moth | | Dockside Harbour | 🐦 Seagull |
-| Snail Garden | 🐌 Snail | | | |
-| Sunny Shore | 🐢 Turtle | | | |
-| Ember Crags | 🦎 Lizard | | | |
-| Sugar Hills | 🐻 Bear | | | |
-| Maple Hollow | 🦔 Hedgehog | | | |
+| Wildbloom biome | Creature | | Citylight biome | Creature | | Skyhaven biome | Creature |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Bunny Meadow | 🐰 Bunny | | Plaza Park | 🐿️ Squirrel | | Cloud Pastures | 🐑 Sheep |
+| Sleepy Pond | 🐸 Frog | | Neon Downtown | 🐱 Cat | | Windmill Cliffs | 🐐 Goat |
+| Dusty Dunes | 🦊 Fox | | Sleepy Suburbs | 🐶 Dog | | Rainbow Falls | 🦄 Unicorn |
+| Frosty Peaks | 🐧 Penguin | | Funfair Pier | 🦝 Raccoon | | Balloon Meadow | 🦅 Eagle |
+| Moonlit Grove | 🦋 Moth | | Dockside Harbour | 🐦 Seagull | | Stargazer's Peak | 🦉 Owl |
+| Snail Garden | 🐌 Snail | | | | | | |
+| Sunny Shore | 🐢 Turtle | | | | | | |
+| Ember Crags | 🦎 Lizard | | | | | | |
+| Sugar Hills | 🐻 Bear | | | | | | |
+| Maple Hollow | 🦔 Hedgehog | | | | | | |
 
 Each biome has its own terrain, colours, sky tint, props, critters, ambient particles and soundscape. It's also scattered with smaller named **spots**, like a flower bed, an old dirt road, an oasis or a frozen lake. Slime enough of a spot to clear it, which earns a chime, a burst of nature and a chance at a collectible find.
 
@@ -48,7 +49,7 @@ Each planet gets a randomly generated name and layout, seeded from the date and 
 
 ### Stardust, finds and the shop
 - **Stardust** ✨ is scattered in little trails across every planet. Roll over it to collect it.
-- **Finds** are collectibles: 8 per biome (80 in Wildbloom, 40 in Citylight). Each one is *common*, *rare* or *legendary*. You can roll one by clearing a spot, and they all live in your **Collection** book, which has a tab per galaxy.
+- **Finds** are collectibles: 8 per biome (80 in Wildbloom, 40 each in Citylight and Skyhaven). Each one is *common*, *rare* or *legendary*. You can roll one by clearing a spot, and they all live in your **Collection** book, which has a tab per galaxy.
 - The **Shop** sells card packs for each biome. It opens on your current galaxy, with a tab for every galaxy: unlocked ones let you buy their packs without travelling, and locked ones show greyed out with their unlock progress. Every pack holds 3 cards from that biome's collection:
   - **Card pack** (✨25): 5% legendary, 25% rare.
   - **Shiny pack** (✨75): 15% legendary, 50% rare, and always at least one rare.
@@ -172,7 +173,7 @@ src/
   main.js           Game loop, state, input, UI, saving and orchestration
   planet.js         Icosphere terrain, biome layout, spots, slime painting, prop layers
   galaxies.js       Galaxy definitions (which biomes belong to which galaxy) and unlock rules
-  biomes.js         The 15 biome definitions (terrain, colours, props, critters, finds)
+  biomes.js         The 20 biome definitions (terrain, colours, props, critters, finds)
   props.js          Procedural prop models
   blob.js           The player blob: movement, rolling, jelly shader, squash and stretch
   skins.js          Creature skins: accessories, body materials, eyes

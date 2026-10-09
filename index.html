@@ -114,8 +114,8 @@
       #galaxy-btn.new::after { content: ''; position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; border-radius: 50%; background: var(--pink-deep); box-shadow: 0 0 0 2px #fff; }
 
       /* galaxy picker cards (title screen + in-game travel panel) */
-      .galaxy-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; width: 100%; }
-      #title .galaxy-cards { width: min(560px, 80vw); margin-bottom: 4px; }
+      .galaxy-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; width: 100%; }
+      #title .galaxy-cards { width: min(840px, 86vw); margin-bottom: 4px; }
       .galaxy-card {
         position: relative; display: flex; flex-direction: column; align-items: stretch; text-align: left; gap: 6px; padding: 0 0 14px; overflow: hidden;
         border: 2px solid rgba(255,255,255,0.9); border-radius: 24px; background: rgba(255,255,255,0.8); box-shadow: var(--shadow-sm);
@@ -216,7 +216,11 @@
       #skins {
         position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 2;
         display: flex; gap: 6px; padding: 8px; border-radius: 24px;
+        /* 21 skins don't fit on smaller desktops: scroll sideways (mouse wheel works too) */
+        max-width: calc(100vw - 32px); overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
       }
+      #skins::-webkit-scrollbar { display: none; }
+      #skins .skin { flex: none; }
       .skin {
         position: relative; width: 48px; height: 48px; border-radius: 16px; border: 1px solid transparent; cursor: pointer;
         background: rgba(255,255,255,0.45); font-size: 24px; display: grid; place-items: center;
@@ -550,6 +554,11 @@
         .galaxy-card .go { margin-top: 4px; padding: 7px 0; font-size: 15px; }
         .galaxy-card .badge { top: 6px; right: 8px; }
         .galaxy-card:disabled .padlock { left: 48px; top: 50%; width: 42px; height: 42px; font-size: 21px; }
+        /* three galaxy tabs on a phone: one line each, "(here)" becomes a dot */
+        .galaxy-tabs { gap: 3px; }
+        .galaxy-tabs button { padding: 9px 4px; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .galaxy-tabs small.here { display: none; }
+        .galaxy-tabs .is-here::after { content: ''; display: inline-block; width: 6px; height: 6px; margin: 0 0 1px 5px; border-radius: 50%; background: var(--c-progress); vertical-align: middle; }
         .choose { margin-bottom: 8px; }
         .tagline { font-size: 16px; margin: 8px 0 20px; }
         .controls { gap: 10px 14px; font-size: 13px; }

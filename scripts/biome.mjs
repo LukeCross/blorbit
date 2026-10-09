@@ -7,13 +7,13 @@ await page.setViewport({ width: 1280, height: 800 });
 page.on('pageerror', (e) => console.log('[pageerror]', e.message));
 page.setDefaultTimeout(120000);
 await page.goto('http://localhost:5173/', { waitUntil: 'load' });
-// every Wildbloom friend awake, so locked galaxies (Citylight) are open too
-await page.evaluate(() => { localStorage.clear(); localStorage.setItem('blorbit-save-v1', JSON.stringify({ unlocked: ['classic', 'bunny', 'frog', 'fox', 'penguin', 'moth', 'snail', 'turtle', 'lizard', 'bear', 'hedgehog'], v: 3 })); });
+// every Wildbloom and Citylight friend awake, so every galaxy is open
+await page.evaluate(() => { localStorage.clear(); localStorage.setItem('blorbit-save-v1', JSON.stringify({ unlocked: ['classic', 'bunny', 'frog', 'fox', 'penguin', 'moth', 'snail', 'turtle', 'lizard', 'bear', 'hedgehog', 'squirrel', 'cat', 'dog', 'raccoon', 'seagull'], v: 3 })); });
 await page.reload({ waitUntil: 'load' });
 await page.waitForSelector('#title-galaxies .galaxy-card', { visible: true });
 // keep rolling new planets in the biome's galaxy until one has the biome we want, then play it
 await page.evaluate((id) => {
-  const g = Object.keys({ wild: 1, city: 1 }).find((k) => window.blorbit.galaxyOf(id) === k);
+  const g = window.blorbit.galaxyOf(id);
   for (let s = 1; s < 200 && !window.blorbit.planet().biomes.includes(id); s++) window.blorbit.newPlanet(s, g);
   window.blorbit.save.galaxy = g;
   window.blorbit.enterGalaxy(g);

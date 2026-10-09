@@ -24,15 +24,16 @@ const vert = /* glsl */ `
   attribute float aWater;
   attribute vec2 aEdge;
   attribute float aPave;
+  attribute float aCloud;
   varying vec3 vN, vP, vWorld, vDead, vAlive, vWaterCol;
   varying vec4 vDyn, vStyle;
-  varying float vWater, vPave;
+  varying float vWater, vPave, vCloud;
   varying vec2 vEdge;
   void main() {
     vN = normalize(normal);
     vP = position;
     vDead = aDead; vAlive = aAlive; vStyle = aStyle; vWaterCol = aWaterCol;
-    vDyn = aDyn; vWater = aWater; vEdge = aEdge; vPave = aPave;
+    vDyn = aDyn; vWater = aWater; vEdge = aEdge; vPave = aPave; vCloud = aCloud;
     vec4 wp = modelMatrix * vec4(position, 1.0);
     vWorld = wp.xyz;
     gl_Position = projectionMatrix * viewMatrix * wp;
@@ -45,7 +46,7 @@ const frag = /* glsl */ `
   uniform vec3 uSunDir;
   varying vec3 vN, vP, vWorld, vDead, vAlive, vWaterCol;
   varying vec4 vDyn, vStyle;
-  varying float vWater, vPave;
+  varying float vWater, vPave, vCloud;
   varying vec2 vEdge;
 
   float hash(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
@@ -94,6 +95,17 @@ const frag = /* glsl */ `
     // moonlit glow
     col += vAlive * moon * life * (0.18 + 0.08 * sin(uTime * 1.5 + vP.x * 2.0));
 
+    // cloud sea (Skyhaven): slowly drifting billows; grey storm cloud until restored, then sunlit white
+    float cloudLit = 0.0;
+    if (vCloud > 0.001) {
+      vec3 drift = vec3(uTime * 0.05, uTime * 0.02, -uTime * 0.04);
+      float puff = vnoise(vP * 1.8 + drift) * 0.6 + vnoise(vP * 5.5 - drift * 1.7) * 0.4;
+      vec3 storm = vec3(0.56, 0.55, 0.64) * (0.8 + 0.35 * puff);
+      vec3 sunny = mix(vec3(1.0, 0.98, 1.0), vec3(1.0, 0.88, 0.94), smoothstep(0.35, 0.8, puff)) * (0.92 + 0.12 * puff);
+      col = mix(col, mix(storm, sunny, life), vCloud);
+      cloudLit = vCloud * (0.35 + 0.4 * life);
+    }
+
     // water / ice
     vec3 N = normalize(vN);
     if (vWater > 0.001) {
@@ -114,7 +126,7 @@ const frag = /* glsl */ `
     vec3 L = normalize(uSunDir);
     vec3 V = normalize(cameraPosition - vWorld);
     float diff = max(dot(N, L), 0.0);
-    col *= 0.52 + diff * 0.58;
+    col *= mix(0.52 + diff * 0.58, 1.0, cloudLit); // clouds glow softly instead of shading like ground
 
     vec3 H = normalize(L + V);
     float wspec = pow(max(dot(N, H), 0.0), 90.0) * vWater * 1.2;
@@ -401,6 +413,18 @@ export class Planet {
         const step = Math.floor(q);
         return 0.12 * (step + smoothstep(0.35, 0.65, q - step)) - 0.25;
       }
+      case 'islands': {
+        // rounded grassy islands; the low ground between them fills with cloud sea
+        const base = f(n.x * 1.5 + 11, n.y * 1.5, n.z * 1.5);
+        const land = smoothstep(-0.2, 0.0, base);
+        return -0.3 + 0.5 * land + 0.14 * land * f(n.x * 3.1, n.y * 3.1 + 4, n.z * 3.1) + 0.03 * f(n.x * 7, n.y * 7, n.z * 7);
+      }
+      case 'cliffs': {
+        // tall plateaus with steep drops down to the clouds
+        const base = f(n.x * 1.3 + 2, n.y * 1.3, n.z * 1.3 + 6);
+        const land = smoothstep(-0.14, -0.05, base);
+        return -0.32 + 0.85 * land + 0.16 * land * f(n.x * 2.6 + 9, n.y * 2.6, n.z * 2.6) + 0.03 * f(n.x * 7, n.y * 7 + 2, n.z * 7);
+      }
       case 'hillocks': return 0.55 * Math.max(0, f(n.x * 3.2, n.y * 3.2, n.z * 3.2)) + 0.2 * f(n.x * 1.3, n.y * 1.3 + 2, n.z * 1.3);
       default: return 0;
     }
@@ -607,6 +631,7 @@ export class Planet {
     const alive = new Float32Array(n * 3);
     const style = new Float32Array(n * 4);
     const pave = new Float32Array(n); // 0..1 how paved the restored ground is (city)
+    const cloud = new Float32Array(n); // 0..1 cloud sea on low ground (sky)
     const waterCol = new Float32Array(n * 3);
     const edge = new Float32Array(n * 2);
     this.waterTarget = new Float32Array(n);
@@ -629,13 +654,13 @@ export class Planet {
       const h = this.heightAt(v);
       pos.setXYZ(i, v.x * h, v.y * h, v.z * h);
       const w = this.softWeights(v);
-      let dr = 0, dg = 0, db = 0, ar = 0, ag = 0, ab = 0, s0 = 0, s1 = 0, s2 = 0, pv = 0;
+      let dr = 0, dg = 0, db = 0, ar = 0, ag = 0, ab = 0, s0 = 0, s1 = 0, s2 = 0, pv = 0, cl = 0;
       for (let r = 0; r < NUM_REGIONS; r++) {
         if (w[r] < 0.002) continue;
         const d = this.deadCols[r], a = this.aliveCols[r], st = this.defs[r].style;
         dr += d.r * w[r]; dg += d.g * w[r]; db += d.b * w[r];
         ar += a.r * w[r]; ag += a.g * w[r]; ab += a.b * w[r];
-        s0 += st[0] * w[r]; s1 += st[1] * w[r]; s2 += st[2] * w[r]; pv += (st[3] || 0) * w[r];
+        s0 += st[0] * w[r]; s1 += st[1] * w[r]; s2 += st[2] * w[r]; pv += (st[3] || 0) * w[r]; cl += (st[4] || 0) * w[r];
       }
       const p = this.patchId[i];
       if (p >= 0) {
@@ -654,6 +679,7 @@ export class Planet {
       alive.set([ar, ag, ab], i * 3);
       style[i * 4] = s0; style[i * 4 + 1] = s1; style[i * 4 + 2] = s2;
       pave[i] = pv;
+      cloud[i] = cl * (1 - smoothstep(-0.2, -0.1, h - this.R)) * (1 - this.waterTarget[i]);
     }
 
     // edges: neighbours in a different biome / patch
@@ -686,6 +712,9 @@ export class Planet {
     geo.setAttribute('aStyle', attr(style, 4));
     this.smooth(pave, 1, idx, 1);
     geo.setAttribute('aPave', attr(pave, 1));
+    this.smooth(cloud, 1, idx, 1);
+    geo.setAttribute('aCloud', attr(cloud, 1));
+    this.cloud = cloud;
     geo.setAttribute('aWaterCol', attr(waterCol, 3));
     geo.setAttribute('aEdge', attr(edge, 2));
     this.dynAttr = attr(this.dyn, 4, true);
@@ -760,7 +789,7 @@ export class Planet {
 
     for (let r = 0; r < NUM_REGIONS; r++) {
       const def = this.defs[r];
-      const free = this.regionVerts[r].filter((i) => this.patchId[i] < 0);
+      const free = this.regionVerts[r].filter((i) => this.patchId[i] < 0 && this.cloud[i] < 0.4);
       for (const [kind, density] of def.small) {
         for (const i of this.sample(free, Math.round(free.length * density))) {
           const it = this.propAt(i, 1, 0.06);
@@ -777,7 +806,8 @@ export class Planet {
     for (const patch of this.patches) {
       for (const [kind, density, placeArg] of patch.def.props) {
         const place = placeArg || (patch.water ? 'rim' : 'any');
-        const cands = patch.verts.filter((i) => {
+        const onLand = patch.verts.filter((i) => this.cloud[i] < 0.4);
+        const cands = (onLand.length ? onLand : patch.verts).filter((i) => {
           const perp = this.patchPerp[i];
           if (place === 'rim') return perp > 0.65;
           if (place === 'inner') return perp < 0.5 && this.regionAng[i] > 0.05;

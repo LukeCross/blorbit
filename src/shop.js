@@ -28,7 +28,8 @@ export function galaxyTabs(save, active, current) {
       const why = `Locked: ${done} of ${need} ${from} friends woken. Wake ${left} more to unlock`;
       return `<button role="tab" class="locked" disabled aria-disabled="true" title="${why}" aria-label="${def.name}. ${why}">🔒 ${def.name} <small>${done}/${need}</small></button>`;
     }
-    return `<button role="tab" data-action="tab" data-id="${g}" class="${g === active ? 'active' : ''}" aria-selected="${g === active}">${def.emoji} ${def.name}${g === current ? ' <small>(here)</small>' : ''}</button>`;
+    const here = g === current;
+    return `<button role="tab" data-action="tab" data-id="${g}" class="${g === active ? 'active' : ''} ${here ? 'is-here' : ''}" aria-selected="${g === active}"${here ? ' title="The galaxy you\'re in"' : ''}>${def.emoji} ${def.name}${here ? ' <small class="here">(here)</small>' : ''}</button>`;
   }).join('')}</div>`;
 }
 

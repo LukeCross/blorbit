@@ -324,6 +324,35 @@ export class Sound {
         else this.tone({ type: 'sawtooth', f: 82, t, dur: 2, vol: 0.012, attack: 0.4, verb: 0.9 }); // foghorn far away
         break;
       }
+      // ---- Skyhaven
+      case 'pastures':
+        if (Math.random() < 0.45) for (let i = 0; i < 3; i++) this.tone({ type: 'triangle', f: midi(81 + [0, 4, 2][i]), t: t + i * 0.32 + Math.random() * 0.1, dur: 0.9, vol: 0.012, verb: 0.8, pan }); // sheep bells
+        else if (Math.random() < 0.5) this.tone({ type: 'sawtooth', f: 300, f2: 270, t, dur: 0.55, vol: 0.006, attack: 0.04, verb: 0.5, pan }); // a soft baa
+        else this.birdChirp();
+        break;
+      case 'cliffs':
+        if (Math.random() < 0.6) this.noiseBurst({ t, dur: 2.4, vol: 0.035, f: 500, f2: 1400, q: 0.6, verb: 0.4 }); // gust of wind
+        else for (let i = 0; i < 3; i++) this.tone({ type: 'square', f: 95, f2: 80, t: t + i * 0.45, dur: 0.18, vol: 0.004, verb: 0.5, pan }); // windmill creak
+        break;
+      case 'rainbow':
+        if (Math.random() < 0.5) this.noiseBurst({ t, dur: 2.8, vol: 0.03, f: 1800, f2: 1200, q: 0.5, type: 'highpass', verb: 0.4 }); // falling water
+        else for (let i = 0; i < 5; i++) this.tone({ type: 'triangle', f: midi(84 + pentaStep(i)), t: t + i * 0.08, dur: 0.7, vol: 0.012, verb: 0.9, pan }); // shimmer
+        break;
+      case 'balloons':
+        if (Math.random() < 0.35) this.noiseBurst({ t, dur: 0.9, vol: 0.03, f: 260, f2: 180, q: 0.8, type: 'lowpass', verb: 0.3 }); // balloon burner
+        else if (Math.random() < 0.5) for (let i = 0; i < 6; i++) this.noiseBurst({ t: t + i * 0.06, dur: 0.05, vol: 0.012, f: 1400, q: 1.5, verb: 0.2 }); // kite flutter
+        else this.birdChirp();
+        break;
+      case 'stargazer':
+        if (Math.random() < 0.45) {
+          // twit-twoo
+          this.tone({ f: 520, f2: 480, t, dur: 0.25, vol: 0.035, attack: 0.04, verb: 0.8, pan });
+          this.tone({ f: 470, f2: 400, t: t + 0.4, dur: 0.6, vol: 0.035, attack: 0.08, verb: 0.8, pan });
+        } else {
+          const n = 93 + pentaStep(Math.floor(Math.random() * 6));
+          this.tone({ f: midi(n), t, dur: 1.4, vol: 0.02, verb: 0.95, pan });
+        }
+        break;
       default:
         this.birdChirp();
     }
@@ -405,7 +434,7 @@ export class Sound {
   // rolling timbre per surface: [filter centre, Q, low thump]
   setBiome(id) {
     this.biome = id;
-    this.rollTimbre = { snow: [1700, 0.9, 0.3], desert: [2600, 0.6, 0.2], pond: [320, 1.6, 1.3], grove: [500, 1.2, 1], shore: [2200, 0.6, 0.4], volcano: [700, 1, 1.5], candy: [600, 2.2, 1.2], autumn: [2000, 0.8, 0.5], park: [800, 1.1, 0.8], downtown: [1400, 0.8, 0.6], suburbs: [600, 1.3, 0.9], funfair: [1100, 1, 1.1], harbour: [700, 1.1, 1] }[id] || [450, 1.4, 1];
+    this.rollTimbre = { snow: [1700, 0.9, 0.3], desert: [2600, 0.6, 0.2], pond: [320, 1.6, 1.3], grove: [500, 1.2, 1], shore: [2200, 0.6, 0.4], volcano: [700, 1, 1.5], candy: [600, 2.2, 1.2], autumn: [2000, 0.8, 0.5], park: [800, 1.1, 0.8], downtown: [1400, 0.8, 0.6], suburbs: [600, 1.3, 0.9], funfair: [1100, 1, 1.1], harbour: [700, 1.1, 1], pastures: [500, 1.3, 1], cliffs: [800, 1, 0.8], rainbow: [450, 1.5, 1.2], balloons: [500, 1.3, 1], stargazer: [1200, 0.9, 0.6] }[id] || [450, 1.4, 1];
   }
 
   setLife(x) {

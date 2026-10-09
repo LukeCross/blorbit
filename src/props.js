@@ -31,6 +31,14 @@ function stripes(n, make) {
   return [merge(...a), merge(...b)];
 }
 
+// a thin rod between two points: ropes, strings, tripod legs
+function rod(from, to, r, segs = 4) {
+  const len = from.distanceTo(to);
+  const g = new THREE.CylinderGeometry(r, r, len, segs).translate(0, len / 2, 0);
+  g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), to.clone().sub(from).normalize()));
+  return g.translate(from.x, from.y, from.z);
+}
+
 function radial(n, make) {
   const out = [];
   for (let i = 0; i < n; i++) out.push(make((i / n) * Math.PI * 2, i));
@@ -799,6 +807,346 @@ export const PROP_KINDS = {
       { geo: merge(new THREE.CylinderGeometry(0.1, 0.13, 0.1, 10).translate(0, 0.11, 0), new THREE.CylinderGeometry(0.01, 0.01, 0.16, 4).translate(0, 0.24, 0)), mat: lambert(0xfdf8f2) },
       { geo: new THREE.IcosahedronGeometry(0.035, 0).translate(0, 0.33, 0), mat: unlit(0xffe08a) },
     ],
+  },
+  // ---------------------------------------------------------------- Skyhaven galaxy
+  // Floating sky islands: soft stone, wood and cloud when withered; restored, flags, kites,
+  // rainbows and lanterns come back in sunny pastels.
+
+  // Cloud Pastures
+  stoneWall: {
+    scale: [0.9, 1.15],
+    parts: () => {
+      const a = [], b = [];
+      for (let row = 0; row < 2; row++) for (let i = 0; i < 5; i++) {
+        const x = -0.3 + i * 0.15 + (row ? 0.075 : 0);
+        if (x > 0.32) continue;
+        const g = new THREE.DodecahedronGeometry(0.085, 0).scale(1.15, 0.72, 0.9).rotateY(i * 1.3 + row).translate(x, 0.06 + row * 0.11, i % 2 ? 0.012 : -0.012);
+        ((i + row) % 2 ? b : a).push(g);
+      }
+      return [
+        { geo: merge(...a), mat: lambert(0xffffff), color: pick([0xe8e2d8, 0xdcd6d0, 0xeae4f0]) },
+        { geo: merge(...b), mat: lambert(0xffffff), color: pick([0xd2cbc4, 0xdcd6e4, 0xe2dacb]) },
+      ];
+    },
+  },
+  stile: {
+    scale: [0.9, 1.1],
+    parts: () => [
+      {
+        geo: merge(box(0.04, 0.5, 0.04, -0.17, 0.25, 0), box(0.04, 0.5, 0.04, 0.17, 0.25, 0), box(0.42, 0.035, 0.05, 0, 0.44, 0), box(0.42, 0.035, 0.05, 0, 0.32, 0), box(0.32, 0.03, 0.12, 0, 0.17, 0.09), box(0.32, 0.03, 0.12, 0, 0.17, -0.09)),
+        mat: lambert(0xffffff), color: pick([0xc89a6a, 0xb8865a, 0xd8aa7a]),
+      },
+      { geo: merge(box(0.03, 0.17, 0.03, -0.13, 0.085, 0.13), box(0.03, 0.17, 0.03, 0.13, 0.085, 0.13), box(0.03, 0.17, 0.03, -0.13, 0.085, -0.13), box(0.03, 0.17, 0.03, 0.13, 0.085, -0.13)), mat: lambert(0x8a6448) },
+    ],
+  },
+  bluebell: {
+    scale: [0.8, 1.3],
+    parts: () => {
+      const stems = [], bells = [];
+      for (let i = 0; i < 3; i++) {
+        // each stem arches over, with little bells hanging from the curve
+        const a = i * 2.1 + 0.4, dx = Math.cos(a), dz = Math.sin(a);
+        const curve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(dx * 0.02, 0.34, dz * 0.02), new THREE.Vector3(dx * 0.13, 0.27, dz * 0.13));
+        stems.push(new THREE.TubeGeometry(curve, 6, 0.007, 3));
+        for (let k = 0; k < 2; k++) {
+          const p = curve.getPoint(0.65 + k * 0.3);
+          const r = 0.028 - k * 0.004;
+          bells.push(new THREE.SphereGeometry(r, 6, 3, 0, Math.PI * 2, 0, Math.PI * 0.62).scale(1, 1.25, 1).translate(p.x, p.y - r * 1.2, p.z));
+        }
+      }
+      return [
+        { geo: merge(...stems), mat: lambert(0x5aa86a) },
+        { geo: merge(...bells), mat: lambert(0xffffff, { side: THREE.DoubleSide }), color: pick([0x8fa8ff, 0xb49aff, 0x9fc0ff, 0xf4f0ff]) },
+      ];
+    },
+  },
+  cloudPuff: {
+    scale: [0.8, 1.4],
+    parts: () => [{
+      geo: merge(
+        new THREE.IcosahedronGeometry(0.16, 1).translate(0, 0.36, 0),
+        new THREE.IcosahedronGeometry(0.12, 1).translate(0.15, 0.32, 0.02),
+        new THREE.IcosahedronGeometry(0.11, 1).translate(-0.15, 0.32, -0.02),
+        new THREE.IcosahedronGeometry(0.1, 1).translate(0.04, 0.31, 0.11),
+      ).scale(1, 0.8, 1),
+      mat: lambert(0xffffff), color: pick([0xffffff, 0xfff4fa, 0xf4f0ff, 0xffeef4]),
+    }],
+  },
+  shepherdHut: {
+    scale: [0.9, 1.1],
+    parts: () => [
+      { geo: merge(rbox(0.62, 0.34, 0.36, 0.04, 0, 0.36, 0), box(0.14, 0.03, 0.1, -0.15, 0.08, 0.24), box(0.14, 0.03, 0.1, -0.15, 0.14, 0.21)), mat: lambert(0xffffff), color: pick([0xb8e0c8, 0xffd0d8, 0xc8d8ff, 0xfff0c0]) },
+      // curved tin roof: the top half of a cylinder lying along x
+      { geo: new THREE.CylinderGeometry(0.21, 0.21, 0.7, 12, 1, false, 0, Math.PI).rotateZ(Math.PI / 2).translate(0, 0.52, 0), mat: lambert(0xffffff), color: pick([0x8a9ab8, 0xb89aa8, 0x9ab8b0]) },
+      { geo: merge(...[[-0.2, 0.19], [0.2, 0.19], [-0.2, -0.19], [0.2, -0.19]].map(([x, z]) => new THREE.CylinderGeometry(0.085, 0.085, 0.03, 10).rotateX(Math.PI / 2).translate(x, 0.09, z)), box(0.12, 0.22, 0.012, -0.15, 0.32, 0.184)), mat: lambert(0x4a4458) },
+      { geo: new THREE.PlaneGeometry(0.13, 0.1).translate(0.13, 0.42, 0.183), mat: unlit(0xfff0c0) },
+    ],
+  },
+
+  // Windmill Cliffs
+  windmill: {
+    scale: [0.9, 1.1],
+    parts: () => {
+      const blades = [], spars = [];
+      for (let i = 0; i < 4; i++) {
+        const r = (i * Math.PI) / 2 + Math.PI / 4;
+        blades.push(box(0.16, 0.66, 0.02, 0.05, 0.52, 0).rotateZ(r).translate(0, 1.72, 0.36));
+        spars.push(box(0.025, 0.86, 0.025, 0, 0.43, 0).rotateZ(r).translate(0, 1.72, 0.37));
+      }
+      const windows = [0.55, 1.05].map((y) => new THREE.PlaneGeometry(0.1, 0.13).translate(0, y, 0.33 - y * 0.06));
+      return [
+        { geo: new THREE.CylinderGeometry(0.25, 0.38, 1.7, 14).translate(0, 0.85, 0), mat: lambert(0xffffff), color: pick([0xfff4e2, 0xffe6e6, 0xe6f0ff, 0xf0ffe8]) },
+        { geo: merge(new THREE.ConeGeometry(0.33, 0.42, 14).translate(0, 1.91, 0), box(0.14, 0.24, 0.02, 0, 0.12, 0.377)), mat: lambert(0xffffff), color: pick([0xb87a7a, 0x7a9ab8, 0x9ab87a, 0xc89a6a]) },
+        { geo: merge(...blades), mat: lambert(0xfdf8f2) },
+        { geo: merge(...spars, new THREE.CylinderGeometry(0.06, 0.06, 0.12, 10).rotateX(Math.PI / 2).translate(0, 1.72, 0.33)), mat: lambert(0x8a6448) },
+        { geo: merge(...windows), mat: unlit(0xfff0c0) },
+      ];
+    },
+  },
+  ropeBridge: {
+    scale: [0.9, 1.1],
+    parts: () => {
+      const sag = (x) => 0.16 - 0.06 * (1 - (x / 0.46) ** 2);
+      const planks = [];
+      for (let i = 0; i < 8; i++) {
+        const x = -0.42 + i * 0.12;
+        planks.push(box(0.09, 0.022, 0.26, x, sag(x), 0, 0, 0, (x / 0.46) * 0.25));
+      }
+      const rails = [-0.14, 0.14].map((z) => new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(new THREE.Vector3(-0.48, 0.38, z), new THREE.Vector3(0, 0.2, z), new THREE.Vector3(0.48, 0.38, z)), 10, 0.008, 3));
+      return [
+        { geo: merge(...planks), mat: lambert(0xffffff), color: pick([0xd8aa7a, 0xc8986a, 0xe0b88a]) },
+        { geo: merge(...[-0.48, 0.48].flatMap((x) => [-0.14, 0.14].map((z) => box(0.045, 0.42, 0.045, x, 0.21, z)))), mat: lambert(0x8a6448) },
+        { geo: merge(...rails), mat: lambert(0xeadcc0) },
+      ];
+    },
+  },
+  kite: {
+    scale: [0.9, 1.2],
+    parts: () => {
+      const top = new THREE.Vector3(0.32, 1.12, 0);
+      const tail = new THREE.QuadraticBezierCurve3(top.clone().add(new THREE.Vector3(0, -0.18, 0)), new THREE.Vector3(0.42, 0.75, 0.05), new THREE.Vector3(0.3, 0.55, 0));
+      const bows = [0.25, 0.5, 0.75, 1].map((t) => {
+        const p = tail.getPoint(t);
+        return new THREE.OctahedronGeometry(0.03, 0).scale(1.6, 0.7, 0.4).translate(p.x, p.y, p.z);
+      });
+      return [
+        { geo: merge(rod(new THREE.Vector3(0, 0.08, 0), top.clone().add(new THREE.Vector3(-0.02, -0.12, 0)), 0.004, 3), new THREE.TubeGeometry(tail, 10, 0.004, 3), new THREE.CylinderGeometry(0.012, 0.016, 0.12, 5).translate(0, 0.06, 0)), mat: lambert(0xf4ecf8) },
+        { geo: new THREE.OctahedronGeometry(0.17, 0).scale(0.72, 1.1, 0.06).rotateZ(-0.35).translate(top.x, top.y, top.z), mat: lambert(0xffffff), color: pick([0xff8fb8, 0x8fd0ff, 0xffd34d, 0xb8f07a, 0xc9a8ff]) },
+        { geo: merge(...bows), mat: lambert(0xffffff), color: pick([0xff7a9a, 0xffa86a, 0x7ac8ff]) },
+      ];
+    },
+  },
+  cliffRock: {
+    scale: [0.85, 1.25],
+    parts: () => [
+      {
+        geo: merge(
+          new THREE.DodecahedronGeometry(0.3, 0).scale(1, 0.75, 0.95).translate(0, 0.2, 0),
+          new THREE.DodecahedronGeometry(0.23, 0).scale(1, 0.85, 1).rotateY(0.7).translate(0.04, 0.55, 0.02),
+          new THREE.DodecahedronGeometry(0.16, 0).rotateY(1.4).translate(-0.02, 0.84, -0.01),
+        ),
+        mat: lambert(0xffffff), color: pick([0xcfc6dc, 0xd8d0e0, 0xc6c0d4]),
+      },
+      { geo: new THREE.IcosahedronGeometry(0.14, 1).scale(1.1, 0.4, 1.1).translate(-0.02, 0.98, -0.01), mat: lambert(0xffffff), color: fromGround(0.85, 1.1) },
+    ],
+  },
+
+  // Rainbow Falls
+  rainbowArch: {
+    scale: [0.9, 1.1],
+    parts: () => {
+      // six pastel bands; plain (not boosted) basic colour so they glow softly without blowing out the bloom
+      const bands = [0xffb3c6, 0xffcf9e, 0xfff0a0, 0xb8f0c0, 0xa8d8ff, 0xd0b8ff].map((c, i) => ({
+        geo: new THREE.TorusGeometry(0.88 - i * 0.05, 0.026, 5, 20, Math.PI),
+        mat: new THREE.MeshBasicMaterial({ color: c }),
+      }));
+      const puff = (x) => [
+        new THREE.IcosahedronGeometry(0.17, 1).translate(x, 0.1, 0),
+        new THREE.IcosahedronGeometry(0.12, 1).translate(x + 0.13, 0.07, 0.04),
+        new THREE.IcosahedronGeometry(0.12, 1).translate(x - 0.13, 0.07, -0.04),
+      ];
+      return [...bands, { geo: merge(...puff(-0.76), ...puff(0.76)), mat: lambert(0xffffff), color: pick([0xffffff, 0xfff4fa, 0xf4f0ff]) }];
+    },
+  },
+  prism: {
+    scale: [0.8, 1.3],
+    parts: () => [
+      { geo: new THREE.DodecahedronGeometry(0.14, 0).scale(1.2, 0.5, 1).translate(0, 0.05, 0), mat: lambert(0xd0c8dc) },
+      {
+        geo: merge(new THREE.OctahedronGeometry(0.1, 0).scale(0.75, 2.1, 0.75).translate(0, 0.28, 0), new THREE.OctahedronGeometry(0.06, 0).scale(0.75, 2, 0.75).rotateZ(0.5).translate(0.09, 0.16, 0.03)),
+        mat: unlit(0xffffff), color: pick([0xffc4d8, 0xffe0b0, 0xfff4b8, 0xc8f4d0, 0xc0e0ff, 0xdcc8ff]),
+      },
+    ],
+  },
+  waterfallRock: {
+    scale: [0.9, 1.15],
+    parts: () => [
+      {
+        geo: merge(
+          new THREE.DodecahedronGeometry(0.3, 0).scale(1, 1.6, 0.85).translate(0, 0.46, -0.04),
+          new THREE.DodecahedronGeometry(0.2, 0).rotateY(0.6).translate(0.16, 0.86, -0.06),
+          new THREE.DodecahedronGeometry(0.14, 0).translate(-0.18, 0.14, 0.14),
+        ),
+        mat: lambert(0xffffff), color: pick([0xcfc6dc, 0xc8d0d8, 0xd6cede]),
+      },
+      { geo: merge(rbox(0.15, 0.86, 0.04, 0.018, 0, 0.53, 0.25), new THREE.CylinderGeometry(0.22, 0.24, 0.03, 14).translate(0, 0.015, 0.3)), mat: shiny(0x9fdcff, { transparent: true, opacity: 0.85, emissive: new THREE.Color(0x3a7aa0), emissiveIntensity: 0.2 }) },
+      { geo: new THREE.TorusGeometry(0.13, 0.045, 5, 12).rotateX(Math.PI / 2).translate(0, 0.05, 0.27), mat: lambert(0xfafcff) },
+    ],
+  },
+  rainbowFlower: {
+    scale: [0.8, 1.3],
+    parts: () => {
+      const petal = (i) => new THREE.SphereGeometry(0.045, 6, 3).scale(1, 0.35, 1.35).translate(0, 0, 0.065).rotateX(-0.25).rotateY((i / 6) * Math.PI * 2).translate(0, 0.36, 0);
+      return [
+        { geo: new THREE.CylinderGeometry(0.008, 0.011, 0.36, 5).translate(0, 0.18, 0), mat: lambert(0x5aa86a) },
+        { geo: new THREE.IcosahedronGeometry(0.03, 0).translate(0, 0.37, 0), mat: lambert(0xfff0a0) },
+        // three colours per flower, each pair of opposite petals one colour
+        { geo: merge(petal(0), petal(3)), mat: lambert(0xffffff), color: pick([0xff9fb8, 0xffb08a]) },
+        { geo: merge(petal(1), petal(4)), mat: lambert(0xffffff), color: pick([0xfff08a, 0xa8f0b0]) },
+        { geo: merge(petal(2), petal(5)), mat: lambert(0xffffff), color: pick([0x9fc8ff, 0xc8a8ff]) },
+      ];
+    },
+  },
+
+  // Balloon Meadow
+  hotAirBalloon: {
+    scale: [0.9, 1.1],
+    parts: () => {
+      const profile = [[0.1, 0.95], [0.22, 1.05], [0.38, 1.22], [0.5, 1.42], [0.55, 1.65], [0.52, 1.88], [0.42, 2.05], [0.24, 2.17], [0, 2.22]];
+      const gores = [[], []];
+      for (let i = 0; i < 8; i++) gores[i % 2].push(new THREE.LatheGeometry(profile.map(([r, y]) => new THREE.Vector2(r, y)), 3, (i / 8) * Math.PI * 2, Math.PI / 4));
+      const corners = [[-0.11, -0.11], [0.11, -0.11], [-0.11, 0.11], [0.11, 0.11]];
+      const ropes = corners.map(([x, z]) => rod(new THREE.Vector3(x, 0.66, z), new THREE.Vector3(x * 0.8, 0.96, z * 0.8), 0.006, 3));
+      const tethers = [[-0.45, 0.2], [0.45, -0.2]].map(([x, z]) => rod(new THREE.Vector3(x * 0.25, 0.5, z * 0.25), new THREE.Vector3(x, 0.02, z), 0.005, 3));
+      return [
+        { geo: merge(...gores[0]), mat: lambert(0xffffff), color: pick([0xff8fb8, 0x8fd0ff, 0xffb06a, 0xb8f07a, 0xc9a8ff]) },
+        { geo: merge(...gores[1]), mat: lambert(0xffffff), color: pick([0xfff8f0, 0xfff0a0, 0xf4f0ff]) },
+        { geo: merge(rbox(0.26, 0.17, 0.26, 0.03, 0, 0.58, 0), ...[-0.45, 0.45].map((x, i) => new THREE.CylinderGeometry(0.02, 0.025, 0.08, 5).translate(x, 0.04, i ? -0.2 : 0.2))), mat: lambert(0xc89a6a) },
+        { geo: merge(...ropes, ...tethers), mat: lambert(0xe8dcc8) },
+        { geo: new THREE.IcosahedronGeometry(0.05, 0).translate(0, 0.86, 0), mat: unlit(0xffd08a) },
+      ];
+    },
+  },
+  weatherVane: {
+    scale: [0.9, 1.15],
+    parts: () => [
+      {
+        geo: merge(
+          new THREE.CylinderGeometry(0.018, 0.024, 1.0, 6).translate(0, 0.5, 0),
+          box(0.42, 0.016, 0.016, 0, 0.78, 0), box(0.016, 0.016, 0.42, 0, 0.78, 0),
+          ...[[0.21, 0], [-0.21, 0], [0, 0.21], [0, -0.21]].map(([x, z]) => new THREE.IcosahedronGeometry(0.025, 0).translate(x, 0.78, z)),
+          new THREE.CylinderGeometry(0.05, 0.06, 0.05, 8).translate(0, 0.025, 0),
+        ),
+        mat: lambert(0x4a4458),
+      },
+      {
+        // arrow with a little rooster perched on it
+        geo: merge(
+          box(0.46, 0.022, 0.022, 0, 0.98, 0), new THREE.ConeGeometry(0.045, 0.1, 4).rotateZ(-Math.PI / 2).translate(0.27, 0.98, 0), box(0.1, 0.1, 0.012, -0.22, 0.99, 0),
+          new THREE.SphereGeometry(0.06, 8, 6).scale(1.2, 1, 0.5).translate(0.02, 1.07, 0), new THREE.SphereGeometry(0.035, 8, 6).translate(0.09, 1.14, 0),
+          new THREE.ConeGeometry(0.05, 0.1, 6).rotateZ(0.9).translate(-0.06, 1.12, 0),
+        ),
+        mat: shiny(0xffffff), color: pick([0xf0c860, 0xe8a070, 0xd8b890]),
+      },
+    ],
+  },
+  picnicBlanket: {
+    scale: [0.9, 1.15],
+    parts: () => {
+      const a = [], b = [];
+      for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) ((i + j) % 2 ? b : a).push(box(0.13, 0.02, 0.13, -0.195 + i * 0.13, 0.012, -0.195 + j * 0.13));
+      return [
+        { geo: merge(...a), mat: lambert(0xffffff), color: pick([0xff8f9f, 0x8fc8ff, 0x8fe0b0, 0xffb06a]) },
+        { geo: merge(...b), mat: lambert(0xfff8f0) },
+        { geo: merge(rbox(0.14, 0.09, 0.1, 0.02, 0.1, 0.07, 0.06), new THREE.TorusGeometry(0.05, 0.008, 4, 10, Math.PI).translate(0.1, 0.115, 0.06)), mat: lambert(0xc89a6a) },
+        { geo: merge(new THREE.IcosahedronGeometry(0.03, 0).translate(-0.09, 0.05, -0.05), new THREE.IcosahedronGeometry(0.03, 0).translate(-0.04, 0.05, -0.1)), mat: lambert(0xff6f7f) },
+      ];
+    },
+  },
+  windsock: {
+    scale: [0.9, 1.15],
+    parts: () => {
+      const orange = [], white = [];
+      for (let i = 0; i < 4; i++) {
+        const r0 = 0.075 - i * 0.011, r1 = 0.075 - (i + 1) * 0.011;
+        (i % 2 ? white : orange).push(new THREE.CylinderGeometry(r1, r0, 0.11, 8, 1, true).translate(0, 0.055 + i * 0.11, 0).rotateZ(-Math.PI / 2 - 0.28).translate(0.02, 0.86, 0));
+      }
+      return [
+        { geo: merge(new THREE.CylinderGeometry(0.016, 0.022, 0.92, 6).translate(0, 0.46, 0), new THREE.TorusGeometry(0.075, 0.01, 4, 10).rotateY(Math.PI / 2).translate(0.03, 0.86, 0)), mat: lambert(0xd8d0e0) },
+        { geo: merge(...orange), mat: lambert(0xffa060, { side: THREE.DoubleSide }) },
+        { geo: merge(...white), mat: lambert(0xfff8f0, { side: THREE.DoubleSide }) },
+      ];
+    },
+  },
+
+  // Stargazer's Peak
+  telescope: {
+    scale: [0.9, 1.15],
+    parts: () => {
+      const head = new THREE.Vector3(0, 0.5, 0);
+      const legs = [0, 1, 2].map((i) => {
+        const a = (i / 3) * Math.PI * 2;
+        return rod(head, new THREE.Vector3(Math.cos(a) * 0.2, 0, Math.sin(a) * 0.2), 0.012, 4);
+      });
+      const tube = (r0, r1, len, off) => new THREE.CylinderGeometry(r1, r0, len, 10).translate(0, off, 0).rotateZ(-0.95).translate(0, 0.55, 0);
+      return [
+        { geo: merge(...legs), mat: lambert(0x8a6448) },
+        { geo: merge(tube(0.05, 0.045, 0.42, 0.12), tube(0.035, 0.035, 0.12, -0.14)), mat: shiny(0xffffff), color: pick([0xf0c860, 0xb8c8ff, 0xffb8c8]) },
+        { geo: merge(tube(0.058, 0.058, 0.03, 0.33), new THREE.SphereGeometry(0.03, 8, 6).translate(0, 0.53, 0)), mat: lambert(0x4a4458) },
+      ];
+    },
+  },
+  observatory: {
+    scale: [0.9, 1.1],
+    parts: () => {
+      const windows = [-0.9, 0, 0.9].map((a) => box(0.1, 0.15, 0.02, 0, 0, 0).rotateY(a).translate(Math.sin(a) * 0.505, 0.68, Math.cos(a) * 0.505));
+      return [
+        { geo: merge(new THREE.CylinderGeometry(0.5, 0.53, 1.1, 18).translate(0, 0.55, 0), new THREE.CylinderGeometry(0.6, 0.62, 0.08, 18).translate(0, 0.04, 0)), mat: lambert(0xffffff), color: pick([0xe8dcff, 0xfff0e0, 0xdcecff]) },
+        { geo: new THREE.SphereGeometry(0.52, 18, 8, 0, Math.PI * 2, 0, Math.PI / 2).translate(0, 1.1, 0), mat: shiny(0xffffff), color: pick([0xf4f0fa, 0xfff0d0, 0xe0e8f8]) },
+        // the slit in the dome, the door, and the little telescope poking out
+        {
+          geo: merge(
+            new THREE.TorusGeometry(0.525, 0.06, 3, 8, Math.PI * 0.42).scale(1, 1, 1).rotateY(-Math.PI / 2).translate(0, 1.1, 0),
+            box(0.16, 0.3, 0.02, 0, 0.23, 0.52),
+            new THREE.CylinderGeometry(0.05, 0.06, 0.42, 10).rotateX(0.85).translate(0, 1.38, 0.42),
+          ),
+          mat: lambert(0x4a4458),
+        },
+        { geo: merge(...windows, new THREE.IcosahedronGeometry(0.045, 0).translate(0, 1.66, 0)), mat: unlit(0xfff0c0) },
+      ];
+    },
+  },
+  starLantern: {
+    scale: [0.9, 1.15],
+    parts: () => {
+      const star = new THREE.Shape();
+      for (let i = 0; i < 10; i++) {
+        const a = Math.PI / 2 + (i / 10) * Math.PI * 2, r = i % 2 ? 0.08 : 0.18;
+        star[i ? 'lineTo' : 'moveTo'](Math.cos(a) * r, Math.sin(a) * r);
+      }
+      return [
+        { geo: merge(new THREE.CylinderGeometry(0.02, 0.026, 0.9, 6).translate(0, 0.45, 0), new THREE.CylinderGeometry(0.06, 0.07, 0.05, 8).translate(0, 0.025, 0), new THREE.TorusGeometry(0.03, 0.008, 4, 8).translate(0, 0.92, 0)), mat: lambert(0x5a5068) },
+        { geo: new THREE.ExtrudeGeometry(star, { depth: 0.04, bevelEnabled: false }).translate(0, 0, -0.02).translate(0, 1.1, 0), mat: unlit(0xffffff), color: pick([0xfff0a0, 0xffe0b8, 0xffd0e0, 0xd8e8ff]) },
+      ];
+    },
+  },
+  sundial: {
+    scale: [0.9, 1.15],
+    parts: () => {
+      const gnomon = new THREE.Shape();
+      gnomon.moveTo(-0.12, 0);
+      gnomon.lineTo(0.12, 0);
+      gnomon.lineTo(-0.12, 0.13);
+      const ticks = [];
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
+        ticks.push(box(0.012, 0.01, 0.04, Math.cos(a) * 0.16, 0.465, Math.sin(a) * 0.16, 0, -a + Math.PI / 2, 0));
+      }
+      return [
+        { geo: merge(lathe([[0.16, 0], [0.16, 0.06], [0.09, 0.08], [0.07, 0.36], [0.12, 0.42], [0.2, 0.42], [0.2, 0.46], [0, 0.46]], 12)), mat: lambert(0xffffff), color: pick([0xe8e2d8, 0xdcd6e4, 0xece0d2]) },
+        { geo: merge(new THREE.ExtrudeGeometry(gnomon, { depth: 0.012, bevelEnabled: false }).translate(0, 0.46, -0.006), ...ticks), mat: shiny(0xf0c860) },
+      ];
+    },
   },
 };
 

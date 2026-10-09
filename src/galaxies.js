@@ -23,6 +23,16 @@ export const GALAXIES = {
     unlockedBy: 'wild',
     unlockAt: 0.8,
   },
+  sky: {
+    name: 'Skyhaven',
+    emoji: '☁️',
+    blurb: 'Islands adrift in a sea of cloud: pastures, windmills, rainbows, balloons and stars.',
+    art: ['#bfe4ff', '#fff0c8'],
+    biomes: ['pastures', 'cliffs', 'rainbow', 'balloons', 'stargazer'],
+    // unlocked by waking 80% of Citylight's creatures (4 of 5)
+    unlockedBy: 'city',
+    unlockAt: 0.8,
+  },
 };
 export const GALAXY_IDS = Object.keys(GALAXIES);
 

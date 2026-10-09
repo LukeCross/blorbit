@@ -23,9 +23,14 @@ export const SKINS = {
   dog: { name: 'Dog Blob', emoji: '🐶', body: 0xf0d29c, slime: 0xfff2c4 },
   raccoon: { name: 'Raccoon Blob', emoji: '🦝', body: 0xb8b4c4, slime: 0xd8d0f4 },
   seagull: { name: 'Seagull Blob', emoji: '🐦', body: 0xfaf8f4, slime: 0xc8ecff },
+  sheep: { name: 'Sheep Blob', emoji: '🐑', body: 0xfff4e4, slime: 0xfff0c0 },
+  goat: { name: 'Goat Blob', emoji: '🐐', body: 0xe6ddd2, slime: 0xd8f0b8 },
+  unicorn: { name: 'Unicorn Blob', emoji: '🦄', body: 0xf6f0ff, slime: 0xf0c8ff },
+  eagle: { name: 'Eagle Blob', emoji: '🦅', body: 0xa8744e, slime: 0xffe0a0 },
+  owl: { name: 'Owl Blob', emoji: '🦉', body: 0xd8a070, slime: 0xb8e8d8 },
 };
 
-export const CREATURE_IDS = ['bunny', 'frog', 'fox', 'penguin', 'moth', 'snail', 'turtle', 'lizard', 'bear', 'hedgehog', 'squirrel', 'cat', 'dog', 'raccoon', 'seagull'];
+export const CREATURE_IDS = ['bunny', 'frog', 'fox', 'penguin', 'moth', 'snail', 'turtle', 'lizard', 'bear', 'hedgehog', 'squirrel', 'cat', 'dog', 'raccoon', 'seagull', 'sheep', 'goat', 'unicorn', 'eagle', 'owl'];
 
 // ---------------------------------------------------------------- materials
 
@@ -36,7 +41,7 @@ const gummy = (color) => shiny(color, { transparent: true, opacity: 0.88 });
 const soft = (color, extra = {}) => matte(color, { roughness: 0.6, ...extra });
 
 // what each sleeping creature's body is made of
-const BODY_STYLE = { fox: fur, bunny: fur, hedgehog: fur, moth: fur, penguin: soft, turtle: soft, frog: gloss, lizard: gloss, snail: gloss, bear: gummy, squirrel: fur, cat: fur, dog: fur, raccoon: fur, seagull: soft };
+const BODY_STYLE = { fox: fur, bunny: fur, hedgehog: fur, moth: fur, penguin: soft, turtle: soft, frog: gloss, lizard: gloss, snail: gloss, bear: gummy, squirrel: fur, cat: fur, dog: fur, raccoon: fur, seagull: soft, sheep: fur, goat: fur, unicorn: soft, eagle: soft, owl: fur };
 export const bodyMaterial = (id) => (BODY_STYLE[id] || soft)(SKINS[id].body);
 
 // ---------------------------------------------------------------- shape helpers
@@ -556,6 +561,161 @@ export function buildAccessories(id) {
       const feather = mesh(roundedCone(0.08, 0.34, 0.4, 12), soft(0xc8cede), x, -0.1, -0.95);
       feather.rotation.set(-Math.PI / 2 - 0.3, 0, r);
       g.add(feather);
+    }
+  }
+
+
+  // ---------------------------------------------------------------- Skyhaven
+
+  if (id === 'sheep') {
+    const wool = fur(skin.body);
+    const face = soft(0xd8c2b4);
+    // fluffy wool clumps all over the top and back, leaving the face clear
+    const golden = Math.PI * (3 - Math.sqrt(5));
+    const d = new THREE.Vector3();
+    for (let i = 0; i < 60; i++) {
+      const y = 1 - (i / 59) * 2, r = Math.sqrt(1 - y * y);
+      d.set(Math.cos(golden * i) * r, y, Math.sin(golden * i) * r);
+      if (d.y < -0.45 || (d.z > 0.3 && d.y < 0.78)) continue;
+      const clump = onSurface(mesh(sphere(0.2 + (i % 3) * 0.03, 16, 12), wool), d.toArray(), 0.97);
+      clump.scale.set(1, 1, 0.55);
+      g.add(clump);
+    }
+    // a soft darker face under the eyes, and little floppy ears
+    g.add(surfacePatch(face, [0, 0.36, 0.93], 0.4, 1.3, 1.05, 0.87));
+    for (const s of [-1, 1]) {
+      const ear = new THREE.Group();
+      ear.position.set(s * 0.68, 0.6, 0.38);
+      const flap = mesh(sphere(0.14, 24, 16), face, s * 0.1, -0.04, 0);
+      flap.scale.set(1.5, 0.6, 0.85);
+      flap.rotation.z = s * -0.5;
+      ear.add(flap);
+      g.add(ear);
+      anims.push((t) => (ear.rotation.z = s * Math.sin(t * 3.4 + s) * 0.12));
+    }
+  }
+
+  if (id === 'goat') {
+    const coat = fur(skin.body);
+    // curly ram horns sweeping back and round, with ridges
+    for (const s of [-1, 1]) {
+      // hugging the side of the head: up from the crown, back, then curling down and forward
+      const tube = taperedTube([[s * 0.28, 0.88, 0.2], [s * 0.42, 1.0, -0.04], [s * 0.64, 0.86, -0.24], [s * 0.76, 0.58, -0.16], [s * 0.7, 0.44, 0.06], [s * 0.6, 0.56, 0.16]], (t) => 0.115 - t * 0.065, 64, 14);
+      const along = tube.geo.attributes.along.array;
+      gradient(tube.geo, (i) => 0.5 + 0.5 * Math.sin(along[i] * Math.PI * 22), 0xd8c8a8, 0xf4ead8, 0.3, 0.7);
+      g.add(new THREE.Mesh(tube.geo, gloss(0xffffff, { vertexColors: true })), new THREE.Mesh(tube.caps[0], gloss(0xd8c8a8)), new THREE.Mesh(tube.caps[1], gloss(0xf4ead8)));
+      // ears stick out sideways below the horns
+      const ear = new THREE.Group();
+      ear.position.set(s * 0.8, 0.3, 0.34);
+      const flap = mesh(roundedCone(0.1, 0.3, 0.4, 20), coat);
+      flap.scale.set(1, 1, 0.5);
+      flap.rotation.z = -s * (Math.PI / 2 + 0.35);
+      ear.add(flap);
+      g.add(ear);
+      anims.push((t) => (ear.rotation.x = Math.max(0, Math.sin(t * 1.3 + s)) ** 6 * 0.35));
+    }
+    g.add(surfacePatch(fur(0xfff4ea), [0, 0.22, 0.97], 0.3, 1.25, 0.85, 0.92));
+    g.add(onSurface(mesh(sphere(0.05), gloss(0xc89aa8)), [0, 0.42, 0.9], 1.01));
+    // a little beard tuft under the chin
+    const beard = mesh(roundedCone(0.11, 0.36, 0.4, 20), fur(0xd8ccbc), 0, 0.04, 0.99);
+    beard.rotation.x = Math.PI - 0.45;
+    g.add(beard);
+  }
+
+  if (id === 'unicorn') {
+    // spiral golden horn
+    const hornGeo = roundedCone(0.12, 0.58, 0.18, 32);
+    const pos = hornGeo.attributes.position;
+    gradient(hornGeo, (i) => 0.5 + 0.5 * Math.sin(pos.getY(i) * 30 + Math.atan2(pos.getZ(i), pos.getX(i)) * 2), 0xf0c860, 0xfff2c8, 0.35, 0.65);
+    const horn = mesh(hornGeo, gloss(0xffffff, { vertexColors: true }), 0, 0.88, 0.36);
+    horn.rotation.x = 0.42;
+    g.add(horn);
+    for (const s of [-1, 1]) {
+      const ear = mesh(roundedCone(0.12, 0.26, 0.3, 20), soft(skin.body), s * 0.4, 0.82, -0.02);
+      ear.scale.set(1, 1, 0.6);
+      ear.rotation.z = -s * 0.3;
+      const inner = mesh(roundedCone(0.07, 0.17, 0.3, 14), soft(0xffd0e4), s * 0.4, 0.84, 0.03);
+      inner.scale.set(1, 1, 0.4);
+      inner.rotation.z = -s * 0.3;
+      g.add(ear, inner);
+    }
+    // a flowing pastel rainbow mane over the head and down the back
+    const mane = new THREE.Group();
+    [0xffb3c6, 0xffd6a0, 0xfff0a0, 0xb8f0c8, 0xa8d8ff, 0xd0b8ff].forEach((c, k) => {
+      const x = (k - 2.5) * 0.055;
+      const tube = taperedTube([[x, 0.94, 0.28], [x * 1.2, 1.07, -0.08], [x * 1.4, 0.88, -0.56], [x * 1.3, 0.44, -0.92], [x, 0.02, -1.04]], (t) => 0.075 - t * 0.04, 40, 10);
+      mane.add(tubeGroup(tube, soft(c)));
+    });
+    g.add(mane);
+    anims.push((t) => (mane.rotation.z = Math.sin(t * 1.8) * 0.06));
+    g.add(onSurface(mesh(sphere(0.045), gloss(0xffa8c8)), [0, 0.42, 0.9], 1.01));
+  }
+
+  if (id === 'eagle') {
+    const white = soft(0xfcfaf6);
+    const dark = soft(0x7a5236);
+    // white-feathered head over the top and front (the eyes sit on top of it)
+    g.add(surfacePatch(white, [0, 0.72, 0.68], 0.62, 1.35, 1.15, 0.83));
+    const beak = mesh(roundedCone(0.14, 0.36, 0.3), gloss(0xffcc4a), 0, 0.22, 0.93);
+    beak.rotation.x = Math.PI / 2 + 0.55;
+    g.add(beak, mesh(sphere(0.055, 16, 12), gloss(0xffb830), 0, 0.03, 1.13));
+    for (const s of [-1, 1]) {
+      // broad folded wings, slowly flexing
+      const pivot = new THREE.Group();
+      pivot.position.set(s * 0.84, 0.18, -0.05);
+      const wing = mesh(sphere(0.5, 32, 20), dark, s * 0.12, -0.08, -0.25);
+      wing.scale.set(0.26, 0.62, 1.4);
+      wing.rotation.x = -0.35;
+      const tip = mesh(sphere(0.24, 20, 14), soft(0x5a3a28), s * 0.12, -0.46, -0.78);
+      tip.scale.set(0.27, 0.5, 0.9);
+      tip.rotation.x = -0.35;
+      pivot.add(wing, tip);
+      g.add(pivot);
+      anims.push((t) => (pivot.rotation.z = s * (0.1 + Math.sin(t * 2.2 + s) * 0.14)));
+      const foot = mesh(sphere(0.17, 20, 14), gloss(0xffcc4a), s * 0.32, -0.87, 0.32);
+      foot.scale.set(1, 0.35, 1.3);
+      g.add(foot);
+    }
+    for (const [x, r] of [[-0.16, 0.42], [-0.06, 0.14], [0.06, -0.14], [0.16, -0.42]]) {
+      const feather = mesh(roundedCone(0.08, 0.36, 0.4, 12), white, x, -0.12, -0.95);
+      feather.rotation.set(-Math.PI / 2 - 0.3, 0, r);
+      g.add(feather);
+    }
+  }
+
+  if (id === 'owl') {
+    const brown = fur(0xa8744e);
+    // pale heart-shaped facial disc around the eyes (the eyes still sit on top)
+    const disc = soft(0xfff0dc);
+    for (const s of [-1, 1]) g.add(surfacePatch(disc, [s * 0.3, 0.55, 0.8], 0.3, 1.05, 1.1, 0.93));
+    g.add(surfacePatch(fur(0xffe4c4), [0, -0.3, 0.95], 0.4, 1.1, 1.0, 0.92));
+    // speckles on the chest
+    for (const [x, y] of [[-0.18, -0.2], [0.1, -0.15], [-0.05, -0.38], [0.22, -0.36], [-0.25, -0.5], [0.05, -0.56]]) {
+      const v = new THREE.Vector3(x, y, 0).setZ(Math.sqrt(1 - x * x - y * y));
+      const dot = onSurface(mesh(roundedCone(0.04, 0.05, 0.6, 10), brown), v.toArray(), 0.97);
+      dot.scale.set(1, 1, 0.4);
+      g.add(dot);
+    }
+    const beak = mesh(roundedCone(0.07, 0.2, 0.35, 16), gloss(0xffa23a), 0, 0.42, 0.88);
+    beak.rotation.x = Math.PI / 2 + 0.7;
+    g.add(beak);
+    for (const s of [-1, 1]) {
+      // ear tufts that twitch now and then
+      const tuft = new THREE.Group();
+      tuft.position.set(s * 0.42, 0.84, 0.12);
+      const cone = mesh(roundedCone(0.12, 0.34, 0.35, 20), brown);
+      cone.scale.set(1, 1, 0.55);
+      cone.rotation.z = -s * 0.45;
+      tuft.add(cone);
+      g.add(tuft);
+      anims.push((t) => (tuft.rotation.z = -s * Math.max(0, Math.sin(t * 1.1 + s * 1.7)) ** 10 * 0.35));
+      // wing patches folded at the sides
+      const wing = onSurface(mesh(sphere(0.4, 24, 16), brown), [s * 0.9, -0.05, -0.2], 0.92);
+      wing.scale.set(0.75, 1.15, 0.32);
+      g.add(wing);
+      const foot = mesh(sphere(0.15, 20, 14), gloss(0xffa23a), s * 0.28, -0.88, 0.36);
+      foot.scale.set(1, 0.35, 1.2);
+      g.add(foot);
     }
   }
 

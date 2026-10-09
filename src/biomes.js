@@ -293,4 +293,102 @@ Object.assign(BIOMES, {
   },
 });
 
+
+// ---------------------------------------------------------------- Skyhaven galaxy
+// Grassy islands drifting in a sea of cloud. style[4] = cloud: low ground between the islands
+// becomes cloud sea, grey and stormy until restored, then soft sunlit white.
+
+Object.assign(BIOMES, {
+  pastures: {
+    name: 'Cloud Pastures', creature: 'sheep', weight: 0.12, terrain: 'islands',
+    dead: 0x6a6e66, alive: 0x8ee07a, sky: ['#9cc8ff', '#fff2d8'], style: [0, 0, 0, 0, 1],
+    small: [['grass', 0.12], ['bluebell', 0.03], ['cloudPuff', 0.002]],
+    big: [['shepherdHut', 0.002]],
+    critters: [['butterfly', 3], ['bird', 2]],
+    particles: [[0xffffff, 0xfff6e0], -0.3, 5],
+    patches: [
+      { name: 'Sheep fold', shape: 'blob', ...M, dead: 0x666a5e, alive: 0x9ae684, props: [['stoneWall', 0.06, 'rim'], ['grass', 0.3]], critters: [['butterfly', 1]] },
+      { name: 'Dry-stone lane', shape: 'path', dead: 0x7e7a72, alive: 0xd8d0bc, props: [['stoneWall', 0.06, 'rim'], ['stile', 0.015, 'rim']] },
+      { name: 'Bluebell bank', shape: 'blob', ...M, dead: 0x5e6260, alive: 0x86d47a, props: [['bluebell', 0.45]], critters: [['bee', 2]] },
+      { name: "Shepherd's hut", shape: 'blob', ...S, dead: 0x6a665e, alive: 0x9ade80, props: [['shepherdHut', 0.035, 'inner'], ['bluebell', 0.15]] },
+      { name: 'Cloud nursery', shape: 'blob', ...S, dead: 0x6e7074, alive: 0xe8f0ff, props: [['cloudPuff', 0.12]] },
+      { name: 'Clover hill', shape: 'blob', ...L, dead: 0x62665a, alive: 0x7cd468, props: [['grass', 0.3], ['flower', 0.05]] },
+    ],
+    patchCount: 10,
+    finds: [['🧶', 'Ball of wool', 'c'], ['🔔', 'Sheep bell', 'c'], ['🧀', 'Cheese wheel', 'c'], ['🍞', 'Fresh loaf', 'c'], ['🧣', 'Knitted scarf', 'r'], ['🎐', 'Wind chime', 'r'], ['🥾', 'Hiking boot', 'r'], ['☀️', 'Bottled sunshine', 'l']],
+  },
+  cliffs: {
+    name: 'Windmill Cliffs', creature: 'goat', weight: 0.04, terrain: 'cliffs',
+    dead: 0x6c6a70, alive: 0xa6d884, sky: ['#88b8f8', '#ffe8cc'], style: [0, 0, 0, 0, 1],
+    small: [['grass', 0.08], ['flower', 0.02]],
+    big: [['windmill', 0.0018], ['cliffRock', 0.004]],
+    critters: [['bird', 4]],
+    particles: [[0xffffff, 0xe8f4ff], -0.2, 6],
+    patches: [
+      { name: 'Windmill hill', shape: 'blob', center: true, rFrac: 0.3, dead: 0x6a6866, alive: 0xb0dc88, props: [['windmill', 0.012, 'inner'], ['flower', 0.2]] },
+      { name: 'Rope bridge', shape: 'path', dead: 0x7a7270, alive: 0xd0b48a, props: [['ropeBridge', 0.05]] },
+      { name: 'Kite ridge', shape: 'blob', ...M, dead: 0x666468, alive: 0x9cd480, props: [['kite', 0.05], ['grass', 0.2]] },
+      { name: 'Rock stacks', shape: 'blob', ...M, dead: 0x6a6870, alive: 0xc8c0d0, props: [['cliffRock', 0.06]] },
+      { name: 'Goat track', shape: 'path', dead: 0x76726e, alive: 0xd8ccb0, props: [['pathStone', 0.1], ['stoneWall', 0.02, 'rim']] },
+      { name: 'Wildflower ledge', shape: 'blob', ...S, dead: 0x666266, alive: 0xa8e08c, props: [['flower', 0.4], ['bluebell', 0.1]], critters: [['butterfly', 2]] },
+    ],
+    patchCount: 9,
+    finds: [['🌾', 'Wheat sheaf', 'c'], ['🪨', 'Cliff pebble', 'c'], ['🌬️', 'Breeze in a jar', 'c'], ['🍃', 'Windblown leaf', 'c'], ['⛰️', 'Summit stone', 'r'], ['🎏', 'Carp streamer', 'r'], ['🪂', 'Parachute', 'r'], ['🌪️', 'Tame tornado', 'l']],
+  },
+  rainbow: {
+    name: 'Rainbow Falls', creature: 'unicorn', weight: 0.06, terrain: 'islands',
+    dead: 0x686670, alive: 0x9adcc8, sky: ['#b0a8ff', '#ffe0f0'], style: [0, 0, 0.2, 0, 1],
+    small: [['rainbowFlower', 0.03], ['grass', 0.06]],
+    big: [['rainbowArch', 0.0015], ['prism', 0.003]],
+    critters: [['butterfly', 4], ['dragonfly', 2]],
+    particles: [[0xffb8dc, 0xfff0a0, 0xa8ecd6, 0xb4dcff, 0xd8c8ff], -0.4, 8],
+    patches: [
+      { name: 'Rainbow pool', shape: 'blob', center: true, rFrac: 0.4, water: 0x8fd8f0, dead: 0x5e6068, alive: 0x7ccab8, props: [['waterfallRock', 0.02, 'rim'], ['lily', 0.05, 'inner']], critters: [['fish', 2], ['dragonfly', 2]] },
+      { name: 'Rainbow arch', shape: 'blob', ...S, dead: 0x6a6872, alive: 0xc8e8e0, props: [['rainbowArch', 0.03, 'inner'], ['rainbowFlower', 0.2]] },
+      { name: 'Prism grotto', shape: 'blob', ...M, emissive: 0.25, dead: 0x5e5c68, alive: 0xc0b0e8, props: [['prism', 0.08]] },
+      { name: 'Waterfall steps', shape: 'path', dead: 0x666670, alive: 0xa8d8d0, props: [['waterfallRock', 0.03, 'rim']] },
+      { name: 'Painted meadow', shape: 'blob', ...L, dead: 0x62626a, alive: 0x9ce0b0, props: [['rainbowFlower', 0.35]], critters: [['butterfly', 2]] },
+      { name: 'Misty spring', shape: 'blob', ...S, water: 0xa8e4f8, dead: 0x5a5c64, alive: 0x88d0c0, props: [['lily', 0.1, 'inner']] },
+    ],
+    patchCount: 10,
+    finds: [['💧', 'Water droplet', 'c'], ['☂️', 'Umbrella', 'c'], ['🎨', 'Paint palette', 'c'], ['🖍️', 'Crayon', 'c'], ['💎', 'Prism gem', 'r'], ['🔮', 'Crystal ball', 'r'], ['🪄', 'Magic wand', 'r'], ['🌈', 'Rainbow in a jar', 'l']],
+  },
+  balloons: {
+    name: 'Balloon Meadow', creature: 'eagle', weight: 0.1, terrain: 'islands',
+    dead: 0x6a6c62, alive: 0x92dc76, sky: ['#94c4ff', '#ffecc8'], style: [0, 0, 0, 0, 1],
+    small: [['grass', 0.1], ['flower', 0.03]],
+    big: [['hotAirBalloon', 0.001]],
+    critters: [['bird', 3], ['butterfly', 2]],
+    particles: [[0xffffff, 0xffe8b0], -0.3, 5],
+    patches: [
+      { name: 'Launch field', shape: 'blob', center: true, rFrac: 0.3, dead: 0x6a6a60, alive: 0xa0e080, props: [['hotAirBalloon', 0.012, 'inner'], ['windsock', 0.02, 'rim']] },
+      { name: 'Picnic spot', shape: 'blob', ...S, dead: 0x666860, alive: 0x96dc7c, props: [['picnicBlanket', 0.05, 'inner'], ['flower', 0.2]], critters: [['bee', 2]] },
+      { name: 'Weather station', shape: 'blob', ...S, dead: 0x6c6a66, alive: 0xd0dcc0, props: [['weatherVane', 0.04, 'inner'], ['windsock', 0.03, 'rim']] },
+      { name: 'Kite field', shape: 'blob', ...M, dead: 0x64665e, alive: 0x8cd474, props: [['kite', 0.06], ['grass', 0.2]] },
+      { name: 'Hedgerow path', shape: 'path', dead: 0x787468, alive: 0xd8cca8, props: [['bush', 0.04, 'rim'], ['flower', 0.1, 'rim']] },
+      { name: 'Wildflower field', shape: 'blob', ...L, dead: 0x62645c, alive: 0x9ae080, props: [['flower', 0.35], ['bluebell', 0.1]], critters: [['butterfly', 2]] },
+    ],
+    patchCount: 10,
+    finds: [['🍓', 'Strawberries', 'c'], ['🥪', 'Sandwich', 'c'], ['🧃', 'Juice box', 'c'], ['🍋', 'Lemon', 'c'], ['🗺️', 'Sky map', 'r'], ['🎩', "Balloonist's hat", 'r'], ['🍰', 'Picnic cake', 'r'], ['🪶', 'Golden feather', 'l']],
+  },
+  stargazer: {
+    name: "Stargazer's Peak", creature: 'owl', weight: 0.02, terrain: 'peaks',
+    dead: 0x5e5c6a, alive: 0x9a9cd8, sky: ['#4c4890', '#f0b8e0'], style: [0, 0.3, 0.6, 0, 1],
+    small: [['moonflower', 0.02], ['glowStone', 0.004]],
+    big: [['observatory', 0.0005], ['starLantern', 0.002]],
+    critters: [['firefly', 6], ['moth', 2]],
+    particles: [[0xfff3a0, 0xd8c8ff, 0xffffff], -0.15, 6],
+    patches: [
+      { name: 'Observatory', shape: 'blob', center: true, rFrac: 0.28, dead: 0x5a5866, alive: 0xb8b4e0, props: [['observatory', 0.012, 'inner'], ['starLantern', 0.03, 'rim']] },
+      { name: 'Telescope terrace', shape: 'blob', ...M, dead: 0x5e5c68, alive: 0xa8a8dc, props: [['telescope', 0.05]] },
+      { name: 'Lantern trail', shape: 'path', emissive: 0.2, dead: 0x5a5866, alive: 0xb0a8e0, props: [['starLantern', 0.04, 'rim']], critters: [['firefly', 2]] },
+      { name: 'Sundial lawn', shape: 'blob', ...S, dead: 0x62606a, alive: 0x9ca8d8, props: [['sundial', 0.04, 'inner'], ['moonflower', 0.15]] },
+      { name: 'Moonflower bed', shape: 'blob', ...M, dead: 0x5c5a66, alive: 0x8c90d8, props: [['moonflower', 0.35]], critters: [['moth', 1]] },
+      { name: 'Star-chart circle', shape: 'blob', ...S, emissive: 0.3, dead: 0x5a586a, alive: 0xc0b8f0, props: [['glowStone', 0.1]] },
+    ],
+    patchCount: 9,
+    finds: [['⭐', 'Wishing star', 'c'], ['🌙', 'Crescent moon', 'c'], ['🕯️', 'Candle', 'c'], ['📜', 'Star chart', 'c'], ['🔭', 'Telescope', 'r'], ['🪐', 'Ringed planet', 'r'], ['☄️', 'Comet', 'r'], ['🌌', 'Milky Way', 'l']],
+  },
+});
+
 export const BIOME_IDS = Object.keys(BIOMES);
