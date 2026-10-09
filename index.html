@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#cbbcff" />
     <title>Blorbit – A cosy, relaxing game about restoring tiny planets</title>
-    <meta name="description" content="Roll a wobbly alien blob around tiny planets in this cosy, relaxing browser game. Bring 25 biomes back to life, wake sleepy creatures and collect 200 cards." />
+    <meta name="description" content="Roll a wobbly alien blob around tiny planets in this cosy, relaxing browser game. Bring 30 biomes back to life, wake sleepy creatures and collect 240 cards." />
     <link rel="canonical" href="https://blorbit.io/" />
 
     <!-- icons + "add to home screen" -->
@@ -18,7 +18,7 @@
     <meta property="og:site_name" content="Blorbit" />
     <meta property="og:url" content="https://blorbit.io/" />
     <meta property="og:title" content="Blorbit – A cosy, relaxing game about restoring tiny planets" />
-    <meta property="og:description" content="Roll a wobbly alien blob around tiny planets in this cosy, relaxing browser game. Bring 25 biomes back to life, wake sleepy creatures and collect 200 cards." />
+    <meta property="og:description" content="Roll a wobbly alien blob around tiny planets in this cosy, relaxing browser game. Bring 30 biomes back to life, wake sleepy creatures and collect 240 cards." />
     <meta property="og:image" content="https://blorbit.io/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -26,7 +26,7 @@
     <meta property="og:locale" content="en_GB" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Blorbit – A cosy, relaxing game about restoring tiny planets" />
-    <meta name="twitter:description" content="Roll a wobbly alien blob around tiny planets in this cosy, relaxing browser game. Bring 25 biomes back to life, wake sleepy creatures and collect 200 cards." />
+    <meta name="twitter:description" content="Roll a wobbly alien blob around tiny planets in this cosy, relaxing browser game. Bring 30 biomes back to life, wake sleepy creatures and collect 240 cards." />
     <meta name="twitter:image" content="https://blorbit.io/og-image.png" />
     <meta name="twitter:image:alt" content="A tiny restored planet with candy hills, a pond and a flower meadow, next to the Blorbit logo" />
 
@@ -37,7 +37,7 @@
         "@type": "VideoGame",
         "name": "Blorbit",
         "url": "https://blorbit.io/",
-        "description": "Roll a wobbly alien blob around tiny planets in this cosy, relaxing browser game. Bring 25 biomes back to life, wake sleepy creatures and collect 200 cards.",
+        "description": "Roll a wobbly alien blob around tiny planets in this cosy, relaxing browser game. Bring 30 biomes back to life, wake sleepy creatures and collect 240 cards.",
         "image": "https://blorbit.io/og-image.png",
         "genre": ["Casual", "Relaxing", "Collecting"],
         "keywords": "cosy game, relaxing game, collecting game, browser game",
@@ -210,7 +210,7 @@
 
       /* galaxy picker cards (title screen + in-game travel panel) */
       .galaxy-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; width: 100%; }
-      #title .galaxy-cards { width: min(1120px, 90vw); margin-bottom: 4px; }
+      #title .galaxy-cards { width: min(1240px, 94vw); margin-bottom: 4px; }
       .galaxy-card {
         position: relative; display: flex; flex-direction: column; align-items: stretch; text-align: left; gap: 6px; padding: 0 0 14px; overflow: hidden;
         border: 2px solid rgba(255,255,255,0.9); border-radius: 24px; background: rgba(255,255,255,0.8); box-shadow: var(--shadow-sm);
@@ -625,7 +625,7 @@
       body.touch .keys-only, body.touch .skin .key { display: none !important; }
 
       /* tablets: keep the galaxy picker to a single swipeable row instead of wrapping onto a second line */
-      @media (min-width: 721px) and (max-width: 1100px) and (min-height: 501px) {
+      @media (min-width: 721px) and (max-width: 1260px) and (min-height: 501px) {
         #title .galaxy-cards {
           grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 250px; width: 88vw;
           overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: none;

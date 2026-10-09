@@ -489,4 +489,102 @@ Object.assign(BIOMES, {
   },
 });
 
+
+// ---------------------------------------------------------------- Seaglow galaxy
+// The sea floor. style[5] = sea: murky, dim water until restored, then dappled with caustic light.
+// Bubbles drift up as ambient particles, and the finds are all ocean-adjacent.
+
+Object.assign(BIOMES, {
+  kelp: {
+    name: 'Kelp Forest', creature: 'otter', weight: 0.1, terrain: 'rolling',
+    dead: 0x4e5a54, alive: 0x58c47a, sky: ['#2a8aa8', '#a8f0d0'], style: [0, 0, 0, 0, 0, 1],
+    small: [['seaGrass', 0.1], ['kelp', 0.014], ['pebble', 0.004]],
+    big: [['kelp', 0.004]],
+    critters: [['minnow', 4], ['jelly', 1]],
+    particles: [[0xd8fff4, 0xffffff], -0.7, 8],
+    patches: [
+      { name: 'Kelp thicket', shape: 'blob', ...L, dead: 0x4a564e, alive: 0x4cc070, props: [['kelp', 0.12]], critters: [['minnow', 3]] },
+      { name: 'Otter raft', shape: 'blob', ...S, dead: 0x56605a, alive: 0x78d098, props: [['kelp', 0.08, 'rim'], ['moonShell', 0.05, 'inner']] },
+      { name: 'Urchin barrens', shape: 'blob', ...M, dead: 0x504e56, alive: 0x9a78c8, props: [['urchin', 0.12]] },
+      { name: 'Seagrass meadow', shape: 'blob', ...L, dead: 0x4e5a52, alive: 0x70d080, props: [['seaGrass', 0.4]], critters: [['minnow', 2]] },
+      { name: 'Sandy channel', shape: 'path', dead: 0x6a6a64, alive: 0xe0d4a8, props: [['pebble', 0.1], ['shell', 0.05, 'rim']] },
+      { name: 'Driftwood bed', shape: 'blob', ...S, dead: 0x58585a, alive: 0x90b890, props: [['seaGrass', 0.2], ['mossRock', 0.05]] },
+    ],
+    patchCount: 10,
+    finds: [['🪵', 'Driftwood', 'c'], ['🍙', 'Seaweed snack', 'c'], ['🪝', 'Fishing hook', 'c'], ['🥽', 'Swim goggles', 'u'], ['🧴', 'Sun lotion', 'u'], ['🛟', 'Lifebuoy', 'r'], ['🔑', 'Sunken key', 'e'], ['🥇', 'Golden pearl', 'l']],
+  },
+  reef: {
+    name: 'Coral Reef', creature: 'pufferfish', weight: 0.08, terrain: 'bumps',
+    dead: 0x6a6a70, alive: 0xf0a078, sky: ['#30a8d0', '#fff0c8'], style: [0, 0, 0, 0, 0, 1],
+    small: [['coral', 0.05], ['coralFan', 0.012], ['anemone', 0.01], ['seaGrass', 0.04]],
+    big: [['coral', 0.004], ['coralFan', 0.003]],
+    critters: [['minnow', 6], ['jelly', 1]],
+    particles: [[0xffffff, 0xd8f4ff, 0xffe0f0], -0.8, 9],
+    patches: [
+      { name: 'Coral garden', shape: 'blob', ...M, dead: 0x6a6a72, alive: 0xff9a8a, props: [['coral', 0.15]], critters: [['minnow', 3]] },
+      { name: 'Fan coral wall', shape: 'blob', ...M, dead: 0x666870, alive: 0xd88ae0, props: [['coralFan', 0.12]] },
+      { name: 'Anemone patch', shape: 'blob', ...S, dead: 0x6c6a6e, alive: 0xffb0a0, props: [['anemone', 0.18]], critters: [['minnow', 2]] },
+      { name: 'Starfish shallows', shape: 'blob', ...S, dead: 0x72706a, alive: 0xf4dca0, props: [['starfish', 0.2], ['shell', 0.1]] },
+      { name: 'Sandbar path', shape: 'path', dead: 0x7a7870, alive: 0xf4e8b8, props: [['shell', 0.08, 'rim'], ['pebble', 0.06]] },
+      { name: 'Reef drop-off', shape: 'blob', ...L, dead: 0x62646c, alive: 0xff9ac0, props: [['coral', 0.1], ['coralFan', 0.05]], critters: [['jelly', 1]] },
+    ],
+    patchCount: 10,
+    finds: [['🍥', 'Swirl fishcake', 'c'], ['🏄', 'Surfer', 'c'], ['🏊', 'Swimmer', 'c'], ['🍣', 'Sushi roll', 'u'], ['🏖️', 'Sandbar', 'u'], ['🚤', 'Speedboat', 'r'], ['💍', 'Pearl ring', 'e'], ['🪩', 'Reef disco ball', 'l']],
+  },
+  galleon: {
+    name: 'Sunken Galleon', creature: 'shark', weight: 0.04, terrain: 'gentle',
+    dead: 0x56585e, alive: 0xb8a888, sky: ['#1c6a8c', '#98d8d8'], style: [0, 0, 0, 0, 0, 1],
+    small: [['pebble', 0.006], ['seaGrass', 0.05], ['mossRock', 0.004]],
+    big: [['shipHull', 0.0014], ['mast', 0.0016], ['anchor', 0.0012]],
+    critters: [['minnow', 3], ['jelly', 1]],
+    particles: [[0xc8f0f0, 0xffffff], -0.6, 6],
+    patches: [
+      { name: 'The wreck', shape: 'blob', center: true, rFrac: 0.28, dead: 0x54565c, alive: 0xc0a880, props: [['shipHull', 0.02, 'inner'], ['mast', 0.02, 'rim']] },
+      { name: 'Treasure pile', shape: 'blob', ...S, dead: 0x5a5a5e, alive: 0xe8c878, props: [['treasureChest', 0.06, 'inner'], ['shell', 0.1]] },
+      { name: 'Anchor graveyard', shape: 'blob', ...M, dead: 0x52545a, alive: 0xa8b0b8, props: [['anchor', 0.06]] },
+      { name: 'Broken masts', shape: 'path', dead: 0x585a5e, alive: 0xb09878, props: [['mast', 0.04, 'rim']] },
+      { name: 'Barnacle rocks', shape: 'blob', ...S, dead: 0x56585c, alive: 0x90a898, props: [['mossRock', 0.12], ['urchin', 0.05]] },
+      { name: 'Cannon row', shape: 'blob', ...M, dead: 0x54565a, alive: 0xb8b0a0, props: [['barrel', 0.08], ['pillar', 0.04]], critters: [['minnow', 2]] },
+    ],
+    patchCount: 9,
+    finds: [['🏴‍☠️', 'Pirate flag', 'c'], ['🔦', "Ship's lantern", 'c'], ['🧱', 'Ballast brick', 'c'], ['🎩', "Captain's hat", 'u'], ['⚖️', 'Brass scales', 'u'], ['🔱', 'Trident', 'r'], ['💰', 'Treasure chest', 'e'], ['🏛️', 'Lost temple', 'l']],
+  },
+  jellyglow: {
+    name: 'Jellyglow Gardens', creature: 'jellyfish', weight: 0.02, terrain: 'hillocks',
+    dead: 0x3e4458, alive: 0x7a78e0, sky: ['#14305a', '#7a5ad0'], style: [0, 0, 0.5, 0, 0, 1],
+    small: [['glowCoral', 0.02], ['glowStone', 0.005], ['seaGrass', 0.03]],
+    big: [['jellyLamp', 0.004], ['glowCoral', 0.003]],
+    critters: [['jelly', 4], ['minnow', 2]],
+    particles: [[0x9affe0, 0xff9ae0, 0x9ab8ff], -0.5, 9],
+    patches: [
+      { name: 'Jelly meadow', shape: 'blob', ...L, emissive: 0.2, dead: 0x40465a, alive: 0x8a80e8, props: [['jellyLamp', 0.1]], critters: [['jelly', 3]] },
+      { name: 'Glow coral bed', shape: 'blob', ...M, emissive: 0.3, dead: 0x424860, alive: 0x70c0d8, props: [['glowCoral', 0.2]] },
+      { name: 'Moon shells', shape: 'blob', ...S, dead: 0x464a5e, alive: 0xb0a0f0, props: [['moonShell', 0.1]] },
+      { name: 'Lantern lane', shape: 'path', emissive: 0.3, dead: 0x444a5c, alive: 0x8ab0f0, props: [['jellyLamp', 0.05, 'rim'], ['glowStone', 0.05]], critters: [['jelly', 2]] },
+      { name: 'Plankton cloud', shape: 'blob', ...S, emissive: 0.4, dead: 0x404660, alive: 0x90e0d0, props: [['glowStone', 0.15]], critters: [['minnow', 3]] },
+      { name: 'Crystal grotto', shape: 'blob', ...M, emissive: 0.25, dead: 0x464a62, alive: 0xa090f0, props: [['crystal', 0.1], ['bigCrystal', 0.02, 'inner']] },
+    ],
+    patchCount: 9,
+    finds: [['🧪', 'Glow potion', 'c'], ['🔬', 'Plankton slide', 'c'], ['🦠', 'Glowing microbe', 'c'], ['🌀', 'Whirlpool', 'u'], ['🪞', 'Moon mirror', 'u'], ['🌫️', 'Sea mist', 'r'], ['⛈️', 'Storm in a jar', 'e'], ['🧜', 'Mermaid', 'l']],
+  },
+  vents: {
+    name: 'Abyssal Vents', creature: 'squid', weight: -0.06, terrain: 'basin',
+    dead: 0x32303a, alive: 0xd8584a, sky: ['#0a1a38', '#a83a5a'], style: [0, 0, 0.2, 0, 0, 1],
+    small: [['tubeWorm', 0.012], ['glowStone', 0.004], ['pebble', 0.005]],
+    big: [['ventChimney', 0.003]],
+    critters: [['jelly', 2], ['minnow', 2]],
+    particles: [[0xff9a6a, 0xffd0a0, 0xffffff], -0.9, 8],
+    patches: [
+      { name: 'Black smokers', shape: 'blob', center: true, rFrac: 0.3, emissive: 0.4, dead: 0x2e2c36, alive: 0xc84a42, props: [['ventChimney', 0.04, 'inner'], ['tubeWorm', 0.06, 'rim']] },
+      { name: 'Tube worm thicket', shape: 'blob', ...M, dead: 0x34323c, alive: 0xe0605a, props: [['tubeWorm', 0.2]] },
+      { name: 'Wreck debris', shape: 'blob', ...S, dead: 0x36343e, alive: 0x887a7a, props: [['barrel', 0.1], ['mast', 0.02]] },
+      { name: 'Warm seep', shape: 'path', emissive: 0.35, dead: 0x34323c, alive: 0xff7a5a, props: [['glowStone', 0.08, 'rim'], ['tubeWorm', 0.04, 'rim']] },
+      { name: 'Idol hollow', shape: 'blob', ...S, dead: 0x363440, alive: 0xb86a6a, props: [['pillar', 0.06, 'inner'], ['urchin', 0.08]] },
+      { name: 'Ember field', shape: 'blob', ...M, emissive: 0.3, dead: 0x302e38, alive: 0xd8724a, props: [['glowStone', 0.1], ['vent', 0.03]] },
+    ],
+    patchCount: 9,
+    finds: [['🪱', 'Tube worm', 'c'], ['🛢️', 'Rusty barrel', 'c'], ['🗿', 'Deep idol', 'c'], ['🧲', 'Magnet', 'u'], ['⛴️', 'Ferry wreck', 'u'], ['🛥️', 'Yacht wreck', 'r'], ['✈️', 'Lost aeroplane', 'e'], ['🛕', 'Abyss shrine', 'l']],
+  },
+});
+
 export const BIOME_IDS = Object.keys(BIOMES);

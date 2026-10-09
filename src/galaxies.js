@@ -43,6 +43,16 @@ export const GALAXIES = {
     unlockedBy: 'sky',
     unlockAt: 0.8,
   },
+  sea: {
+    name: 'Seaglow',
+    emoji: '🐋',
+    blurb: 'Kelp forests, reefs, wrecks and glowing depths. Light up the deep.',
+    art: ['#a8ecf4', '#b8a8ff'],
+    biomes: ['kelp', 'reef', 'galleon', 'jellyglow', 'vents'],
+    // unlocked by waking 80% of Sunroam's creatures (4 of 5)
+    unlockedBy: 'safari',
+    unlockAt: 0.8,
+  },
 };
 export const GALAXY_IDS = Object.keys(GALAXIES);
 

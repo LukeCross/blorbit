@@ -33,9 +33,14 @@ export const SKINS = {
   hippo: { name: 'Hippo Blob', emoji: '🦛', body: 0xb8a4d8, slime: 0xe0d0f8 },
   panda: { name: 'Panda Blob', emoji: '🐼', body: 0xf8f8f4, slime: 0xd0f0d0 },
   koala: { name: 'Koala Blob', emoji: '🐨', body: 0xaab0c0, slime: 0xd8e4f0 },
+  otter: { name: 'Otter Blob', emoji: '🦦', body: 0xa87a5a, slime: 0xd8b8a0 },
+  pufferfish: { name: 'Pufferfish Blob', emoji: '🐡', body: 0xffd860, slime: 0xfff0a0 },
+  shark: { name: 'Shark Blob', emoji: '🦈', body: 0x8ea4bc, slime: 0xc0e0f0 },
+  jellyfish: { name: 'Jellyfish Blob', emoji: '🪼', body: 0xff9ae0, slime: 0xffd0f4 },
+  squid: { name: 'Squid Blob', emoji: '🦑', body: 0xff7a8c, slime: 0xffb8c4 },
 };
 
-export const CREATURE_IDS = ['bunny', 'frog', 'fox', 'penguin', 'moth', 'snail', 'turtle', 'lizard', 'bear', 'hedgehog', 'squirrel', 'cat', 'dog', 'raccoon', 'seagull', 'sheep', 'goat', 'unicorn', 'eagle', 'owl', 'lion', 'parrot', 'hippo', 'panda', 'koala'];
+export const CREATURE_IDS = ['bunny', 'frog', 'fox', 'penguin', 'moth', 'snail', 'turtle', 'lizard', 'bear', 'hedgehog', 'squirrel', 'cat', 'dog', 'raccoon', 'seagull', 'sheep', 'goat', 'unicorn', 'eagle', 'owl', 'lion', 'parrot', 'hippo', 'panda', 'koala', 'otter', 'pufferfish', 'shark', 'jellyfish', 'squid'];
 
 // ---------------------------------------------------------------- materials
 
@@ -46,7 +51,7 @@ const gummy = (color) => shiny(color, { transparent: true, opacity: 0.88 });
 const soft = (color, extra = {}) => matte(color, { roughness: 0.6, ...extra });
 
 // what each sleeping creature's body is made of
-const BODY_STYLE = { fox: fur, bunny: fur, hedgehog: fur, moth: fur, penguin: soft, turtle: soft, frog: gloss, lizard: gloss, snail: gloss, bear: gummy, squirrel: fur, cat: fur, dog: fur, raccoon: fur, seagull: soft, sheep: fur, goat: fur, unicorn: soft, eagle: soft, owl: fur, lion: fur, parrot: soft, hippo: soft, panda: fur, koala: fur };
+const BODY_STYLE = { fox: fur, bunny: fur, hedgehog: fur, moth: fur, penguin: soft, turtle: soft, frog: gloss, lizard: gloss, snail: gloss, bear: gummy, squirrel: fur, cat: fur, dog: fur, raccoon: fur, seagull: soft, sheep: fur, goat: fur, unicorn: soft, eagle: soft, owl: fur, lion: fur, parrot: soft, hippo: soft, panda: fur, koala: fur, otter: fur, pufferfish: gloss, shark: gloss, jellyfish: gummy, squid: gloss };
 export const bodyMaterial = (id) => (BODY_STYLE[id] || soft)(SKINS[id].body);
 
 // ---------------------------------------------------------------- shape helpers
@@ -870,6 +875,155 @@ export function buildAccessories(id) {
     const leaf = mesh(new THREE.SphereGeometry(0.1, 12, 8).scale(0.45, 1.1, 0.12), soft(0x8fb89a), 0.55, 0.95, 0.12);
     leaf.rotation.z = -0.6;
     g.add(leaf);
+  }
+
+
+  // ---------------------------------------------------------------- Seaglow
+
+  if (id === 'otter') {
+    const coat = fur(skin.body);
+    const cream = fur(0xf0dcc4);
+    // pale muzzle and chest, small round ears, long whiskers and a little shell held to the tummy
+    g.add(surfacePatch(cream, [0, 0.06, 0.96], 0.4, 1.3, 0.85, 0.9));
+    g.add(surfacePatch(cream, [0, -0.45, 0.9], 0.45, 1.0, 1.1, 0.88));
+    g.add(onSurface(mesh(sphere(0.06), gloss(0x3a2e34)), [0, 0.2, 0.95], 1.01));
+    for (const s of [-1, 1]) {
+      const ear = mesh(sphere(0.12, 20, 14), coat, s * 0.5, 0.84, 0.1);
+      ear.scale.set(1, 1, 0.6);
+      g.add(ear);
+      for (const k of [-1, 0, 1]) {
+        const w = mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.28, 4), matte(0xfff4e8), s * 0.34, 0.14 + k * 0.05, 0.98);
+        w.rotation.z = Math.PI / 2 + s * k * 0.15;
+        w.rotation.y = s * 0.25;
+        g.add(w);
+      }
+      const paw = mesh(sphere(0.13, 20, 14), coat, s * 0.2, -0.4, 1.0);
+      paw.scale.set(1, 0.8, 0.8);
+      g.add(paw);
+    }
+    const shell = mesh(new THREE.SphereGeometry(0.17, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2).scale(1, 0.7, 1), soft(0xf4d0e0), 0, -0.4, 1.02);
+    shell.rotation.x = Math.PI / 2 - 0.2;
+    g.add(shell);
+    // a rudder-like tail
+    const tail = mesh(roundedCone(0.14, 0.55, 0.4, 20), coat, 0, -0.55, -0.85);
+    tail.rotation.x = -Math.PI / 2 - 0.5;
+    tail.scale.set(1, 1, 0.5);
+    g.add(tail);
+    anims.push((t) => (tail.rotation.z = Math.sin(t * 1.5) * 0.15));
+  }
+
+  if (id === 'pufferfish') {
+    const yellow = soft(skin.body);
+    const cream = soft(0xfff4d0);
+    // pale tummy, a ring of little spikes, pectoral fins that flutter, and a fish tail
+    g.add(surfacePatch(cream, [0, -0.35, 0.93], 0.55, 1.2, 1.1, 0.88));
+    const golden = Math.PI * (3 - Math.sqrt(5));
+    const d = new THREE.Vector3();
+    for (let i = 0; i < 46; i++) {
+      const y = 1 - (i / 45) * 2, r = Math.sqrt(1 - y * y);
+      d.set(Math.cos(golden * i) * r, y, Math.sin(golden * i) * r);
+      if (d.z > 0.35 && d.y > -0.2 && d.y < 0.95) continue;
+      if (d.y < -0.5) continue;
+      const spike = onSurface(mesh(roundedCone(0.05, 0.16, 0.4, 10), soft(0xe8a830)), d.toArray(), 0.98);
+      spike.rotateX(Math.PI / 2);
+      g.add(spike);
+    }
+    g.add(onSurface(mesh(sphere(0.07), gloss(0xe86a6a)), [0, 0.2, 0.94], 1.01));
+    for (const s of [-1, 1]) {
+      const fin = new THREE.Group();
+      fin.position.set(s * 0.92, 0.0, 0.2);
+      const f = mesh(sphere(0.2, 20, 14), soft(0xffe8a0));
+      f.scale.set(0.25, 0.9, 1);
+      fin.add(f);
+      g.add(fin);
+      anims.push((t) => (fin.rotation.y = s * (0.2 + Math.sin(t * 5 + s) * 0.35)));
+    }
+    const tail = mesh(roundedCone(0.28, 0.4, 0.3, 20), yellow, 0, -0.1, -0.98);
+    tail.rotation.x = -Math.PI / 2;
+    tail.scale.set(1, 0.3, 1.3);
+    g.add(tail);
+  }
+
+  if (id === 'shark') {
+    const grey = soft(skin.body);
+    const white = soft(0xf6f8fc);
+    // white belly, tall dorsal fin, side fins and a crescent tail, with a toothy grin
+    g.add(surfacePatch(white, [0, -0.45, 0.88], 0.62, 1.4, 1.2, 0.86));
+    const dorsal = mesh(roundedCone(0.2, 0.62, 0.3, 20), grey, 0, 1.0, -0.2);
+    dorsal.rotation.x = -0.45;
+    dorsal.scale.set(0.35, 1, 1);
+    g.add(dorsal);
+    for (const s of [-1, 1]) {
+      const fin = mesh(roundedCone(0.14, 0.5, 0.3, 16), grey, s * 0.88, -0.2, 0.1);
+      fin.rotation.set(0.2, 0, -s * (Math.PI / 2 + 0.5));
+      fin.scale.set(1, 1, 0.3);
+      g.add(fin);
+      for (let k = 0; k < 4; k++) {
+        const tooth = mesh(new THREE.ConeGeometry(0.025, 0.06, 4), matte(0xffffff), s * (0.05 + k * 0.07), 0.07, 0.99);
+        tooth.rotation.x = Math.PI;
+        g.add(tooth);
+      }
+    }
+    const tail = new THREE.Group();
+    tail.position.set(0, -0.1, -0.95);
+    const top = mesh(roundedCone(0.16, 0.5, 0.3, 14), grey, 0, 0.12, -0.06);
+    top.rotation.x = -0.4;
+    top.scale.set(0.3, 1, 1);
+    const bot = mesh(roundedCone(0.12, 0.34, 0.3, 14), grey, 0, -0.1, -0.04);
+    bot.rotation.x = Math.PI + 0.5;
+    bot.scale.set(0.3, 1, 1);
+    tail.add(top, bot);
+    g.add(tail);
+    anims.push((t) => (tail.rotation.y = Math.sin(t * 2.2) * 0.35));
+  }
+
+  if (id === 'jellyfish') {
+    const glass = gummy(0xffc8f0);
+    // a see-through bell cap with glowing spots, and a skirt of long ribbon tentacles
+    const bell = mesh(new THREE.SphereGeometry(1.0, 40, 20, 0, Math.PI * 2, 0, Math.PI * 0.42), glass, 0, 0.06, 0);
+    bell.scale.setScalar(1.06);
+    g.add(bell);
+    for (let i = 0; i < 7; i++) {
+      const a = i * 0.9, r = 0.45 + (i % 3) * 0.12;
+      const spot = mesh(sphere(0.05 + (i % 2) * 0.02, 12, 8), new THREE.MeshBasicMaterial({ color: new THREE.Color(0xfff0ff).multiplyScalar(1.5) }), Math.cos(a) * r, 0.78 + (i % 3) * 0.04 - r * 0.2, Math.sin(a) * r);
+      g.add(spot);
+    }
+    const tentacles = [];
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      const tube = taperedTube([[Math.cos(a) * 0.55, -0.65, Math.sin(a) * 0.55], [Math.cos(a) * 0.6, -0.95, Math.sin(a) * 0.6], [Math.cos(a) * 0.5, -1.25, Math.sin(a) * 0.5], [Math.cos(a) * 0.55, -1.5, Math.sin(a) * 0.55]], (t) => 0.05 - t * 0.03, 20, 8);
+      const tg = tubeGroup(tube, gummy(i % 2 ? 0xffb0e8 : 0xd8b0ff));
+      g.add(tg);
+      tentacles.push(tg);
+    }
+    anims.push((t) => tentacles.forEach((tg, i) => { tg.rotation.z = Math.sin(t * 1.6 + i) * 0.08; tg.rotation.x = Math.cos(t * 1.3 + i * 1.7) * 0.08; }));
+  }
+
+  if (id === 'squid') {
+    const red = soft(skin.body);
+    const pale = soft(0xffd0d8);
+    // a pointed mantle fin on top, pale underside, and a skirt of wavy tentacles
+    const fin = mesh(roundedCone(0.4, 0.75, 0.3, 24), red, 0, 0.9, -0.1);
+    fin.scale.set(1, 1, 0.7);
+    fin.rotation.x = -0.2;
+    g.add(fin);
+    g.add(surfacePatch(pale, [0, -0.3, 0.9], 0.55, 1.15, 1.1, 0.88));
+    for (const s of [-1, 1]) {
+      const flap = mesh(sphere(0.3, 20, 14), red, s * 0.45, 0.95, -0.15);
+      flap.scale.set(0.7, 0.18, 1.0);
+      flap.rotation.z = -s * 0.5;
+      g.add(flap);
+    }
+    const arms = [];
+    for (let i = 0; i < 6; i++) {
+      const a = Math.PI * 0.2 + (i / 5) * Math.PI * 0.6 + Math.PI;
+      const x = Math.cos(a) * 0.6;
+      const tube = taperedTube([[x, -0.5, 0.75], [x * 1.2, -0.75, 0.9], [x * 1.0, -1.0, 1.0], [x * 1.3, -1.2, 1.1]], (t) => 0.075 - t * 0.05, 20, 8);
+      const tg = tubeGroup(tube, soft(i % 2 ? 0xff98a4 : skin.body));
+      g.add(tg);
+      arms.push(tg);
+    }
+    anims.push((t) => arms.forEach((tg, i) => (tg.rotation.x = Math.sin(t * 1.8 + i) * 0.1)));
   }
 
   g.userData.animate = (t) => anims.forEach((a) => a(t));

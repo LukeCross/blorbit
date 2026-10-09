@@ -25,15 +25,16 @@ const vert = /* glsl */ `
   attribute vec2 aEdge;
   attribute float aPave;
   attribute float aCloud;
+  attribute float aSea;
   varying vec3 vN, vP, vWorld, vDead, vAlive, vWaterCol;
   varying vec4 vDyn, vStyle;
-  varying float vWater, vPave, vCloud;
+  varying float vWater, vPave, vCloud, vSea;
   varying vec2 vEdge;
   void main() {
     vN = normalize(normal);
     vP = position;
     vDead = aDead; vAlive = aAlive; vStyle = aStyle; vWaterCol = aWaterCol;
-    vDyn = aDyn; vWater = aWater; vEdge = aEdge; vPave = aPave; vCloud = aCloud;
+    vDyn = aDyn; vWater = aWater; vEdge = aEdge; vPave = aPave; vCloud = aCloud; vSea = aSea;
     vec4 wp = modelMatrix * vec4(position, 1.0);
     vWorld = wp.xyz;
     gl_Position = projectionMatrix * viewMatrix * wp;
@@ -46,7 +47,7 @@ const frag = /* glsl */ `
   uniform vec3 uSunDir;
   varying vec3 vN, vP, vWorld, vDead, vAlive, vWaterCol;
   varying vec4 vDyn, vStyle;
-  varying float vWater, vPave, vCloud;
+  varying float vWater, vPave, vCloud, vSea;
   varying vec2 vEdge;
 
   float hash(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
@@ -106,6 +107,18 @@ const frag = /* glsl */ `
       cloudLit = vCloud * (0.35 + 0.4 * life);
     }
 
+    // sea floor (Seaglow): murky, blue-green and dull until restored, then dappled with drifting caustic light
+    float seaLit = 0.0;
+    if (vSea > 0.001) {
+      vec3 drift = vec3(uTime * 0.22, -uTime * 0.16, uTime * 0.19);
+      float c1 = vnoise(vP * 7.0 + drift), c2 = vnoise(vP * 11.0 - drift.yzx);
+      float caustic = pow(1.0 - abs(c1 + c2 - 1.0), 5.0);
+      vec3 murk = col * vec3(0.5, 0.7, 0.85) + vec3(0.01, 0.05, 0.09);
+      vec3 bright = col * vec3(0.95, 1.05, 1.1) + vec3(0.25, 0.55, 0.6) * caustic * 0.55;
+      col = mix(col, mix(murk, bright, life), vSea);
+      seaLit = vSea * (0.25 + 0.3 * life);
+    }
+
     // water / ice
     vec3 N = normalize(vN);
     if (vWater > 0.001) {
@@ -126,7 +139,7 @@ const frag = /* glsl */ `
     vec3 L = normalize(uSunDir);
     vec3 V = normalize(cameraPosition - vWorld);
     float diff = max(dot(N, L), 0.0);
-    col *= mix(0.52 + diff * 0.58, 1.0, cloudLit); // clouds glow softly instead of shading like ground
+    col *= mix(0.52 + diff * 0.58, 1.0, max(cloudLit, seaLit)); // clouds glow softly instead of shading like ground
 
     vec3 H = normalize(L + V);
     float wspec = pow(max(dot(N, H), 0.0), 90.0) * vWater * 1.2;
@@ -632,6 +645,7 @@ export class Planet {
     const style = new Float32Array(n * 4);
     const pave = new Float32Array(n); // 0..1 how paved the restored ground is (city)
     const cloud = new Float32Array(n); // 0..1 cloud sea on low ground (sky)
+    const sea = new Float32Array(n); // 0..1 underwater look (seaglow)
     const waterCol = new Float32Array(n * 3);
     const edge = new Float32Array(n * 2);
     this.waterTarget = new Float32Array(n);
@@ -654,13 +668,13 @@ export class Planet {
       const h = this.heightAt(v);
       pos.setXYZ(i, v.x * h, v.y * h, v.z * h);
       const w = this.softWeights(v);
-      let dr = 0, dg = 0, db = 0, ar = 0, ag = 0, ab = 0, s0 = 0, s1 = 0, s2 = 0, pv = 0, cl = 0;
+      let dr = 0, dg = 0, db = 0, ar = 0, ag = 0, ab = 0, s0 = 0, s1 = 0, s2 = 0, pv = 0, cl = 0, sv = 0;
       for (let r = 0; r < NUM_REGIONS; r++) {
         if (w[r] < 0.002) continue;
         const d = this.deadCols[r], a = this.aliveCols[r], st = this.defs[r].style;
         dr += d.r * w[r]; dg += d.g * w[r]; db += d.b * w[r];
         ar += a.r * w[r]; ag += a.g * w[r]; ab += a.b * w[r];
-        s0 += st[0] * w[r]; s1 += st[1] * w[r]; s2 += st[2] * w[r]; pv += (st[3] || 0) * w[r]; cl += (st[4] || 0) * w[r];
+        s0 += st[0] * w[r]; s1 += st[1] * w[r]; s2 += st[2] * w[r]; pv += (st[3] || 0) * w[r]; cl += (st[4] || 0) * w[r]; sv += (st[5] || 0) * w[r];
       }
       const p = this.patchId[i];
       if (p >= 0) {
@@ -679,6 +693,7 @@ export class Planet {
       alive.set([ar, ag, ab], i * 3);
       style[i * 4] = s0; style[i * 4 + 1] = s1; style[i * 4 + 2] = s2;
       pave[i] = pv;
+      sea[i] = sv;
       cloud[i] = cl * (1 - smoothstep(-0.2, -0.1, h - this.R)) * (1 - this.waterTarget[i]);
     }
 
@@ -715,6 +730,8 @@ export class Planet {
     this.smooth(cloud, 1, idx, 1);
     geo.setAttribute('aCloud', attr(cloud, 1));
     this.cloud = cloud;
+    this.smooth(sea, 1, idx, 1);
+    geo.setAttribute('aSea', attr(sea, 1));
     geo.setAttribute('aWaterCol', attr(waterCol, 3));
     geo.setAttribute('aEdge', attr(edge, 2));
     this.dynAttr = attr(this.dyn, 4, true);

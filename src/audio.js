@@ -381,6 +381,27 @@ export class Sound {
         if (Math.random() < 0.5) for (let i = 0; i < 4; i++) this.tone({ type: 'square', f: 640 + (i % 2) * 90, f2: 540, t: t + i * 0.16, dur: 0.1, vol: 0.005, verb: 0.5, pan }); // kookaburra laugh
         else this.noiseBurst({ t, dur: 2.4, vol: 0.025, f: 700, f2: 1300, q: 0.5, verb: 0.4 }); // hot wind
         break;
+      // ---- Seaglow
+      case 'kelp':
+        if (Math.random() < 0.5) for (let i = 0; i < 3; i++) this.tone({ type: 'sine', f: 500 + i * 130, f2: 800 + i * 160, t: t + i * 0.09, dur: 0.12, vol: 0.012, verb: 0.6, pan }); // bubbles
+        else this.noiseBurst({ t, dur: 2.6, vol: 0.02, f: 300, f2: 500, q: 0.7, type: 'lowpass', verb: 0.7 }); // slow current
+        break;
+      case 'reef':
+        if (Math.random() < 0.6) for (let i = 0; i < 4; i++) this.tone({ type: 'sine', f: 600 + Math.random() * 600, f2: 900 + Math.random() * 500, t: t + i * 0.07, dur: 0.1, vol: 0.01, verb: 0.5, pan }); // bubble pops
+        else this.tone({ type: 'triangle', f: midi(79 + pentaStep(Math.floor(Math.random() * 5))), t, dur: 1.2, vol: 0.012, verb: 0.9, pan }); // dolphin-ish chime
+        break;
+      case 'galleon':
+        if (Math.random() < 0.5) this.tone({ type: 'sawtooth', f: 70, f2: 62, t, dur: 1.8, vol: 0.014, attack: 0.4, verb: 0.9, pan }); // timbers groaning
+        else this.tone({ type: 'sine', f: midi(60), t, dur: 2.4, vol: 0.014, verb: 0.95, pan }); // distant ship's bell
+        break;
+      case 'jellyglow':
+        if (Math.random() < 0.6) for (let i = 0; i < 4; i++) this.tone({ type: 'sine', f: midi(84 + pentaStep(i + Math.floor(Math.random() * 3))), t: t + i * 0.2, dur: 1.2, vol: 0.011, verb: 0.95, pan }); // glassy shimmer
+        else this.noiseBurst({ t, dur: 1.5, vol: 0.012, f: 1500, f2: 900, q: 0.8, type: 'highpass', verb: 0.8 });
+        break;
+      case 'vents':
+        if (Math.random() < 0.5) this.tone({ type: 'sawtooth', f: 48, f2: 42, t, dur: 2.4, vol: 0.02, attack: 0.5, verb: 0.9, pan }); // deep rumble
+        else this.noiseBurst({ t, dur: 2, vol: 0.03, f: 200, f2: 120, q: 0.9, type: 'lowpass', verb: 0.6 }); // venting
+        break;
       default:
         this.birdChirp();
     }
@@ -470,7 +491,7 @@ export class Sound {
   // rolling timbre per surface: [filter centre, Q, low thump]
   setBiome(id) {
     this.biome = id;
-    this.rollTimbre = { snow: [1700, 0.9, 0.3], desert: [2600, 0.6, 0.2], pond: [320, 1.6, 1.3], grove: [500, 1.2, 1], shore: [2200, 0.6, 0.4], volcano: [700, 1, 1.5], candy: [600, 2.2, 1.2], autumn: [2000, 0.8, 0.5], park: [800, 1.1, 0.8], downtown: [1400, 0.8, 0.6], suburbs: [600, 1.3, 0.9], funfair: [1100, 1, 1.1], harbour: [700, 1.1, 1], pastures: [500, 1.3, 1], cliffs: [800, 1, 0.8], rainbow: [450, 1.5, 1.2], balloons: [500, 1.3, 1], stargazer: [1200, 0.9, 0.6], savanna: [1400, 0.8, 0.7], canopy: [450, 1.5, 1.1], riverbank: [350, 1.5, 1.2], bamboo: [900, 1, 0.8], outback: [2200, 0.7, 0.4] }[id] || [450, 1.4, 1];
+    this.rollTimbre = { snow: [1700, 0.9, 0.3], desert: [2600, 0.6, 0.2], pond: [320, 1.6, 1.3], grove: [500, 1.2, 1], shore: [2200, 0.6, 0.4], volcano: [700, 1, 1.5], candy: [600, 2.2, 1.2], autumn: [2000, 0.8, 0.5], park: [800, 1.1, 0.8], downtown: [1400, 0.8, 0.6], suburbs: [600, 1.3, 0.9], funfair: [1100, 1, 1.1], harbour: [700, 1.1, 1], pastures: [500, 1.3, 1], cliffs: [800, 1, 0.8], rainbow: [450, 1.5, 1.2], balloons: [500, 1.3, 1], stargazer: [1200, 0.9, 0.6], savanna: [1400, 0.8, 0.7], canopy: [450, 1.5, 1.1], riverbank: [350, 1.5, 1.2], bamboo: [900, 1, 0.8], outback: [2200, 0.7, 0.4], kelp: [350, 1.5, 1.3], reef: [900, 1.1, 0.9], galleon: [450, 1.4, 1.1], jellyglow: [500, 1.3, 1], vents: [250, 1.8, 1.5] }[id] || [450, 1.4, 1];
   }
 
   setLife(x) {

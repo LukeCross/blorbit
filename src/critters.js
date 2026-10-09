@@ -85,6 +85,25 @@ const KINDS = {
     }
     return { g };
   } },
+  // Seaglow: schooling minnows and drifting jellyfish (they swim a little above the seabed)
+  minnow: { flying: true, speed: 1.4, hover: [0.25, 0.9], turn: 4, build: () => {
+    const g = new THREE.Group();
+    const col = rnd([0xffb04a, 0x6ad8ff, 0xff7ab0, 0xffe86a, 0x9affc8]);
+    g.add(new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8).scale(0.55, 0.8, 1.5), unlit(col, { transparent: true, opacity: 0.9 })));
+    g.add(new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.08, 8).rotateX(-Math.PI / 2).translate(0, 0, -0.13), unlit(col)));
+    return { g };
+  } },
+  jelly: { flying: true, speed: 0.25, hover: [0.5, 1.5], turn: 1.2, build: () => {
+    const g = new THREE.Group();
+    const col = rnd([0xff9ae0, 0x9ab8ff, 0x9affe0, 0xd89aff]);
+    const mat = unlit(col, { transparent: true, opacity: 0.75 });
+    g.add(new THREE.Mesh(new THREE.SphereGeometry(0.11, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2).translate(0, 0.06, 0), mat));
+    for (let i = 0; i < 5; i++) {
+      const a = (i / 5) * Math.PI * 2;
+      g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.004, 0.2, 4).translate(Math.cos(a) * 0.06, -0.05, Math.sin(a) * 0.06), mat));
+    }
+    return { g, glow: true };
+  } },
   fish: { jumper: true, build: () => {
     const g = new THREE.Group();
     const col = rnd([0xff8a3a, 0xffd04a, 0x8ad0ff, 0xff6a9a]);

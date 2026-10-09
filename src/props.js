@@ -1236,6 +1236,138 @@ export const PROP_KINDS = {
       mat: lambert(0xffffff), color: pick([0xd8764a, 0xc8683e, 0xe08a58]),
     }],
   },
+
+  // ---------------------------------------------------------------- Seaglow galaxy
+  // The sea floor: drab sand, rock and wreckage when withered; kelp, coral and glow when restored.
+
+  // Kelp Forest
+  kelp: {
+    scale: [1.0, 1.7],
+    parts: () => {
+      const blades = [];
+      [[0, 0, 1.2], [0.07, 0.04, 0.9], [-0.06, 0.05, 1.05]].forEach(([x, z, h], k) => {
+        const curve = new THREE.CatmullRomCurve3([0, 0.33, 0.66, 1].map((t, i) => new THREE.Vector3(x + Math.sin(i * 1.7 + k) * 0.07, h * t, z + Math.cos(i * 1.3 + k) * 0.05)));
+        blades.push(new THREE.TubeGeometry(curve, 8, 0.018, 4));
+        for (let i = 1; i < 4; i++) {
+          const p = curve.getPoint(i / 4);
+          blades.push(new THREE.SphereGeometry(0.075, 8, 4).scale(1, 0.18, 0.5).rotateY(i + k).translate(p.x + 0.07, p.y, p.z));
+        }
+      });
+      return [{ geo: merge(...blades), mat: lambert(0xffffff), color: fromGround(0.75, 1.05) }];
+    },
+  },
+  urchin: {
+    scale: [0.6, 1.1],
+    parts: () => [{
+      geo: merge(new THREE.IcosahedronGeometry(0.1, 1).translate(0, 0.1, 0), ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => {
+        const a = i * 0.63, y = (((i * 7) % 10) / 10) * 0.12;
+        return rod(new THREE.Vector3(Math.cos(a) * 0.07, 0.1 + y * 0.4, Math.sin(a) * 0.07), new THREE.Vector3(Math.cos(a) * 0.2, 0.12 + y, Math.sin(a) * 0.2), 0.009, 3);
+      })),
+      mat: lambert(0xffffff), color: pick([0x8a5ac8, 0xd85a9a, 0x5a6ad8]),
+    }],
+  },
+
+  // Coral Reef
+  coralFan: {
+    scale: [0.8, 1.4],
+    parts: () => [
+      { geo: new THREE.CylinderGeometry(0.03, 0.045, 0.14, 6).translate(0, 0.07, 0), mat: lambert(0xffffff), color: pick([0xe86a8a, 0xf08a5a, 0xc86ad8]) },
+      { geo: new THREE.CircleGeometry(0.26, 14, 0, Math.PI).translate(0, 0.14, 0), mat: lambert(0xffffff, { side: THREE.DoubleSide }), color: pick([0xff7a9a, 0xff9a6a, 0xd87aff, 0xffc86a]) },
+    ],
+  },
+  anemone: {
+    scale: [0.8, 1.3],
+    parts: () => [
+      { geo: new THREE.CylinderGeometry(0.07, 0.09, 0.1, 10).translate(0, 0.05, 0), mat: lambert(0xffffff), color: pick([0xe0709a, 0xd88a5a, 0x9a70d8]) },
+      { geo: merge(...[0, 1, 2, 3, 4, 5, 6, 7].map((i) => { const a = i * 0.785; return new THREE.CapsuleGeometry(0.014, 0.16, 2, 5).rotateZ(Math.cos(i) * 0.3).rotateX(Math.sin(i * 1.7) * 0.3).translate(Math.cos(a) * 0.05, 0.17, Math.sin(a) * 0.05); })), mat: lambert(0xffffff), color: pick([0xffa0c8, 0xffc890, 0xc8a0ff]) },
+    ],
+  },
+
+  // Sunken Galleon
+  shipHull: {
+    scale: [1.0, 1.3],
+    parts: () => {
+      const hull = new THREE.CylinderGeometry(0.42, 0.3, 0.9, 10, 1, true, 0, Math.PI).rotateZ(Math.PI / 2).scale(1, 0.55, 0.7);
+      const ribs = [-0.3, -0.1, 0.1, 0.3].map((x) => box(0.025, 0.34, 0.5, x, 0.2, 0, 0, 0, 0));
+      return [
+        { geo: merge(hull.translate(0, 0.28, 0), ...ribs), mat: lambert(0xffffff, { side: THREE.DoubleSide }), color: pick([0x7a5a42, 0x6a4e3a, 0x8a6a4c]) },
+        { geo: merge(box(0.04, 0.5, 0.04, 0.35, 0.55, 0), box(0.04, 0.34, 0.04, -0.25, 0.46, 0.05, 0.3, 0, 0.2)), mat: lambert(0x5a4030) },
+      ];
+    },
+  },
+  mast: {
+    scale: [0.9, 1.4],
+    parts: () => [
+      { geo: merge(new THREE.CylinderGeometry(0.03, 0.04, 1.1, 8).translate(0, 0.55, 0), box(0.5, 0.03, 0.03, 0, 0.9, 0), box(0.4, 0.03, 0.03, 0, 0.6, 0)), mat: lambert(0x6a4e3a) },
+      { geo: merge(new THREE.PlaneGeometry(0.42, 0.28).translate(0, 0.74, 0.01), new THREE.PlaneGeometry(0.34, 0.2).translate(0.02, 0.45, 0.01)), mat: lambert(0xffffff, { side: THREE.DoubleSide }), color: pick([0xe8e0cc, 0xd8cfb8, 0xeee8d8]) },
+    ],
+  },
+  treasureChest: {
+    scale: [0.9, 1.1],
+    parts: () => [
+      { geo: merge(rbox(0.36, 0.2, 0.24, 0.03, 0, 0.1, 0), new THREE.CylinderGeometry(0.12, 0.12, 0.36, 12, 1, false, 0, Math.PI).rotateZ(Math.PI / 2).rotateY(Math.PI / 2).translate(0, 0.2, 0)), mat: lambert(0xffffff), color: pick([0x8a5a3a, 0x7a4e32, 0x9a6a44]) },
+      { geo: merge(box(0.04, 0.34, 0.26, -0.1, 0.17, 0), box(0.04, 0.34, 0.26, 0.1, 0.17, 0), box(0.05, 0.06, 0.04, 0, 0.18, 0.12)), mat: lambert(0xd8b040) },
+      { geo: merge(new THREE.SphereGeometry(0.04, 8, 6).translate(0.05, 0.22, 0.02), new THREE.SphereGeometry(0.035, 8, 6).translate(-0.06, 0.21, -0.03), new THREE.SphereGeometry(0.03, 8, 6).translate(0.0, 0.24, -0.04)), mat: unlit(0xffd860) },
+    ],
+  },
+  anchor: {
+    scale: [0.9, 1.2],
+    parts: () => [{
+      geo: merge(
+        new THREE.CylinderGeometry(0.025, 0.025, 0.6, 6).translate(0, 0.3, 0), box(0.28, 0.025, 0.025, 0, 0.5, 0),
+        new THREE.TorusGeometry(0.04, 0.012, 5, 10).translate(0, 0.64, 0),
+        new THREE.TorusGeometry(0.2, 0.025, 6, 14, Math.PI).rotateZ(Math.PI).translate(0, 0.22, 0),
+        new THREE.ConeGeometry(0.05, 0.1, 4).translate(-0.2, 0.24, 0), new THREE.ConeGeometry(0.05, 0.1, 4).translate(0.2, 0.24, 0),
+      ),
+      mat: lambert(0xffffff), color: pick([0x6a7480, 0x5e6a76, 0x7a8490]),
+    }],
+  },
+
+  // Jellyglow Gardens
+  jellyLamp: {
+    scale: [0.8, 1.5],
+    parts: () => [
+      { geo: new THREE.CylinderGeometry(0.012, 0.02, 0.5, 6).translate(0, 0.25, 0), mat: lambert(0x4a6a78) },
+      { geo: merge(new THREE.SphereGeometry(0.13, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2).translate(0, 0.52, 0), ...[0, 1, 2, 3, 4].map((i) => new THREE.CylinderGeometry(0.006, 0.003, 0.16, 4).translate(Math.cos(i * 1.26) * 0.07, 0.44, Math.sin(i * 1.26) * 0.07))), mat: unlit(0xffffff), color: pick([0xff9ae0, 0x9ab8ff, 0x9affe0, 0xd89aff]) },
+    ],
+  },
+  glowCoral: {
+    scale: [0.8, 1.4],
+    parts: () => [{
+      geo: merge(...[0, 1, 2, 3, 4].map((i) => { const a = i * 1.26, h = 0.2 + (i % 3) * 0.1; return new THREE.CapsuleGeometry(0.03, h, 3, 6).rotateZ(Math.cos(a) * 0.35).rotateX(Math.sin(a) * 0.35).translate(Math.cos(a) * 0.07, h / 2 + 0.05, Math.sin(a) * 0.07); })),
+      mat: unlit(0xffffff), color: pick([0x7affd8, 0xff8ad8, 0x8ab8ff, 0xc8ff7a]),
+    }],
+  },
+  moonShell: {
+    scale: [0.8, 1.3],
+    parts: () => [
+      { geo: merge(new THREE.SphereGeometry(0.17, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2).scale(1, 0.7, 1).translate(0, 0.02, 0), ...[-0.1, 0, 0.1].map((x) => box(0.015, 0.1, 0.3, x, 0.08, 0, 0, 0, 0))), mat: lambert(0xffffff), color: pick([0xd8c8f0, 0xf0d8e8, 0xc8e0f0]) },
+      { geo: new THREE.SphereGeometry(0.05, 10, 8).translate(0, 0.07, 0), mat: unlit(0xffffff) },
+    ],
+  },
+
+  // Abyssal Vents
+  ventChimney: {
+    scale: [0.9, 1.5],
+    parts: () => [
+      { geo: lathe([[0.2, 0], [0.15, 0.2], [0.11, 0.45], [0.09, 0.7], [0.1, 0.78], [0.06, 0.8], [0, 0.78]], 9), mat: lambert(0xffffff), color: pick([0x3e3a44, 0x4a4450, 0x36323c]) },
+      { geo: new THREE.CylinderGeometry(0.05, 0.05, 0.03, 8).translate(0, 0.79, 0), mat: unlit(0xff7a3a) },
+    ],
+  },
+  tubeWorm: {
+    scale: [0.8, 1.4],
+    parts: () => [
+      { geo: merge(...[[0, 0, 0.5], [0.07, 0.03, 0.38], [-0.06, 0.04, 0.44], [0.02, -0.07, 0.32]].map(([x, z, h]) => new THREE.CylinderGeometry(0.022, 0.026, h, 6).translate(x, h / 2, z))), mat: lambert(0xf0ece4) },
+      { geo: merge(...[[0, 0, 0.5], [0.07, 0.03, 0.38], [-0.06, 0.04, 0.44], [0.02, -0.07, 0.32]].map(([x, z, h]) => new THREE.SphereGeometry(0.036, 8, 6).translate(x, h + 0.01, z))), mat: unlit(0xff5a6a) },
+    ],
+  },
+  barrel: {
+    scale: [0.8, 1.1],
+    parts: () => [
+      { geo: lathe([[0.1, 0], [0.13, 0.1], [0.14, 0.2], [0.13, 0.3], [0.1, 0.4], [0, 0.4]], 10), mat: lambert(0xffffff), color: pick([0x7a5a3e, 0x6a5440, 0x8a6648]) },
+      { geo: merge(new THREE.TorusGeometry(0.128, 0.01, 4, 12).rotateX(Math.PI / 2).translate(0, 0.1, 0), new THREE.TorusGeometry(0.128, 0.01, 4, 12).rotateX(Math.PI / 2).translate(0, 0.3, 0)), mat: lambert(0x5a606a) },
+    ],
+  },
 };
 
 // kinds too small/plentiful to have a withered stand-in
