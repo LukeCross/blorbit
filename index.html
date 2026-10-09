@@ -736,6 +736,13 @@
         #pack-actions .btn { margin: 4px; }
       }
 
+      /* tablets and other narrow windows: the centred planet card would run into the corner buttons, so drop it below them */
+      @media (min-width: 721px) and (max-width: 1100px) and (min-height: 501px) {
+        #hud-top { top: 72px; }
+        #biome-label { top: 212px; }
+        #finds { top: 256px; }
+      }
+
       /* portrait phones: planet card spans the width under the top buttons */
       @media (max-width: 720px) {
         #hud-top {
