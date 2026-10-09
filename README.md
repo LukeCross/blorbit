@@ -22,6 +22,7 @@ When you boot the game you **choose your galaxy**. Each galaxy is its own set of
 - **🦒 Sunroam:** 5 biomes (savanna, jungle, river, bamboo and outback), 5 creatures and 40 finds. Dusty, withered ground warms back to gold and green. It **unlocks once you've woken 4 of the 5 Skyhaven creatures** (80%).
 - **🐋 Seaglow:** 5 sea-floor biomes (kelp, coral, a wreck, glowing jellies and deep vents), 5 creatures and 40 finds. The water starts murky and dim, then comes alive with caustic light and glow as you restore it. It **unlocks once you've woken 4 of the 5 Sunroam creatures** (80%).
 - **🥘 Feastvale:** 5 food biomes (bakery, orchard, noodle night market, veggie farm and spice bazaar), 5 creatures and 40 finds. Cold, dull ground warms to gold and starts to steam as you restore it. It **unlocks once you've woken 4 of the 5 Seaglow creatures** (80%).
+- **🏚️ Gloomhollow:** 5 spooky-but-cosy biomes (misty graveyard, haunted mansion, cauldron swamp, pumpkin lane and cobweb crypt), 5 creatures and 40 finds. Grey, bare ground turns moonlit purple and mossy green, with candlelit windows and friendly wisps. It **unlocks once you've woken 4 of the 5 Feastvale creatures** (80%).
 
 Can't wait? Every locked galaxy card also has **🎬 Watch a video to unlock**. Watch one short rewarded video to the end and that galaxy unlocks for good. Skipping leaves it locked, and you can try again any time.
 
@@ -30,18 +31,18 @@ Travel between unlocked galaxies is **free**. Tap the galaxy icon next to the pl
 ### Biomes and spots
 Every planet is split into **4 biomes**, picked at random from its galaxy:
 
-| Wildbloom biome | Creature | | Citylight biome | Creature | | Skyhaven biome | Creature | | Sunroam biome | Creature | | Seaglow biome | Creature | | Feastvale biome | Creature |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Bunny Meadow | 🐰 Bunny | | Plaza Park | 🐿️ Squirrel | | Cloud Pastures | 🐑 Sheep | | Golden Savanna | 🦁 Lion | | Kelp Forest | 🦦 Otter | | Bakery Village | 🐓 Rooster |
-| Sleepy Pond | 🐸 Frog | | Neon Downtown | 🐱 Cat | | Windmill Cliffs | 🐐 Goat | | Parrot Canopy | 🦜 Parrot | | Coral Reef | 🐡 Pufferfish | | Orchard Lane | 🐒 Monkey |
-| Dusty Dunes | 🦊 Fox | | Sleepy Suburbs | 🐶 Dog | | Rainbow Falls | 🦄 Unicorn | | Hippo River | 🦛 Hippo | | Sunken Galleon | 🦈 Shark | | Noodle Night Market | 🐀 Rat |
-| Frosty Peaks | 🐧 Penguin | | Funfair Pier | 🦝 Raccoon | | Balloon Meadow | 🦅 Eagle | | Bamboo Highlands | 🐼 Panda | | Jellyglow Gardens | 🪼 Jellyfish | | Veggie Valley | 🐖 Pig |
-| Moonlit Grove | 🦋 Moth | | Dockside Harbour | 🐦 Seagull | | Stargazer's Peak | 🦉 Owl | | Red Outback | 🐨 Koala | | Abyssal Vents | 🦑 Squid | | Spice Bazaar | 🐫 Camel |
-| Snail Garden | 🐌 Snail | | | | | | | | | | | | | | | |
-| Sunny Shore | 🐢 Turtle | | | | | | | | | | | | | | | |
-| Ember Crags | 🦎 Lizard | | | | | | | | | | | | | | | |
-| Sugar Hills | 🐻 Bear | | | | | | | | | | | | | | | |
-| Maple Hollow | 🦔 Hedgehog | | | | | | | | | | | | | | | |
+| Wildbloom biome | Creature | | Citylight biome | Creature | | Skyhaven biome | Creature | | Sunroam biome | Creature | | Seaglow biome | Creature | | Feastvale biome | Creature | | Gloomhollow biome | Creature |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Bunny Meadow | 🐰 Bunny | | Plaza Park | 🐿️ Squirrel | | Cloud Pastures | 🐑 Sheep | | Golden Savanna | 🦁 Lion | | Kelp Forest | 🦦 Otter | | Bakery Village | 🐓 Rooster | | Misty Graveyard | 👻 Ghost |
+| Sleepy Pond | 🐸 Frog | | Neon Downtown | 🐱 Cat | | Windmill Cliffs | 🐐 Goat | | Parrot Canopy | 🦜 Parrot | | Coral Reef | 🐡 Pufferfish | | Orchard Lane | 🐒 Monkey | | Haunted Mansion | 🦇 Bat |
+| Dusty Dunes | 🦊 Fox | | Sleepy Suburbs | 🐶 Dog | | Rainbow Falls | 🦄 Unicorn | | Hippo River | 🦛 Hippo | | Sunken Galleon | 🦈 Shark | | Noodle Night Market | 🐀 Rat | | Cauldron Swamp | 🧙 Witch |
+| Frosty Peaks | 🐧 Penguin | | Funfair Pier | 🦝 Raccoon | | Balloon Meadow | 🦅 Eagle | | Bamboo Highlands | 🐼 Panda | | Jellyglow Gardens | 🪼 Jellyfish | | Veggie Valley | 🐖 Pig | | Pumpkin Lane | 🧟 Zombie |
+| Moonlit Grove | 🦋 Moth | | Dockside Harbour | 🐦 Seagull | | Stargazer's Peak | 🦉 Owl | | Red Outback | 🐨 Koala | | Abyssal Vents | 🦑 Squid | | Spice Bazaar | 🐫 Camel | | Cobweb Crypt | 🕷️ Spider |
+| Snail Garden | 🐌 Snail | | | | | | | | | | | | | | | | | | |
+| Sunny Shore | 🐢 Turtle | | | | | | | | | | | | | | | | | | |
+| Ember Crags | 🦎 Lizard | | | | | | | | | | | | | | | | | | |
+| Sugar Hills | 🐻 Bear | | | | | | | | | | | | | | | | | | |
+| Maple Hollow | 🦔 Hedgehog | | | | | | | | | | | | | | | | | | |
 
 Each biome has its own terrain, colours, sky tint, props, critters, ambient particles and soundscape. It's also scattered with smaller named **spots**, like a flower bed, an old dirt road, an oasis or a frozen lake. Slime enough of a spot to clear it, which earns a chime, a burst of nature and a chance at a collectible find.
 
@@ -54,7 +55,7 @@ Each planet gets a randomly generated name and layout, seeded from the date and 
 
 ### Stardust, finds and the shop
 - **Stardust** ✨ is scattered in little trails across every planet. Roll over it to collect it.
-- **Finds** are collectibles: 8 per biome (80 in Wildbloom, 40 each in Citylight, Skyhaven, Sunroam, Seaglow and Feastvale). Each biome has 3 *common*, 2 *uncommon*, 1 *rare*, 1 *epic* and 1 *legendary* find. You roll one every time you clear a spot, and they all live in your **Collection** book, which has a tab per galaxy.
+- **Finds** are collectibles: 8 per biome (80 in Wildbloom, 40 each in Citylight, Skyhaven, Sunroam, Seaglow, Feastvale and Gloomhollow). Each biome has 3 *common*, 2 *uncommon*, 1 *rare*, 1 *epic* and 1 *legendary* find. You roll one every time you clear a spot, and they all live in your **Collection** book, which has a tab per galaxy.
 - The **Shop** sells three card packs for each biome. It opens on your current galaxy, with a tab for every galaxy: unlocked ones let you buy their packs without travelling, and locked ones show greyed out with their unlock progress. Every pack holds 3 cards from that biome's collection, and promises at least one card of a certain rarity:
 
 | | Common | Uncommon | Rare | Epic | Legendary | Guarantee |
@@ -198,7 +199,7 @@ There are no models, textures or sound assets. Everything you see and hear is ge
 - **Painting** uses a spatial hash grid so only nearby vertices are touched each frame. Changed vertices go on an *active list*, and only the dirty ranges of each attribute buffer are uploaded to the GPU.
 
 ### Props and critters
-- About 60 procedurally modelled prop types (trees, flowers, cacti, crystals, lanterns, lollipops and more) are rendered with **InstancedMesh**, so thousands of objects cost only a handful of draw calls.
+- About 160 procedurally modelled prop types (trees, flowers, cacti, crystals, lanterns, lollipops and more) are rendered with **InstancedMesh**, so thousands of objects cost only a handful of draw calls.
 - Props grow in with an elastic "pop" when their patch of ground comes alive. Withered grey stand-ins mark where they'll appear.
 - Butterflies, bees, fireflies, birds, crabs, fish and other critters wander each biome. Ambient particles like pollen, snow and embers drift around too.
 
@@ -242,7 +243,7 @@ src/
   main.js           Game loop, state, input, UI, saving and orchestration
   planet.js         Icosphere terrain, biome layout, spots, slime painting, prop layers
   galaxies.js       Galaxy definitions (which biomes belong to which galaxy) and unlock rules
-  biomes.js         The 35 biome definitions (terrain, colours, props, critters, finds)
+  biomes.js         The 40 biome definitions (terrain, colours, props, critters, finds)
   props.js          Procedural prop models
   blob.js           The player blob: movement, rolling, jelly shader, squash and stretch
   skins.js          Creature skins: accessories, body materials, eyes

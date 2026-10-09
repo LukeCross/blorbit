@@ -82,8 +82,9 @@ Key facts:
 | `safari` | Sunroam | 🦒 | savanna (lion), canopy (parrot), riverbank (hippo), bamboo (panda), outback (koala) | `sky` 80% |
 | `sea` | Seaglow | 🐋 | kelp (otter), reef (pufferfish), galleon (shark), jellyglow (jellyfish), vents (squid) | `safari` 80% |
 | `feast` | Feastvale | 🥘 | bakery (rooster), orchard (monkey), market (rat), veggie (pig), bazaar (camel) | `sea` 80% |
+| `gloom` | Gloomhollow | 🏚️ | graveyard (ghost), mansion (bat), cauldron (witch), pumpkins (zombie), crypt (spider) | `feast` 80% |
 
-**Current totals: 6 galaxies, 35 biomes, 280 cards (80 + 5 × 40).** Update this table and these totals whenever you add a galaxy.
+**Current totals: 7 galaxies, 40 biomes, 320 cards (80 + 6 × 40).** Update this table and these totals whenever you add a galaxy.
 
 Special per-biome rendering knobs (`style` array in `biomes.js`): `[sand, snow, moon, pave, cloud, sea]`. `style[3]` = paved ground (city, markets), `style[4]` = cloud sea (Skyhaven), `style[5]` = underwater look (Seaglow). Adding a new ground-shader effect means: new vertex attribute `aX`, varying `vX`, a block in the fragment shader, a buffer filled in `planet.js` next to `cloud`/`sea`, and a new `style[n]` slot (follow how `aSea` was added).
 
@@ -169,7 +170,7 @@ Add a `case '<biomeId>':` per biome in the ambient switch (above `default:`), an
 New terrain: a `case` in `terrain()`. New ground effect: follow the `aSea`/`aCloud` pattern (attribute, varying, fragment block, `style[n]` slot, buffer with `smooth()`, `setAttribute`).
 
 ### 6.8 Counts, docs and generated images: every place that changes
-After adding a galaxy, update ALL of these (numbers are galaxies / biomes / cards = 6 / 35 / 280 at time of writing; new totals = biomes + 5, cards + 40, galaxies + 1):
+After adding a galaxy, update ALL of these (numbers are galaxies / biomes / cards = 7 / 40 / 320 at time of writing; new totals = biomes + 5, cards + 40, galaxies + 1):
 
 | File | What to change |
 | --- | --- |
@@ -188,7 +189,7 @@ grep -rnE "[0-9]+ biomes|[0-9]+ galaxies|[0-9]+ cards|biome definitions" index.h
 `src/collection.js` totals, the shop/collection tabs, the title picker and the skin bar are computed from `GALAXIES`, so they need no edits.
 
 ### 6.9 UI layout that depends on the number of galaxies (check every time)
-- **Title galaxy picker** (`index.html`): `#title .galaxy-cards { width: min(1420px, 94vw) }` is sized so all cards fit one row on a wide desktop (cards are `minmax(220px, 1fr)`; 6 cards need ~1390px). With more galaxies, raise that width and the `@media (min-width: 721px) and (max-width: 1500px) and (min-height: 501px)` upper bound (single swipeable row, `grid-auto-columns: 250px`, `width: 88vw`, scroll-snap) so the swipe row covers every width where they no longer fit. Phones (<=720px) use a stacked list. Verify at 1920, 1440, 1024 and 820 wide.
+- **Title galaxy picker** (`index.html`): `#title .galaxy-cards { width: min(1660px, 94vw) }` is sized so all cards fit one row on a wide desktop (cards are `minmax(220px, 1fr)`; 7 cards need ~1625px). With more galaxies, raise that width and the `@media (min-width: 721px) and (max-width: 1760px) and (min-height: 501px)` upper bound (single swipeable row, `grid-auto-columns: 250px`, `width: 88vw`, scroll-snap) so the swipe row covers every width where they no longer fit. Phones (<=720px) use a stacked list. Verify at 1920, 1440, 1024 and 820 wide.
 - **Shop and collection galaxy tabs** (`.galaxy-tabs`): never wrap or truncate; they scroll sideways, and `renderKeepingTabs` (in `shop.js`, used by the shop and `renderBook`) preserves scroll position and reveals the active tab. Keep `position: relative` on `.galaxy-tabs` (the reveal math uses `offsetLeft`).
 - **Skin bar** (`#skins`): scrolls sideways; shows Classic, the current galaxy's creatures, then skins unlocked elsewhere. Number keys `1-9`, `0` map to the current galaxy's creatures.
 - **Top HUD** (`#hud-top`): between 721px and 1100px wide (tablets) the planet card is dropped below the corner buttons (`top: 72px`, with `#biome-label` and `#finds` pushed down). Phones and landscape phones have their own rules. Don't let HUD buttons overlap.

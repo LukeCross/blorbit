@@ -684,4 +684,101 @@ Object.assign(BIOMES, {
   },
 });
 
+// ---------------------------------------------------------------- Gloomhollow galaxy
+// Spooky but cosy: a moonlit world of friendly ghosts. Withered ground is grey and bare; restored it
+// glows in soft purples and mossy greens, with candlelit windows and drifting wisps.
+
+Object.assign(BIOMES, {
+  graveyard: {
+    name: 'Misty Graveyard', creature: 'ghost', weight: 0.06, terrain: 'bumps',
+    dead: 0x585660, alive: 0x7aa898, sky: ['#2a2848', '#8a88c0'], style: [0, 0, 0.12],
+    small: [['grass', 0.05], ['graveCross', 0.004], ['pebble', 0.004]],
+    big: [['gravestone', 0.004], ['deadTree', 0.0014]],
+    critters: [['ghost', 2], ['firefly', 2]],
+    particles: [[0xe0e8ff, 0xc8d8f0], -0.3, 7],
+    patches: [
+      { name: 'Old headstones', shape: 'blob', ...M, dead: 0x5a5862, alive: 0x80ac9c, props: [['gravestone', 0.07]], critters: [['ghost', 1]] },
+      { name: 'Cross row', shape: 'blob', ...S, dead: 0x5c5a64, alive: 0x88b4a2, props: [['graveCross', 0.1]] },
+      { name: 'Gate path', shape: 'path', dead: 0x6a6670, alive: 0xb8b4c8, pave: 0.6, props: [['ironGate', 0.02, 'rim'], ['lantern', 0.03, 'rim']] },
+      { name: 'Crooked trees', shape: 'blob', ...L, dead: 0x54525c, alive: 0x74a090, props: [['deadTree', 0.05], ['grass', 0.15]], critters: [['firefly', 2]] },
+      { name: 'Mausoleum yard', shape: 'blob', ...M, emissive: 0.15, dead: 0x5a5862, alive: 0x9a98c0, pave: 0.5, props: [['mausoleum', 0.03, 'inner'], ['candles', 0.05]] },
+      { name: 'Fresh bones', shape: 'blob', ...S, dead: 0x5c5a60, alive: 0x84b0a0, props: [['bones', 0.1], ['graveCross', 0.04]] },
+    ],
+    patchCount: 10,
+    finds: [['🪦', 'Tombstone', 'c'], ['🥀', 'Wilted rose', 'c'], ['⛓️', 'Old chain', 'c'], ['🪓', "Gravedigger's axe", 'u'], ['🪔', 'Grave lamp', 'u'], ['💀', 'Friendly skull', 'r'], ['⚰️', 'Little coffin', 'e'], ['🌕', 'Harvest moon', 'l']],
+  },
+  mansion: {
+    name: 'Haunted Mansion', creature: 'bat', weight: 0.1, terrain: 'hillocks',
+    dead: 0x56505e, alive: 0x9a78c4, sky: ['#241e44', '#7a64a8'], style: [0, 0, 0.12],
+    small: [['grass', 0.04], ['candles', 0.003], ['pebble', 0.004]],
+    big: [['manor', 0.0012], ['deadTree', 0.0012]],
+    critters: [['bat', 3], ['firefly', 1]],
+    particles: [[0xd8c8ff, 0xffe0a0], -0.4, 6],
+    patches: [
+      { name: 'The manor', shape: 'blob', ...M, emissive: 0.2, dead: 0x58525e, alive: 0xa688cc, pave: 0.7, props: [['manor', 0.04, 'inner'], ['candles', 0.04]], critters: [['bat', 2]] },
+      { name: 'Iron fence', shape: 'path', dead: 0x5a5660, alive: 0x9c86b8, props: [['ironGate', 0.04, 'rim'], ['lantern', 0.03, 'rim']] },
+      { name: 'Library lawn', shape: 'blob', ...S, dead: 0x58525c, alive: 0x8c70b4, props: [['bookStack', 0.1]] },
+      { name: 'Bat tree', shape: 'blob', ...M, dead: 0x56505a, alive: 0x8a6cb0, props: [['deadTree', 0.06]], critters: [['bat', 3]] },
+      { name: 'Candle garden', shape: 'blob', ...S, emissive: 0.25, dead: 0x5a5460, alive: 0xb094d4, props: [['candles', 0.12], ['glowShroom', 0.05]], critters: [['firefly', 2]] },
+      { name: 'Cobbled drive', shape: 'path', dead: 0x68626e, alive: 0xc0b4d4, pave: 1, props: [['lantern', 0.04, 'rim'], ['gravestone', 0.02, 'rim']] },
+    ],
+    patchCount: 10,
+    finds: [['🚪', 'Creaky door', 'c'], ['🛏️', 'Four-poster bed', 'c'], ['🪑', 'Wobbly chair', 'c'], ['🖼️', 'Spooky portrait', 'u'], ['🕰️', 'Grandfather clock', 'u'], ['🛋️', 'Velvet sofa', 'r'], ['🎩', 'Top hat', 'e'], ['🧛', 'Count Gloom', 'l']],
+  },
+  cauldron: {
+    name: 'Cauldron Swamp', creature: 'witch', weight: -0.1, terrain: 'basin',
+    dead: 0x4e5248, alive: 0x62b880, sky: ['#1e3a3a', '#7ac8a8'], style: [0, 0, 0.1],
+    small: [['reed', 0.012], ['glowShroom', 0.012], ['fern', 0.02], ['pebble', 0.004]],
+    big: [['willow', 0.002], ['cauldron', 0.0014]],
+    critters: [['firefly', 4], ['ghost', 1]],
+    particles: [[0x98ffa0, 0xc8ffd8], -0.6, 8],
+    patches: [
+      { name: 'Bubbling cauldrons', shape: 'blob', ...M, emissive: 0.25, dead: 0x4c5048, alive: 0x68c088, props: [['cauldron', 0.06]], critters: [['firefly', 2]] },
+      { name: 'Toadstool ring', shape: 'blob', ...S, emissive: 0.2, dead: 0x504c4c, alive: 0x78c898, props: [['glowShroom', 0.15], ['shroom', 0.08]] },
+      { name: 'Bog pool', shape: 'blob', ...M, water: true, dead: 0x4a4c44, alive: 0x4aa878, props: [['reed', 0.12, 'rim'], ['lily', 0.1, 'inner']] },
+      { name: 'Spellbook nook', shape: 'blob', ...S, dead: 0x504c4a, alive: 0x70b890, props: [['bookStack', 0.1], ['candles', 0.06]] },
+      { name: 'Weeping willows', shape: 'blob', ...L, dead: 0x4a4e46, alive: 0x60b47c, props: [['willow', 0.04], ['fern', 0.2]], critters: [['ghost', 1]] },
+      { name: 'Broom trail', shape: 'path', dead: 0x62604c, alive: 0xa8c898, props: [['pathStone', 0.1], ['lantern', 0.03, 'rim']] },
+    ],
+    patchCount: 10,
+    finds: [['📖', 'Spellbook', 'c'], ['🍸', 'Potion glass', 'c'], ['🧹', 'Broomstick', 'c'], ['🫙', 'Jar of newts', 'u'], ['🧿', 'Evil-eye charm', 'u'], ['👁️', 'Eye of newt', 'r'], ['🧠', 'Pickled brain', 'e'], ['🪬', "Witch's charm", 'l']],
+  },
+  pumpkins: {
+    name: 'Pumpkin Lane', creature: 'zombie', weight: 0.08, terrain: 'rolling',
+    dead: 0x5e5448, alive: 0xd88a48, sky: ['#3a2450', '#ff9a58'], style: [0, 0, 0.08],
+    small: [['grass', 0.05], ['pumpkin', 0.008], ['leafPile', 0.006]],
+    big: [['jackLantern', 0.003], ['scarecrow', 0.0012]],
+    critters: [['bat', 2], ['bird', 1]],
+    particles: [[0xffb060, 0xffd890], -0.5, 7],
+    patches: [
+      { name: 'Jack-o-lantern row', shape: 'blob', ...M, emissive: 0.2, dead: 0x5c5248, alive: 0xe09050, props: [['jackLantern', 0.08]] },
+      { name: 'Pumpkin patch', shape: 'blob', ...L, dead: 0x5a5046, alive: 0xd48a44, props: [['pumpkin', 0.15], ['grass', 0.15]] },
+      { name: 'Scarecrow hill', shape: 'blob', ...S, dead: 0x5e5448, alive: 0xdc9a58, props: [['scarecrow', 0.05, 'inner'], ['cornStalk', 0.1]], critters: [['bat', 1]] },
+      { name: 'Hay maze', shape: 'blob', ...M, dead: 0x62584a, alive: 0xe4b868, props: [['haybale', 0.08]] },
+      { name: 'Trick-or-treat lane', shape: 'path', emissive: 0.2, dead: 0x6a6258, alive: 0xd8b888, props: [['lantern', 0.05, 'rim'], ['jackLantern', 0.03, 'rim']] },
+      { name: 'Leaf heap', shape: 'blob', ...S, dead: 0x5c5248, alive: 0xc87a3a, props: [['leafPile', 0.12], ['maple', 0.03]] },
+    ],
+    patchCount: 10,
+    finds: [['🎁', 'Treat bag', 'c'], ['🔦', 'Torch', 'c'], ['🧨', 'Firecracker', 'c'], ['🪅', 'Piñata', 'u'], ['🥮', 'Mooncake', 'u'], ['🪤', 'Mousetrap', 'r'], ['🍗', 'Roast drumstick', 'e'], ['🌚', 'Grinning moon', 'l']],
+  },
+  crypt: {
+    name: 'Cobweb Crypt', creature: 'spider', weight: 0.04, terrain: 'gentle',
+    dead: 0x4c4a56, alive: 0x8a84b4, sky: ['#1a1832', '#5a5490'], style: [0, 0, 0.1, 0.7],
+    small: [['pebble', 0.006], ['bones', 0.003], ['candles', 0.003]],
+    big: [['pillar', 0.0016], ['coffin', 0.0016]],
+    critters: [['bat', 2], ['ghost', 1]],
+    particles: [[0xb8b0e8, 0xe0d8ff], -0.2, 6],
+    patches: [
+      { name: 'Stone coffins', shape: 'blob', ...M, dead: 0x4e4c58, alive: 0x8e88b8, pave: 1, props: [['coffin', 0.07]] },
+      { name: 'Cobweb corner', shape: 'blob', ...S, dead: 0x504e5a, alive: 0x9a94c4, pave: 0.7, props: [['pillar', 0.04, 'inner'], ['bones', 0.08]], critters: [['bat', 1]] },
+      { name: 'Candle hall', shape: 'path', emissive: 0.3, dead: 0x56545e, alive: 0xa8a0d0, pave: 1, props: [['candles', 0.08, 'rim'], ['lantern', 0.03, 'rim']] },
+      { name: 'Old library', shape: 'blob', ...M, dead: 0x4e4c56, alive: 0x8480ac, pave: 0.6, props: [['bookStack', 0.08], ['candles', 0.04]] },
+      { name: 'Bone pile', shape: 'blob', ...S, dead: 0x504e56, alive: 0x948ebc, props: [['bones', 0.15]], critters: [['ghost', 1]] },
+      { name: 'Crypt arch', shape: 'blob', ...M, emissive: 0.15, dead: 0x4c4a54, alive: 0x9c96c8, pave: 1, props: [['mausoleum', 0.03, 'inner'], ['gravestone', 0.05]] },
+    ],
+    patchCount: 9,
+    finds: [['🕸️', 'Cobweb', 'c'], ['🦷', 'Loose tooth', 'c'], ['📕', 'Dusty tome', 'c'], ['⛏️', "Miner's pick", 'u'], ['🔨', 'Old mallet', 'u'], ['🗡️', 'Crypt dagger', 'r'], ['☠️', 'Skull and crossbones', 'e'], ['🕍', 'Hidden shrine', 'l']],
+  },
+});
+
 export const BIOME_IDS = Object.keys(BIOMES);

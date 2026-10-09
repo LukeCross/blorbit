@@ -104,6 +104,23 @@ const KINDS = {
     }
     return { g, glow: true };
   } },
+  // Gloomhollow: flapping bats and little see-through ghosts that bob along
+  bat: { flying: true, speed: 1.5, hover: [0.6, 1.6], turn: 4, build: () => {
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.SphereGeometry(0.055, 10, 8).scale(0.9, 0.9, 1.2), lambert(0x2a2236)));
+    for (const s of [-1, 1]) g.add(new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.05, 6).translate(s * 0.03, 0.06, 0.03), lambert(0x2a2236)));
+    const w = wings(rnd([0x3a2e4a, 0x4a2e52, 0x2e2a40]), 0.11, 0.05);
+    g.add(...w);
+    return { g, wings: w, flap: 18, amp: 0.8 };
+  } },
+  ghost: { flying: true, speed: 0.4, hover: [0.3, 1.2], turn: 1.5, build: () => {
+    const g = new THREE.Group();
+    const mat = unlit(0xe8f0ff, { transparent: true, opacity: 0.7 });
+    g.add(new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 10).translate(0, 0.08, 0), mat));
+    g.add(new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.16, 12).rotateX(Math.PI).translate(0, -0.02, 0), mat));
+    for (const s of [-1, 1]) g.add(new THREE.Mesh(new THREE.SphereGeometry(0.015, 8, 6).translate(s * 0.035, 0.1, 0.075), lambert(0x222233)));
+    return { g, glow: true };
+  } },
   fish: { jumper: true, build: () => {
     const g = new THREE.Group();
     const col = rnd([0xff8a3a, 0xffd04a, 0x8ad0ff, 0xff6a9a]);

@@ -63,6 +63,16 @@ export const GALAXIES = {
     unlockedBy: 'sea',
     unlockAt: 0.8,
   },
+  gloom: {
+    name: 'Gloomhollow',
+    emoji: '🏚️',
+    blurb: 'Graveyards, mansions, cauldron swamps and pumpkin lanes. Wake the friendly spooks.',
+    art: ['#c8b8f0', '#7a68b0'],
+    biomes: ['graveyard', 'mansion', 'cauldron', 'pumpkins', 'crypt'],
+    // unlocked by waking 80% of Feastvale's creatures (4 of 5)
+    unlockedBy: 'feast',
+    unlockAt: 0.8,
+  },
 };
 export const GALAXY_IDS = Object.keys(GALAXIES);
 

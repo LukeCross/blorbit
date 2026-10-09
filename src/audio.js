@@ -427,6 +427,32 @@ export class Sound {
         if (Math.random() < 0.5) for (let i = 0; i < 4; i++) this.tone({ type: 'triangle', f: midi(72 + [0, 1, 4, 5][i]), t: t + i * 0.22, dur: 0.6, vol: 0.012, verb: 0.8, pan }); // oud-ish phrase
         else this.noiseBurst({ t, dur: 2.2, vol: 0.02, f: 600, f2: 1100, q: 0.6, verb: 0.4 }); // warm wind
         break;
+      // ---- Gloomhollow (gentle, not scary: owls and creaks, never stingers)
+      case 'graveyard':
+        if (Math.random() < 0.4) for (let i = 0; i < 2; i++) this.tone({ type: 'sine', f: midi(64 - i * 3), t: t + i * 0.5, dur: 1.6, vol: 0.012, attack: 0.15, verb: 0.95, pan }); // hollow oo-ooo
+        else if (Math.random() < 0.5) this.tone({ type: 'sine', f: midi(55), t, dur: 2.6, vol: 0.016, verb: 0.95, pan }); // distant bell toll
+        else this.noiseBurst({ t, dur: 2.4, vol: 0.02, f: 300, f2: 800, q: 0.7, verb: 0.6 }); // misty breeze
+        break;
+      case 'mansion':
+        if (Math.random() < 0.5) this.tone({ type: 'sawtooth', f: 70, f2: 95, t, dur: 0.9, vol: 0.006, attack: 0.2, verb: 0.6, pan }); // creaky floorboard
+        else if (Math.random() < 0.5) for (let i = 0; i < 4; i++) this.tone({ type: 'triangle', f: midi(1 + 72 + [0, 3, 7, 3][i]), t: t + i * 0.3, dur: 0.8, vol: 0.01, verb: 0.9, pan }); // music-box
+        else this.tone({ type: 'square', f: 3200, f2: 2400, t, dur: 0.08, vol: 0.004, verb: 0.5, pan }); // bat squeak
+        break;
+      case 'cauldron':
+        if (Math.random() < 0.6) for (let i = 0; i < 3; i++) this.tone({ type: 'sine', f: 180 + Math.random() * 260, f2: 420 + Math.random() * 200, t: t + i * 0.18, dur: 0.12, vol: 0.02, verb: 0.4, pan, glide: 0.08 }); // bubbling
+        else if (Math.random() < 0.5) this.tone({ type: 'sawtooth', f: 330, f2: 220, t, dur: 0.9, vol: 0.006, attack: 0.1, verb: 0.6, pan }); // a cackle-ish warble
+        else this.birdChirp();
+        break;
+      case 'pumpkins':
+        if (Math.random() < 0.5) this.noiseBurst({ t, dur: 2, vol: 0.025, f: 700, f2: 1500, q: 0.6, verb: 0.4 }); // rustling leaves
+        else if (Math.random() < 0.5) this.tone({ type: 'sine', f: midi(62), f2: midi(58), t, dur: 1.4, vol: 0.014, attack: 0.2, verb: 0.9, pan }); // low owl hoot
+        else for (let i = 0; i < 3; i++) this.tone({ type: 'triangle', f: midi(76 + pentaStep(i + 1)), t: t + i * 0.25, dur: 0.6, vol: 0.01, verb: 0.8, pan }); // trick-or-treat chimes
+        break;
+      case 'crypt':
+        if (Math.random() < 0.5) this.tone({ type: 'sawtooth', f: 52, f2: 46, t, dur: 2.4, vol: 0.016, attack: 0.5, verb: 0.95, pan }); // stone rumble
+        else if (Math.random() < 0.5) this.noiseBurst({ t, dur: 0.12, vol: 0.02, f: 2200, q: 2, verb: 0.9 }); // a dripping echo
+        else this.tone({ type: 'sine', f: midi(48 + pentaStep(Math.floor(Math.random() * 5))), t, dur: 2.2, vol: 0.012, attack: 0.4, verb: 0.95, pan }); // low hum
+        break;
       default:
         this.birdChirp();
     }
@@ -516,7 +542,7 @@ export class Sound {
   // rolling timbre per surface: [filter centre, Q, low thump]
   setBiome(id) {
     this.biome = id;
-    this.rollTimbre = { snow: [1700, 0.9, 0.3], desert: [2600, 0.6, 0.2], pond: [320, 1.6, 1.3], grove: [500, 1.2, 1], shore: [2200, 0.6, 0.4], volcano: [700, 1, 1.5], candy: [600, 2.2, 1.2], autumn: [2000, 0.8, 0.5], park: [800, 1.1, 0.8], downtown: [1400, 0.8, 0.6], suburbs: [600, 1.3, 0.9], funfair: [1100, 1, 1.1], harbour: [700, 1.1, 1], pastures: [500, 1.3, 1], cliffs: [800, 1, 0.8], rainbow: [450, 1.5, 1.2], balloons: [500, 1.3, 1], stargazer: [1200, 0.9, 0.6], savanna: [1400, 0.8, 0.7], canopy: [450, 1.5, 1.1], riverbank: [350, 1.5, 1.2], bamboo: [900, 1, 0.8], outback: [2200, 0.7, 0.4], kelp: [350, 1.5, 1.3], reef: [900, 1.1, 0.9], galleon: [450, 1.4, 1.1], jellyglow: [500, 1.3, 1], vents: [250, 1.8, 1.5], bakery: [900, 1, 0.8], orchard: [500, 1.3, 1], market: [1300, 0.9, 0.7], veggie: [450, 1.4, 1], bazaar: [2200, 0.7, 0.4] }[id] || [450, 1.4, 1];
+    this.rollTimbre = { snow: [1700, 0.9, 0.3], desert: [2600, 0.6, 0.2], pond: [320, 1.6, 1.3], grove: [500, 1.2, 1], shore: [2200, 0.6, 0.4], volcano: [700, 1, 1.5], candy: [600, 2.2, 1.2], autumn: [2000, 0.8, 0.5], park: [800, 1.1, 0.8], downtown: [1400, 0.8, 0.6], suburbs: [600, 1.3, 0.9], funfair: [1100, 1, 1.1], harbour: [700, 1.1, 1], pastures: [500, 1.3, 1], cliffs: [800, 1, 0.8], rainbow: [450, 1.5, 1.2], balloons: [500, 1.3, 1], stargazer: [1200, 0.9, 0.6], savanna: [1400, 0.8, 0.7], canopy: [450, 1.5, 1.1], riverbank: [350, 1.5, 1.2], bamboo: [900, 1, 0.8], outback: [2200, 0.7, 0.4], kelp: [350, 1.5, 1.3], reef: [900, 1.1, 0.9], galleon: [450, 1.4, 1.1], jellyglow: [500, 1.3, 1], vents: [250, 1.8, 1.5], bakery: [900, 1, 0.8], orchard: [500, 1.3, 1], market: [1300, 0.9, 0.7], veggie: [450, 1.4, 1], bazaar: [2200, 0.7, 0.4], graveyard: [380, 1.5, 1.2], mansion: [700, 1.2, 0.8], cauldron: [320, 1.7, 1.3], pumpkins: [1200, 0.9, 0.7], crypt: [260, 1.8, 1.5] }[id] || [450, 1.4, 1];
   }
 
   setLife(x) {

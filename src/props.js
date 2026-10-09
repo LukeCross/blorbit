@@ -1493,6 +1493,115 @@ export const PROP_KINDS = {
       { geo: lathe([[0.17, 0.1], [0.12, 0.2], [0.05, 0.3], [0.025, 0.4], [0.04, 0.42], [0, 0.43]], 12), mat: lambert(0xffffff), color: pick([0x4a9ab8, 0xd8a83a, 0xc85a4a]) },
     ],
   },
+  // Gloomhollow
+  gravestone: {
+    scale: [0.8, 1.3],
+    parts: () => [
+      { geo: merge(rbox(0.22, 0.34, 0.07, 0.025, 0, 0.19, 0), new THREE.CylinderGeometry(0.11, 0.11, 0.07, 12).rotateX(Math.PI / 2).translate(0, 0.34, 0), rbox(0.3, 0.05, 0.14, 0.015, 0, 0.025, 0)), mat: lambert(0xffffff), color: pick([0x9a9aa8, 0x8a8c9a, 0xa8a8b4, 0x7e8090]) },
+      { geo: box(0.1, 0.012, 0.075, 0, 0.3, 0.01), mat: lambert(0x5a5c68) },
+    ],
+  },
+  graveCross: {
+    scale: [0.8, 1.3],
+    parts: () => [
+      { geo: merge(rbox(0.07, 0.5, 0.07, 0.015, 0, 0.25, 0), rbox(0.26, 0.07, 0.07, 0.015, 0, 0.36, 0), rbox(0.2, 0.04, 0.16, 0.01, 0, 0.02, 0)), mat: lambert(0xffffff), color: pick([0x9a9aa8, 0x8a8c9a, 0xa8a8b4]) },
+    ],
+  },
+  deadTree: {
+    scale: [0.9, 1.6],
+    parts: () => [
+      { geo: merge(
+        new THREE.CylinderGeometry(0.05, 0.1, 0.8, 7).translate(0, 0.4, 0),
+        new THREE.CylinderGeometry(0.02, 0.045, 0.45, 5).rotateZ(-0.9).translate(0.17, 0.78, 0),
+        new THREE.CylinderGeometry(0.018, 0.04, 0.4, 5).rotateZ(0.8).translate(-0.15, 0.7, 0.03),
+        new THREE.CylinderGeometry(0.015, 0.03, 0.3, 5).rotateX(0.8).translate(0.02, 0.95, 0.12),
+        new THREE.CylinderGeometry(0.01, 0.02, 0.22, 4).rotateZ(-0.3).translate(0.3, 1.05, 0),
+        new THREE.CylinderGeometry(0.01, 0.02, 0.22, 4).rotateZ(0.4).translate(-0.26, 0.95, 0.03),
+      ), mat: lambert(0xffffff), color: pick([0x4a3e4a, 0x3e3446, 0x54464e]) },
+    ],
+  },
+  mausoleum: {
+    scale: [1.0, 1.3],
+    parts: () => [
+      { geo: merge(rbox(0.62, 0.42, 0.5, 0.02, 0, 0.21, 0), box(0.7, 0.05, 0.58, 0, 0.44, 0), new THREE.ConeGeometry(0.46, 0.22, 4).rotateY(Math.PI / 4).scale(1, 1, 0.85).translate(0, 0.58, 0), box(0.07, 0.4, 0.07, -0.25, 0.2, 0.31), box(0.07, 0.4, 0.07, 0.25, 0.2, 0.31)), mat: lambert(0xffffff), color: pick([0x9a98a8, 0x8e8ca0, 0xa4a2b2]) },
+      { geo: merge(new THREE.CircleGeometry(0.12, 12, 0, Math.PI).translate(0, 0.16, 0.255), box(0.24, 0.16, 0.01, 0, 0.08, 0.255)), mat: lambert(0x2a2432) },
+      { geo: new THREE.SphereGeometry(0.03, 8, 6).translate(0, 0.74, 0), mat: unlit(0xb8f0d8) },
+    ],
+  },
+  manor: {
+    scale: [1.1, 1.4],
+    parts: () => [
+      { geo: merge(rbox(0.7, 0.5, 0.46, 0.02, 0, 0.25, 0), rbox(0.26, 0.82, 0.26, 0.02, -0.28, 0.41, -0.05), box(0.08, 0.2, 0.08, 0.26, 0.6, 0.04)), mat: lambert(0xffffff), color: pick([0x6a5a78, 0x5e5470, 0x74647e]) },
+      { geo: merge(new THREE.ConeGeometry(0.52, 0.34, 4).rotateY(Math.PI / 4).scale(1, 1, 0.7).translate(0.04, 0.67, 0), new THREE.ConeGeometry(0.24, 0.4, 4).rotateY(Math.PI / 4).translate(-0.28, 1.02, -0.05)), mat: lambert(0x3a3048) },
+      { geo: merge(box(0.09, 0.12, 0.01, -0.12, 0.33, 0.235), box(0.09, 0.12, 0.01, 0.12, 0.33, 0.235), box(0.09, 0.12, 0.01, 0.26, 0.33, 0.235), box(0.07, 0.1, 0.01, -0.28, 0.7, 0.085), box(0.07, 0.1, 0.01, -0.28, 0.5, 0.085)), mat: unlit(0xffd070) },
+      { geo: merge(new THREE.CircleGeometry(0.06, 10, 0, Math.PI).translate(0.02, 0.1, 0.235), box(0.12, 0.1, 0.01, 0.02, 0.05, 0.235)), mat: lambert(0x2a2030) },
+    ],
+  },
+  cauldron: {
+    scale: [0.8, 1.2],
+    parts: () => [
+      { geo: merge(new THREE.SphereGeometry(0.2, 14, 10, 0, Math.PI * 2, 0.5, 2.1).translate(0, 0.22, 0), new THREE.TorusGeometry(0.15, 0.02, 6, 16).rotateX(Math.PI / 2).translate(0, 0.35, 0), ...[0, 2.1, 4.2].map((a) => new THREE.CylinderGeometry(0.02, 0.025, 0.1, 5).translate(Math.cos(a) * 0.12, 0.04, Math.sin(a) * 0.12))), mat: lambert(0x2e2c38) },
+      { geo: new THREE.CircleGeometry(0.15, 14).rotateX(-Math.PI / 2).translate(0, 0.33, 0), mat: unlit(0x78e870) },
+      { geo: merge(new THREE.SphereGeometry(0.035, 7, 5).translate(0.05, 0.37, 0.03), new THREE.SphereGeometry(0.025, 7, 5).translate(-0.06, 0.37, -0.04)), mat: unlit(0xa8ff98) },
+    ],
+  },
+  candles: {
+    scale: [0.8, 1.2],
+    parts: () => {
+      const cs = [[0, 0, 0.2], [0.09, 0.05, 0.13], [-0.08, 0.06, 0.1], [0.02, -0.09, 0.07]];
+      return [
+        { geo: merge(...cs.map(([x, z, h]) => new THREE.CylinderGeometry(0.03, 0.035, h, 8).translate(x, h / 2, z))), mat: lambert(0xffffff), color: pick([0xf4ecd8, 0xe8dcc0, 0xd8c8e8]) },
+        { geo: merge(...cs.map(([x, z, h]) => new THREE.SphereGeometry(0.022, 7, 5).scale(0.7, 1.4, 0.7).translate(x, h + 0.03, z))), mat: unlit(0xffc060) },
+      ];
+    },
+  },
+  coffin: {
+    scale: [0.8, 1.2],
+    parts: () => [
+      { geo: new THREE.CylinderGeometry(0.1, 0.06, 0.44, 6).rotateX(Math.PI / 2).scale(1, 0.55, 1).translate(0, 0.07, 0), mat: lambert(0xffffff), color: pick([0x5a3a30, 0x4e3a40, 0x62443a]) },
+      { geo: merge(box(0.02, 0.005, 0.2, 0, 0.105, -0.04), box(0.09, 0.005, 0.02, 0, 0.105, 0)), mat: lambert(0xc8a868) },
+    ],
+  },
+  jackLantern: {
+    scale: [0.8, 1.3],
+    parts: () => [
+      { geo: merge(new THREE.SphereGeometry(0.15, 12, 8).scale(1.15, 0.9, 1.05).translate(0, 0.14, 0), new THREE.CylinderGeometry(0.018, 0.025, 0.07, 5).translate(0, 0.29, 0)), mat: lambert(0xffffff), color: pick([0xe8782a, 0xd8681e, 0xf08a38]) },
+      { geo: merge(new THREE.ConeGeometry(0.03, 0.05, 3).rotateX(0).translate(-0.06, 0.18, 0.15), new THREE.ConeGeometry(0.03, 0.05, 3).translate(0.06, 0.18, 0.15), box(0.12, 0.025, 0.02, 0, 0.09, 0.155)), mat: unlit(0xffb84a) },
+    ],
+  },
+  bones: {
+    scale: [0.8, 1.3],
+    parts: () => [
+      { geo: merge(
+        new THREE.CylinderGeometry(0.015, 0.015, 0.22, 5).rotateZ(Math.PI / 2).rotateY(0.4).translate(0, 0.015, 0),
+        new THREE.SphereGeometry(0.028, 6, 5).translate(-0.1, 0.02, 0.04), new THREE.SphereGeometry(0.028, 6, 5).translate(0.1, 0.02, -0.04),
+        new THREE.CylinderGeometry(0.014, 0.014, 0.18, 5).rotateZ(Math.PI / 2).rotateY(-0.7).translate(0.04, 0.03, 0.1),
+        new THREE.SphereGeometry(0.075, 8, 6).scale(1, 0.9, 1.05).translate(-0.08, 0.075, -0.1),
+        box(0.07, 0.04, 0.05, -0.08, 0.02, -0.04),
+      ), mat: lambert(0xece4d4) },
+      { geo: merge(new THREE.SphereGeometry(0.02, 6, 5).translate(-0.105, 0.09, -0.04), new THREE.SphereGeometry(0.02, 6, 5).translate(-0.055, 0.09, -0.04)), mat: lambert(0x2a2430) },
+    ],
+  },
+  bookStack: {
+    scale: [0.8, 1.2],
+    parts: () => [
+      { geo: merge(rbox(0.3, 0.07, 0.2, 0.01, 0, 0.035, 0), rbox(0.26, 0.06, 0.18, 0.01, 0.02, 0.1, 0.01).rotateY(0.25), rbox(0.22, 0.055, 0.16, 0.01, -0.01, 0.16, 0).rotateY(-0.2)), mat: lambert(0xffffff), color: pick([0x6a3a5a, 0x3a4a6a, 0x5a3a2e, 0x3a5a4a]) },
+      { geo: merge(box(0.28, 0.012, 0.19, 0, 0.035, 0.002), box(0.24, 0.01, 0.17, 0.02, 0.1, 0.002).rotateY(0.25)), mat: lambert(0xf0e8d0) },
+    ],
+  },
+  ironGate: {
+    scale: [0.9, 1.2],
+    parts: () => [
+      { geo: merge(
+        box(0.05, 0.55, 0.05, -0.3, 0.275, 0), box(0.05, 0.55, 0.05, 0.3, 0.275, 0),
+        box(0.6, 0.03, 0.03, 0, 0.12, 0), box(0.6, 0.03, 0.03, 0, 0.42, 0),
+        ...[-0.2, -0.1, 0, 0.1, 0.2].map((x) => box(0.02, 0.4, 0.02, x, 0.28, 0)),
+        ...[-0.3, 0.3].map((x) => new THREE.ConeGeometry(0.04, 0.09, 4).translate(x, 0.6, 0)),
+        ...[-0.2, -0.1, 0, 0.1, 0.2].map((x) => new THREE.ConeGeometry(0.02, 0.06, 4).translate(x, 0.51, 0)),
+      ), mat: lambert(0x38343e) },
+    ],
+  },
+
 };
 
 // kinds too small/plentiful to have a withered stand-in
