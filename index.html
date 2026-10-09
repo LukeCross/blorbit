@@ -138,11 +138,19 @@
          else stays hidden (body.booting) until main.js says the game is ready. */
       body.booting > *:not(#loader):not(script) { visibility: hidden; }
       #loader {
-        position: fixed; inset: 0; z-index: 20; display: grid; place-content: center; justify-items: center; gap: 26px;
+        position: fixed; inset: 0; z-index: 20; display: grid; place-content: center; justify-items: center; gap: 14px;
         background: radial-gradient(ellipse at 50% 40%, #f4ecff 0%, #dccdff 55%, #c6b4ff 100%);
         transition: opacity 0.5s ease, visibility 0s linear 0.5s;
       }
       #loader.out { opacity: 0; visibility: hidden; }
+      /* same face, size and finish as the title wordmark. Held back until Fredoka has arrived so it never flashes in a different font. */
+      .lname {
+        font: 700 clamp(64px, 11vw, 120px) / 1 var(--font-display); letter-spacing: -0.02em;
+        background: linear-gradient(180deg, #8fe8cc 0%, #a99bff 55%, #ff9fd0 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+        filter: drop-shadow(0 6px 0 rgba(255,255,255,0.9)) drop-shadow(0 14px 24px rgba(120,100,220,0.3));
+        opacity: 0; transition: opacity 0.3s ease;
+      }
+      .lname.ready { opacity: 1; }
       .lstage { position: relative; width: 300px; height: 130px; }
       /* rolling: move 230px while turning one full turn (a 72px ball's circumference is ~226px) */
       .lblob { position: absolute; left: 50%; bottom: 22px; width: 72px; height: 72px; margin-left: -36px; animation: lroll 1.9s cubic-bezier(.45,.05,.55,.95) infinite alternate; }
@@ -801,6 +809,7 @@
   <body class="booting">
     <!-- loading screen: a little blob rolling back and forth until the game is ready -->
     <div id="loader" role="status" aria-live="polite">
+      <div class="lname" aria-hidden="true">Blorbit</div>
       <div class="lstage" aria-hidden="true">
         <i class="ldrip"></i><i class="ldrip"></i><i class="ldrip"></i>
         <div class="lshadow"></div>
@@ -810,6 +819,16 @@
       </div>
       <p class="ltext" id="loader-text">Rolling in<span>.</span><span>.</span><span>.</span></p>
     </div>
+    <script>
+      // show the name once Fredoka is in (or after a couple of seconds, in case the font can't load)
+      (function () {
+        var el = document.querySelector('.lname');
+        var show = function () { el.classList.add('ready'); };
+        if (document.fonts && document.fonts.load) document.fonts.load('700 64px Fredoka', 'Blorbit').then(show, show);
+        else show();
+        setTimeout(show, 2500);
+      })();
+    </script>
     <script>
       // on a very slow connection, reassure the player rather than rolling silently forever
       setTimeout(function () {
