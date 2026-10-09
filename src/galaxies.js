@@ -26,7 +26,7 @@ export const GALAXIES = {
   sky: {
     name: 'Skyhaven',
     emoji: '☁️',
-    blurb: 'Islands adrift in a sea of cloud: pastures, windmills, rainbows, balloons and stars.',
+    blurb: 'Floating islands, windmills, rainbows and stars. Brighten the skies.',
     art: ['#bfe4ff', '#fff0c8'],
     biomes: ['pastures', 'cliffs', 'rainbow', 'balloons', 'stargazer'],
     // unlocked by waking 80% of Citylight's creatures (4 of 5)
