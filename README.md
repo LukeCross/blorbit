@@ -68,12 +68,14 @@ You start as the classic water blob. Each creature you wake becomes a skin with 
 Press any key, or click/tap anywhere on the title screen, to start.
 
 ### Touch (phones and tablets)
-- **Drag anywhere** on the screen to use the virtual joystick: push up to roll forward and left/right to steer.
+- **Tap sides** (default): your blob rolls forward by itself. **Hold the left or right half** of the screen to turn; the turn starts gentle and builds up the longer you hold. Quick taps give a small nudge, and both thumbs down goes straight.
+- **Joystick** (optional, in Settings → Touch controls): **drag anywhere** to use a virtual joystick. Push up to roll forward and left/right to steer.
 - Tap the icons in the top bar for the Collection, Shop, auto-roll, Settings and sound.
 - Swipe the skin strip at the bottom to browse and equip skins.
 
 ### Settings
 - **Graphics:** *Auto* (default), *Smooth* or *Pretty*. See [Performance](#performance) below.
+- **Touch controls** (touch devices only): *Tap sides* or *Joystick*.
 - **Turning sensitivity:** a slider from 40% to 160% that scales how fast the blob turns.
 - **Colorblind mode:** swaps meaningful colours to a blue/orange palette that stays distinct for protanopia, deuteranopia and tritanopia. It adds ✓ badges on finished biomes, a pulse on nearly-finished ones and ◆/★ markers on rare/legendary finds, so nothing relies on colour alone. It also raises secondary text contrast above the WCAG AA guideline of 4.5:1.
 - **Reset all progress:** wipes skins, finds, stardust and the current planet (asks you to confirm).

@@ -32,6 +32,7 @@ if ((save.v || 0) < 3) Object.assign(save, { autoRoll: false, v: 3 }); // auto-r
 save.quality ??= 'auto';
 save.sensitivity ??= 1; // multiplies the blob's turn speed
 save.colorblind ??= false;
+save.touchControls ??= 'tap'; // touch devices: 'tap' = rolls by itself, hold a side to turn; 'stick' = drag joystick
 document.body.classList.toggle('cb', save.colorblind);
 quality.tier = save.quality === 'auto' ? detectTier() : save.quality;
 // trails were removed from the shop: give back any stardust spent on them
@@ -106,7 +107,11 @@ window.addEventListener('resize', () => {
 
 // touch devices get touch hints and no keyboard badges
 const coarse = window.matchMedia('(pointer: coarse)');
-const syncTouch = () => document.body.classList.toggle('touch', coarse.matches);
+const tapSteer = () => coarse.matches && save.touchControls === 'tap';
+const syncTouch = () => {
+  document.body.classList.toggle('touch', coarse.matches);
+  document.body.classList.toggle('tap-steer', tapSteer());
+};
 syncTouch();
 coarse.addEventListener?.('change', syncTouch);
 const smallScreen = () => window.innerWidth <= 720 || window.innerHeight <= 500;
@@ -324,10 +329,43 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('keyup', (e) => {
   if (KEYMAP[e.code]) keys[KEYMAP[e.code]] = false;
 });
-window.addEventListener('blur', () => Object.keys(keys).forEach((k) => (keys[k] = false)));
+window.addEventListener('blur', () => {
+  Object.keys(keys).forEach((k) => (keys[k] = false));
+  held.clear();
+});
 
-// touch / mouse: drag anywhere for a virtual joystick
+// tap steering: each finger down holds a side (-1 left, +1 right); sliding across the middle switches side
+const held = new Map(); // pointerId -> { side, t0 }
+const nudges = []; // quick taps keep turning briefly so they still register
+const MIN_TAP = 0.16; // seconds
+// holding a side eases from a gentle turn up to full turn speed, so short holds give fine corrections
+const RAMP = { start: 0.45, time: 0.5 };
+const sideOf = (x) => (x < window.innerWidth / 2 ? -1 : 1);
+function showHeldSides() {
+  const now = performance.now() / 1000;
+  const active = [...held.values(), ...nudges.filter((n) => n.until > now)];
+  $('steer-sides').children[0].classList.toggle('on', active.some((h) => h.side < 0));
+  $('steer-sides').children[1].classList.toggle('on', active.some((h) => h.side > 0));
+}
+function tapTurn() {
+  const now = performance.now() / 1000;
+  while (nudges.length && nudges[0].until <= now) nudges.shift();
+  const strength = (side) => {
+    const on = [...held.values(), ...nudges].filter((h) => h.side === side);
+    if (!on.length) return 0;
+    const t = Math.min(1, (now - Math.min(...on.map((h) => h.t0))) / RAMP.time);
+    return RAMP.start + (1 - RAMP.start) * t * t * (3 - 2 * t);
+  };
+  return strength(1) - strength(-1); // both thumbs down = straight on
+}
+
+// touch / mouse: drag anywhere for a virtual joystick (or hold a side, in tap steering)
 renderer.domElement.addEventListener('pointerdown', (e) => {
+  if (tapSteer()) {
+    held.set(e.pointerId, { side: sideOf(e.clientX), t0: performance.now() / 1000 });
+    showHeldSides();
+    return;
+  }
   if (stick.id !== null) return;
   Object.assign(stick, { id: e.pointerId, x0: e.clientX, y0: e.clientY, dx: 0, dy: 0 });
   const j = $('joystick');
@@ -336,6 +374,13 @@ renderer.domElement.addEventListener('pointerdown', (e) => {
   j.classList.add('on');
 });
 window.addEventListener('pointermove', (e) => {
+  const h = held.get(e.pointerId);
+  if (h) {
+    const side = sideOf(e.clientX);
+    if (side !== h.side) Object.assign(h, { side, t0: performance.now() / 1000 }); // a new direction eases in again
+    showHeldSides();
+    return;
+  }
   if (e.pointerId !== stick.id) return;
   let dx = e.clientX - stick.x0, dy = e.clientY - stick.y0;
   const len = Math.hypot(dx, dy);
@@ -345,6 +390,16 @@ window.addEventListener('pointermove', (e) => {
   $('knob').style.transform = `translate(${dx}px, ${dy}px)`;
 });
 const release = (e) => {
+  const h = held.get(e.pointerId);
+  if (h) {
+    held.delete(e.pointerId);
+    if (performance.now() / 1000 - h.t0 < MIN_TAP) {
+      nudges.push({ side: h.side, t0: h.t0, until: h.t0 + MIN_TAP });
+      setTimeout(showHeldSides, MIN_TAP * 1000);
+    }
+    showHeldSides();
+    return;
+  }
   if (e.pointerId !== stick.id) return;
   stick.id = null;
   stick.dx = stick.dy = 0;
@@ -358,7 +413,9 @@ function readInput() {
   let steer = (keys.right ? 1 : 0) - (keys.left ? 1 : 0) + stick.dx;
   let throttle = (keys.up ? 1 : 0) - (keys.down ? 1 : 0) - stick.dy;
   if (Math.abs(stick.dx) < 0.15 && stick.id !== null && !keys.left && !keys.right) steer = 0;
-  if (save.autoRoll && !keys.down && stick.dy < 0.3) throttle = 1;
+  if (tapSteer()) steer += tapTurn();
+  // tap steering always rolls forward
+  if ((save.autoRoll || tapSteer()) && !keys.down && stick.dy < 0.3) throttle = 1;
   return { steer: Math.max(-1, Math.min(1, steer)), throttle: Math.max(-1, Math.min(1, throttle)) };
 }
 
@@ -383,6 +440,12 @@ function start() {
   $('title').classList.add('hidden');
   ['hud-top', 'skins', 'biome-label', 'autoroll', 'hud-left'].forEach((id) => $(id).classList.remove('hidden'));
   buildSkinBar();
+  if (tapSteer()) flashSteerHint();
+}
+// show both sides for a moment so it's obvious where to hold
+function flashSteerHint() {
+  $('steer-sides').classList.add('hint');
+  setTimeout(() => $('steer-sides').classList.remove('hint'), 2800);
 }
 
 $('next-planet').addEventListener('click', () => {
@@ -597,6 +660,7 @@ function openSettings() {
     b.classList.toggle('active', b.dataset.q === save.quality);
     if (b.dataset.q === 'auto') b.textContent = `Auto (${quality.tier === 'smooth' ? 'Smooth' : 'Pretty'})`;
   });
+  $('touch-picker').querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.dataset.c === save.touchControls));
   showSensitivity();
   $('colorblind').classList.toggle('on', save.colorblind);
   $('colorblind').setAttribute('aria-checked', save.colorblind);
@@ -608,6 +672,16 @@ function showSensitivity() {
   el.style.setProperty('--fill', `${((save.sensitivity - el.min) / (el.max - el.min)) * 100}%`);
   $('sensitivity-value').textContent = `${Math.round(save.sensitivity * 100)}%`;
 }
+$('touch-picker').addEventListener('click', (e) => {
+  const c = e.target.closest('button')?.dataset.c;
+  if (!c || c === save.touchControls) return;
+  save.touchControls = c;
+  persist();
+  syncTouch();
+  held.clear();
+  $('touch-picker').querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.dataset.c === c));
+  if (tapSteer()) flashSteerHint();
+});
 $('sensitivity').addEventListener('input', (e) => {
   save.sensitivity = Number(e.target.value);
   applySensitivity();
@@ -999,6 +1073,10 @@ function frame() {
   else renderer.render(scene, camera);
 }
 frame();
+
+// everything's loaded: the title's start button can go live
+$('start-btn').disabled = false;
+$('start-btn').textContent = 'Start rolling';
 
 // handy for debugging from the console
 refreshDust();
