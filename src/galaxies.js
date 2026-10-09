@@ -73,6 +73,16 @@ export const GALAXIES = {
     unlockedBy: 'feast',
     unlockAt: 0.8,
   },
+  stomp: {
+    name: 'Stompvale',
+    emoji: '👣',
+    blurb: 'Fern jungles, fossil canyons, ice-age tundra and tar pits. Wake the gentle giants.',
+    art: ['#c8e8a0', '#ffc890'],
+    biomes: ['fernwood', 'fossils', 'iceage', 'dodoisle', 'tarpits'],
+    // unlocked by waking 80% of Gloomhollow's creatures (4 of 5)
+    unlockedBy: 'gloom',
+    unlockAt: 0.8,
+  },
 };
 export const GALAXY_IDS = Object.keys(GALAXIES);
 

@@ -121,6 +121,29 @@ const KINDS = {
     for (const s of [-1, 1]) g.add(new THREE.Mesh(new THREE.SphereGeometry(0.015, 8, 6).translate(s * 0.035, 0.1, 0.075), lambert(0x222233)));
     return { g, glow: true };
   } },
+  // Stompvale: gliding pterosaurs and tiny waddling hatchlings
+  pterosaur: { flying: true, speed: 1.2, hover: [1.0, 2.0], turn: 1.8, build: () => {
+    const g = new THREE.Group();
+    const skin = rnd([0xe8a05a, 0xd88a6a, 0xc8a078]);
+    g.add(new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8).scale(0.8, 0.8, 1.5), lambert(skin)));
+    g.add(new THREE.Mesh(new THREE.ConeGeometry(0.025, 0.2, 6).rotateX(Math.PI / 2).translate(0, 0.01, 0.18), lambert(0xf0c890)));
+    g.add(new THREE.Mesh(new THREE.ConeGeometry(0.025, 0.14, 4).rotateX(-Math.PI / 2 - 0.5).translate(0, 0.07, -0.1), lambert(0xd85a3a)));
+    const w = wings(skin, 0.2, 0.07);
+    g.add(...w);
+    return { g, wings: w, flap: 6, amp: 0.7 };
+  } },
+  hatchling: { flying: false, speed: 0.6, hover: [0, 0], turn: 3, build: () => {
+    const g = new THREE.Group();
+    const col = rnd([0x7ac86a, 0x6ac8b8, 0xe8b85a]);
+    g.add(new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 8).scale(1, 0.85, 1.25).translate(0, 0.1, 0), lambert(col)));
+    g.add(new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8).translate(0, 0.17, 0.12), lambert(col)));
+    g.add(new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.14, 6).rotateX(-Math.PI / 2 - 0.3).translate(0, 0.09, -0.16), lambert(col)));
+    for (const x of [-1, 1]) {
+      g.add(new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 6).translate(x * 0.03, 0.19, 0.17), lambert(0x111111)));
+      g.add(new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6).scale(1, 0.6, 1.3).translate(x * 0.05, 0.02, 0.03), lambert(0xf0e6c8)));
+    }
+    return { g };
+  } },
   fish: { jumper: true, build: () => {
     const g = new THREE.Group();
     const col = rnd([0xff8a3a, 0xffd04a, 0x8ad0ff, 0xff6a9a]);

@@ -83,8 +83,9 @@ Key facts:
 | `sea` | Seaglow | 🐋 | kelp (otter), reef (pufferfish), galleon (shark), jellyglow (jellyfish), vents (squid) | `safari` 80% |
 | `feast` | Feastvale | 🥘 | bakery (rooster), orchard (monkey), market (rat), veggie (pig), bazaar (camel) | `sea` 80% |
 | `gloom` | Gloomhollow | 🏚️ | graveyard (ghost), mansion (bat), cauldron (witch), pumpkins (zombie), crypt (spider) | `feast` 80% |
+| `stomp` | Stompvale | 👣 | fernwood (longneck), fossils (trex), iceage (mammoth), dodoisle (dodo), tarpits (sloth) | `gloom` 80% |
 
-**Current totals: 7 galaxies, 40 biomes, 320 cards (80 + 6 × 40).** Update this table and these totals whenever you add a galaxy.
+**Current totals: 8 galaxies, 45 biomes, 360 cards (80 + 7 × 40).** Update this table and these totals whenever you add a galaxy.
 
 Special per-biome rendering knobs (`style` array in `biomes.js`): `[sand, snow, moon, pave, cloud, sea]`. `style[3]` = paved ground (city, markets), `style[4]` = cloud sea (Skyhaven), `style[5]` = underwater look (Seaglow). Adding a new ground-shader effect means: new vertex attribute `aX`, varying `vX`, a block in the fragment shader, a buffer filled in `planet.js` next to `cloud`/`sea`, and a new `style[n]` slot (follow how `aSea` was added).
 
@@ -98,7 +99,7 @@ Never guess. Compute what's taken (run from the repo root):
 import re
 s = open('src/biomes.js').read()
 sk = open('src/skins.js').read() + open('src/galaxies.js').read()
-used = set(re.findall(r"\['([^'\w#][^']*)', '", s)) | set(re.findall(r"emoji: '([^']+)'", sk))
+used = set(re.findall(r"\['([^'\w#][^']*)', [\"']", s)) | set(re.findall(r"emoji: '([^']+)'", sk))
 st = lambda e: e.replace('️', '')          # ignore variation selectors
 U = {st(u) for u in used}
 want = "🥐 🥖 ...".split()                         # your candidates
@@ -170,13 +171,13 @@ Add a `case '<biomeId>':` per biome in the ambient switch (above `default:`), an
 New terrain: a `case` in `terrain()`. New ground effect: follow the `aSea`/`aCloud` pattern (attribute, varying, fragment block, `style[n]` slot, buffer with `smooth()`, `setAttribute`).
 
 ### 6.8 Counts, docs and generated images: every place that changes
-After adding a galaxy, update ALL of these (numbers are galaxies / biomes / cards = 7 / 40 / 320 at time of writing; new totals = biomes + 5, cards + 40, galaxies + 1):
+After adding a galaxy, update ALL of these (numbers are galaxies / biomes / cards = 8 / 45 / 360 at time of writing; new totals = biomes + 5, cards + 40, galaxies + 1):
 
 | File | What to change |
 | --- | --- |
 | `index.html` | **4 occurrences** of "Bring N biomes back to life ... collect N cards." in `meta description`, `og:description`, `twitter:description` and the JSON-LD `description` (lines ~8, 21, 29, 40). |
 | `about.html` | `meta description` and `og:description` ("restore N biomes across N galaxies ... collect N cards"); add a new `<div class="galaxy">` card (emoji + name, one-line blurb, `<ul>` of 5 biomes with creature emojis) after the last one; the "There are **N cards**" sentence in the Collecting section. |
-| `README.md` | Galaxies bullet list (add a bullet with name, biome themes, "5 creatures and 40 finds", the unlock sentence); the biome/creature table (add two columns "X biome \| Creature" and fill the first five rows; keep the separator row's column count in step); the Finds sentence ("80 in Wildbloom, 40 each in ..."); the `biomes.js` line in the project structure ("The N biome definitions"). Also stale: "About 60 procedurally modelled prop types" (there are 148 now). |
+| `README.md` | Galaxies bullet list (add a bullet with name, biome themes, "5 creatures and 40 finds", the unlock sentence); the biome/creature table (add two columns "X biome \| Creature" and fill the first five rows; keep the separator row's column count in step); the Finds sentence ("80 in Wildbloom, 40 each in ..."); the `biomes.js` line in the project structure ("The N biome definitions"). Also stale: "About 60 procedurally modelled prop types" (there are 170 now). |
 | `scripts/og/compose.html` | The chips line: "N galaxies", "N biomes", "N cards to collect". |
 | `public/og-image.png` | **Regenerate** after editing compose.html: start `npm run dev`, then `node scripts/og/compose.mjs` (writes `public/og-image.png`; also the About page hero). To also change the planet photo, run `node scripts/og/capture.mjs`, copy a frame to `scripts/og/planet.png`, then compose. |
 | `scripts/biome.mjs` | Its test save's `unlocked` array must include every creature of the earlier galaxies so the new galaxy isn't locked when you screenshot it (add the previous galaxy's 5 creature ids) and update its comment. |
@@ -189,7 +190,7 @@ grep -rnE "[0-9]+ biomes|[0-9]+ galaxies|[0-9]+ cards|biome definitions" index.h
 `src/collection.js` totals, the shop/collection tabs, the title picker and the skin bar are computed from `GALAXIES`, so they need no edits.
 
 ### 6.9 UI layout that depends on the number of galaxies (check every time)
-- **Title galaxy picker** (`index.html`): `#title .galaxy-cards { width: min(1660px, 94vw) }` is sized so all cards fit one row on a wide desktop (cards are `minmax(220px, 1fr)`; 7 cards need ~1625px). With more galaxies, raise that width and the `@media (min-width: 721px) and (max-width: 1760px) and (min-height: 501px)` upper bound (single swipeable row, `grid-auto-columns: 250px`, `width: 88vw`, scroll-snap) so the swipe row covers every width where they no longer fit. Phones (<=720px) use a stacked list. Verify at 1920, 1440, 1024 and 820 wide.
+- **Title galaxy picker** (`index.html`): `#title .galaxy-cards { width: min(1700px, 94vw) }` is sized so all cards fit one row on a wide desktop (title cards are `minmax(200px, 1fr)`; 8 cards need ~1700px). With more galaxies, raise that width and the `@media (min-width: 721px) and (max-width: 1810px) and (min-height: 501px)` upper bound (single swipeable row, `grid-auto-columns: 250px`, `width: 88vw`, scroll-snap) so the swipe row covers every width where they no longer fit. Phones (<=720px) use a stacked list. Verify at 1920, 1440, 1024 and 820 wide.
 - **Shop and collection galaxy tabs** (`.galaxy-tabs`): never wrap or truncate; they scroll sideways, and `renderKeepingTabs` (in `shop.js`, used by the shop and `renderBook`) preserves scroll position and reveals the active tab. Keep `position: relative` on `.galaxy-tabs` (the reveal math uses `offsetLeft`).
 - **Skin bar** (`#skins`): scrolls sideways; shows Classic, the current galaxy's creatures, then skins unlocked elsewhere. Number keys `1-9`, `0` map to the current galaxy's creatures.
 - **Top HUD** (`#hud-top`): between 721px and 1100px wide (tablets) the planet card is dropped below the corner buttons (`top: 72px`, with `#biome-label` and `#finds` pushed down). Phones and landscape phones have their own rules. Don't let HUD buttons overlap.

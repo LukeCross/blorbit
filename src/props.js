@@ -1602,7 +1602,91 @@ export const PROP_KINDS = {
     ],
   },
 
+  // Stompvale
+  cycad: {
+    scale: [0.8, 1.4],
+    parts: () => [
+      { geo: new THREE.CylinderGeometry(0.09, 0.13, 0.4, 9).translate(0, 0.2, 0), mat: lambert(0x7a5a40) },
+      { geo: radial(8, (a) => new THREE.ConeGeometry(0.07, 0.55, 4).translate(0, 0.27, 0).rotateZ(1.1).translate(0.04, 0.42, 0).rotateY(a)), mat: lambert(0xffffff), color: fromGround(0.7, 1.0) },
+    ],
+  },
+  horsetail: {
+    scale: [0.8, 1.5],
+    parts: () => {
+      const stems = [[0, 0, 0.7], [0.1, 0.05, 0.5], [-0.09, 0.07, 0.6], [0.03, -0.1, 0.42]];
+      return [
+        { geo: merge(...stems.map(([x, z, h]) => new THREE.CylinderGeometry(0.014, 0.018, h, 6).translate(x, h / 2, z))), mat: lambert(0xffffff), color: fromGround(0.8, 1.1) },
+        { geo: merge(...stems.flatMap(([x, z, h]) => [0.3, 0.55, 0.8].filter((k) => k * 0.7 < h).map((k) => radial(5, (a) => new THREE.ConeGeometry(0.012, 0.13, 3).translate(0, 0.06, 0).rotateZ(1.25).rotateY(a)).translate(x, k * 0.7, z)))), mat: lambert(0xffffff), color: fromGround(0.9, 1.2) },
+      ];
+    },
+  },
+  ammonite: {
+    scale: [0.8, 1.4],
+    parts: () => {
+      const spiral = [];
+      for (let i = 0; i < 28; i++) {
+        const t = i / 27, a = t * Math.PI * 3.2, r = 0.03 + t * 0.14;
+        spiral.push(new THREE.SphereGeometry(0.025 + t * 0.05, 7, 5).translate(Math.cos(a) * r, 0.1, Math.sin(a) * r));
+      }
+      return [{ geo: merge(...spiral).rotateX(1.2).translate(0, 0.07, 0), mat: lambert(0xffffff), color: pick([0xc8b898, 0xb8a888, 0xd4c4a4]) }];
+    },
+  },
+  ribcage: {
+    scale: [0.9, 1.4],
+    parts: () => [
+      { geo: merge(
+        new THREE.CylinderGeometry(0.016, 0.02, 0.8, 6).rotateZ(Math.PI / 2).translate(0, 0.26, 0),
+        ...[-0.3, -0.15, 0, 0.15, 0.3].map((x) => new THREE.TorusGeometry(0.2 - Math.abs(x) * 0.2, 0.016, 5, 12, Math.PI).scale(1, 1.3, 1).rotateY(Math.PI / 2).translate(x, 0.0, 0)),
+      ), mat: lambert(0xece4d4) },
+    ],
+  },
+  dinoSkull: {
+    scale: [0.9, 1.3],
+    parts: () => [
+      { geo: merge(
+        new THREE.SphereGeometry(0.17, 10, 8).scale(1, 0.8, 1.3).translate(0, 0.17, -0.1),
+        new THREE.SphereGeometry(0.1, 10, 8).scale(1, 0.6, 1.9).translate(0, 0.12, 0.2),
+        ...[-1, 1].flatMap((s) => [0.08, 0.15, 0.22, 0.29].map((z) => new THREE.ConeGeometry(0.012, 0.04, 4).rotateX(Math.PI).translate(s * 0.07, 0.07, z))),
+      ), mat: lambert(0xece4d4) },
+      { geo: merge(...[-1, 1].map((s) => new THREE.SphereGeometry(0.045, 8, 6).translate(s * 0.1, 0.2, 0.0))), mat: lambert(0x3a3430) },
+    ],
+  },
+  tarBubble: {
+    scale: [0.8, 1.5],
+    parts: () => [
+      { geo: new THREE.CylinderGeometry(0.2, 0.22, 0.02, 14).translate(0, 0.01, 0), mat: lambert(0x1e1c22) },
+      { geo: merge(new THREE.SphereGeometry(0.1, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2).translate(0.03, 0.02, 0), new THREE.SphereGeometry(0.06, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2).translate(-0.09, 0.02, 0.07)), mat: lambert(0x2c2a34) },
+    ],
+  },
+  tarPool: {
+    scale: [1.0, 1.5],
+    parts: () => [
+      { geo: new THREE.CylinderGeometry(0.34, 0.38, 0.03, 18).translate(0, 0.015, 0).scale(1.2, 1, 0.9), mat: lambert(0x1c1a20) },
+      { geo: merge(new THREE.SphereGeometry(0.07, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2).translate(0.1, 0.03, 0.05), new THREE.SphereGeometry(0.045, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2).translate(-0.15, 0.03, -0.04)), mat: lambert(0x34303c) },
+    ],
+  },
+  tusks: {
+    scale: [0.9, 1.4],
+    parts: () => [
+      { geo: merge(...[-1, 1].map((s) => new THREE.TorusGeometry(0.28, 0.035, 6, 14, Math.PI * 0.85).rotateZ(Math.PI * 0.08).scale(s, 1, 1).translate(s * 0.1, 0.0, 0).rotateY(s * 0.15))), mat: lambert(0xf0e8d4) },
+      { geo: new THREE.CylinderGeometry(0.1, 0.12, 0.05, 10).translate(0, 0.025, 0), mat: lambert(0x8a7a68) },
+    ],
+  },
+  nest: {
+    scale: [0.8, 1.2],
+    parts: () => [
+      { geo: merge(new THREE.TorusGeometry(0.2, 0.05, 6, 14).rotateX(Math.PI / 2).translate(0, 0.06, 0), new THREE.CylinderGeometry(0.19, 0.13, 0.08, 14).translate(0, 0.04, 0)), mat: lambert(0xffffff), color: pick([0x8a6a40, 0x9a7a4a, 0x7a5a38]) },
+      { geo: merge(...[[0.0, 0.0], [0.08, 0.06], [-0.07, 0.07], [0.0, -0.09]].map(([x, z]) => new THREE.SphereGeometry(0.06, 10, 8).scale(0.8, 1.1, 0.8).translate(x, 0.12, z))), mat: lambert(0xffffff), color: pick([0xf0e6c8, 0xd8e8d0, 0xe8d0b8]) },
+    ],
+  },
+  caveSlab: {
+    scale: [0.9, 1.3],
+    parts: () => [
+      { geo: merge(rbox(0.5, 0.6, 0.14, 0.04, 0, 0.3, 0), rbox(0.3, 0.2, 0.14, 0.04, 0.28, 0.1, 0.06)), mat: lambert(0xffffff), color: pick([0x8a7a6a, 0x7e6e60, 0x948472]) },
+      { geo: merge(new THREE.TorusGeometry(0.05, 0.012, 5, 10).translate(-0.1, 0.42, 0.075), box(0.012, 0.16, 0.012, -0.1, 0.29, 0.075), box(0.1, 0.012, 0.012, -0.1, 0.32, 0.075), box(0.012, 0.12, 0.012, 0.1, 0.2, 0.075, 0, 0, 0.5), box(0.012, 0.12, 0.012, 0.16, 0.2, 0.075, 0, 0, -0.5), box(0.012, 0.12, 0.012, 0.1, 0.38, 0.075, 0, 0, -0.6), box(0.14, 0.012, 0.012, 0.13, 0.5, 0.075)), mat: lambert(0xd8602a) },
+    ],
+  },
 };
 
 // kinds too small/plentiful to have a withered stand-in
-export const NO_DEAD = new Set(['grass', 'flower', 'snowdrop', 'sprinkle', 'pebble', 'shell', 'seaGrass', 'pathStone', 'plank', 'starfish', 'carrot', 'cabbage']);
+export const NO_DEAD = new Set(['grass', 'flower', 'snowdrop', 'sprinkle', 'pebble', 'shell', 'seaGrass', 'pathStone', 'plank', 'starfish', 'carrot', 'cabbage', 'horsetail']);
