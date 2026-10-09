@@ -1,15 +1,17 @@
 import { BIOMES } from './biomes.js';
 import { GALAXIES, GALAXY_IDS, isGalaxyUnlocked, unlockProgress } from './galaxies.js';
 import { SKINS } from './skins.js';
-import { RARITY, RATES, drawPack } from './collection.js';
+import { RARITY, RATES, TIERS, drawPack } from './collection.js';
 
-// Stardust shop: a standard and a shiny card pack for every biome. Opens on the current
-// galaxy's biomes, with tabs for any other galaxy you've unlocked.
+// Stardust shop: three card packs for every biome, each with better odds than the last.
+// Opens on the current galaxy's biomes, with tabs for the other galaxies.
 
 export const PACKS = {
-  standard: { name: 'Card pack', cost: 25 },
-  premium: { name: 'Shiny pack', cost: 75 },
+  standard: { name: 'Card pack', icon: '🃏', cost: 25 },
+  premium: { name: 'Shiny pack', icon: '💎', cost: 75 },
+  prism: { name: 'Prism pack', icon: '🔮', cost: 150 },
 };
+const BUY_CLASS = { standard: '', premium: 'shiny', prism: 'prism' };
 
 
 const $ = (id) => document.getElementById(id);
@@ -31,6 +33,17 @@ export function galaxyTabs(save, active, current) {
     const here = g === current;
     return `<button role="tab" data-action="tab" data-id="${g}" class="${g === active ? 'active' : ''} ${here ? 'is-here' : ''}" aria-selected="${g === active}"${here ? ' title="The galaxy you\'re in"' : ''}>${def.emoji} ${def.name}${here ? ' <small class="here">(here)</small>' : ''}</button>`;
   }).join('')}</div>`;
+}
+
+// the chance of each rarity per card, for every pack, plus what each pack guarantees
+function oddsTable() {
+  const head = TIERS.map((t) => `<th><span class="tier t-${t}"></span><span class="long">${RARITY[t][0].toUpperCase()}${RARITY[t].slice(1)}</span><span class="short">${t.toUpperCase()}</span></th>`).join('');
+  const rows = Object.entries(PACKS).map(([type, pk]) => {
+    const r = RATES[type];
+    return `<tr><td>${pk.icon} ${pk.name} <small>✨${pk.cost}</small></td>${TIERS.map((t) => `<td>${r[t] ? pct(r[t]) : '–'}</td>`).join('')}<td>${RARITY[r.floor]}+</td></tr>`;
+  }).join('');
+  return `<details class="odds"><summary>Pack odds</summary>
+    <table><thead><tr><th>Pack</th>${head}<th>1 card at least</th></tr></thead><tbody>${rows}</tbody></table></details>`;
 }
 
 export class Shop {
@@ -71,10 +84,10 @@ export class Shop {
   render() {
     $('shop-dust').textContent = this.save.stardust;
     const dust = this.save.stardust;
-    const s = RATES.standard, p = RATES.premium;
     $('shop-body').innerHTML = `
-      <p class="shop-note">Every pack holds <b>3 cards</b> from one biome's collection.
-      Card pack: ${pct(s.l)} legendary · ${pct(s.r)} rare. <span class="shiny-text">Shiny pack</span>: ${pct(p.l)} legendary · ${pct(p.r)} rare · always at least one rare.</p>
+      <p class="shop-note">Every pack holds <b>3 cards</b> from one biome's collection. Bigger packs have better odds,
+      and each one promises at least one card of a certain rarity.</p>
+      ${oddsTable()}
       ${galaxyTabs(this.save, this.tab, this.currentGalaxy())}
       <div class="pack-list">${GALAXIES[this.tab].biomes.map((b) => {
         const def = BIOMES[b];
@@ -82,8 +95,7 @@ export class Shop {
         return `<div class="pack-row">
           <span class="pack-icon">${SKINS[def.creature].emoji}</span>
           <div class="pack-name"><b>${def.name}</b><small>${found}/${def.finds.length} found</small></div>
-          <button class="buy" data-action="pack" data-id="${b}" data-type="standard" ${dust < PACKS.standard.cost ? 'disabled' : ''}>🃏 ✨${PACKS.standard.cost}</button>
-          <button class="buy shiny" data-action="pack" data-id="${b}" data-type="premium" ${dust < PACKS.premium.cost ? 'disabled' : ''}>💎 ✨${PACKS.premium.cost}</button>
+          ${Object.entries(PACKS).map(([type, pk]) => `<button class="buy ${BUY_CLASS[type]}" data-action="pack" data-id="${b}" data-type="${type}" title="${pk.name}" aria-label="${pk.name} for ${def.name}, ${pk.cost} stardust" ${dust < pk.cost ? 'disabled' : ''}>${pk.icon} ✨${pk.cost}</button>`).join('')}
         </div>`;
       }).join('')}</div>`;
   }

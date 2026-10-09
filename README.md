@@ -49,10 +49,17 @@ Each planet gets a randomly generated name and layout, seeded from the date and 
 
 ### Stardust, finds and the shop
 - **Stardust** ✨ is scattered in little trails across every planet. Roll over it to collect it.
-- **Finds** are collectibles: 8 per biome (80 in Wildbloom, 40 each in Citylight and Skyhaven). Each one is *common*, *rare* or *legendary*. You can roll one by clearing a spot, and they all live in your **Collection** book, which has a tab per galaxy.
-- The **Shop** sells card packs for each biome. It opens on your current galaxy, with a tab for every galaxy: unlocked ones let you buy their packs without travelling, and locked ones show greyed out with their unlock progress. Every pack holds 3 cards from that biome's collection:
-  - **Card pack** (✨25): 5% legendary, 25% rare.
-  - **Shiny pack** (✨75): 15% legendary, 50% rare, and always at least one rare.
+- **Finds** are collectibles: 8 per biome (80 in Wildbloom, 40 each in Citylight and Skyhaven). Each biome has 3 *common*, 2 *uncommon*, 1 *rare*, 1 *epic* and 1 *legendary* find. You roll one every time you clear a spot, and they all live in your **Collection** book, which has a tab per galaxy.
+- The **Shop** sells three card packs for each biome. It opens on your current galaxy, with a tab for every galaxy: unlocked ones let you buy their packs without travelling, and locked ones show greyed out with their unlock progress. Every pack holds 3 cards from that biome's collection, and promises at least one card of a certain rarity:
+
+| | Common | Uncommon | Rare | Epic | Legendary | Guarantee |
+| --- | --- | --- | --- | --- | --- | --- |
+| Clearing a spot | 52% | 27% | 13% | 6% | 2% | – |
+| 🃏 Card pack (✨25) | 52% | 27% | 13% | 6% | 2% | 1 uncommon or better |
+| 💎 Shiny pack (✨75) | 15% | 30% | 30% | 18% | 7% | 1 rare or better |
+| 🔮 Prism pack (✨150) | – | 14% | 38% | 32% | 16% | 1 epic or better |
+
+  Percentages are the chance per card. Bigger packs are slightly better value: a legendary costs roughly ✨390 in Card packs, ✨365 in Shiny packs and ✨330 in Prism packs (one planet gives about ✨210). The shop's **Pack odds** panel shows the same table.
 
 ### Skins
 You start as the classic water blob. Each creature you wake becomes a skin with its own body colour and accessories: ears, shells, spines, antennae and more. All the features tumble with the blob as it rolls.
@@ -87,7 +94,7 @@ Pick a galaxy on the title screen to start, or press `Enter` to jump back into t
 - **Graphics:** *Auto* (default), *Smooth* or *Pretty*. See [Performance](#performance) below.
 - **Touch controls** (touch devices only): *Tap sides* or *Joystick*.
 - **Turning sensitivity:** a slider from 40% to 160% that scales how fast the blob turns.
-- **Colorblind mode:** swaps meaningful colours to a blue/orange palette that stays distinct for protanopia, deuteranopia and tritanopia. It adds ✓ badges on finished biomes, a pulse on nearly-finished ones and ◆/★ markers on rare/legendary finds, so nothing relies on colour alone. It also raises secondary text contrast above the WCAG AA guideline of 4.5:1.
+- **Colorblind mode:** swaps meaningful colours to a blue/orange palette that stays distinct for protanopia, deuteranopia and tritanopia. It adds ✓ badges on finished biomes, a pulse on nearly-finished ones and ●/◆/▲/★ markers on uncommon/rare/epic/legendary finds, so nothing relies on colour alone. It also raises secondary text contrast above the WCAG AA guideline of 4.5:1.
 - **Reset all progress:** wipes skins, finds, stardust and the current planet (asks you to confirm).
 
 ---

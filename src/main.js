@@ -772,9 +772,17 @@ function rollFind(biomeId, dir) {
   sound.discovery(rarity, isNew);
   findCard(emoji, name, rarity, isNew, count);
   if (isNew) {
-    const colors = rarity === 'l' ? [GOLD, WHITE, PINK] : rarity === 'r' ? [new THREE.Color(0x8ad8ff), WHITE] : [WHITE];
-    particles.burst(surfacePoint(dir, 0.6), dir, colors, rarity === 'l' ? 120 : 30, rarity === 'l' ? 9 : 5, 0.5, 1.4);
+    const colors = {
+      c: [WHITE],
+      u: [new THREE.Color(0x8ff0cc), WHITE],
+      r: [new THREE.Color(0x8ad8ff), WHITE],
+      e: [new THREE.Color(0xc8a0ff), new THREE.Color(0xffc4e8), WHITE],
+      l: [GOLD, WHITE, PINK],
+    }[rarity];
+    const size = { c: [30, 5], u: [36, 5], r: [50, 6], e: [85, 8], l: [120, 9] }[rarity];
+    particles.burst(surfacePoint(dir, 0.6), dir, colors, size[0], size[1], 0.5, 1.4);
     if (rarity === 'l') { hitstop = 0.08; shake = 0.2; }
+    if (rarity === 'e') shake = 0.1;
     $('book-btn').classList.remove('bump');
     void $('book-btn').offsetWidth;
     $('book-btn').classList.add('bump');

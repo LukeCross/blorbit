@@ -34,7 +34,9 @@
         --c-progress: var(--mint-deep);
         --c-done: var(--butter-deep);
         --c-near: var(--pink-deep);
+        --c-uncommon: rgba(95,211,176,0.75);
         --c-rare: rgba(124,196,245,0.7);
+        --c-epic: rgba(168,124,245,0.8);
         --c-legend: rgba(245,201,74,0.9);
 
         --glass: rgba(255, 255, 255, 0.52);
@@ -259,6 +261,8 @@
       .find b { display: block; font: 600 16px var(--font-display); }
       .find small { font-size: 12px; color: var(--ink-soft); text-transform: capitalize; font-weight: 800; }
       .find.new .find-emoji { background: var(--accent); }
+      .find.new.u .find-emoji { background: linear-gradient(135deg, #e0fff4, #a8f0d8); box-shadow: 0 0 14px rgba(95,211,176,0.6); }
+      .find.new.e .find-emoji { background: linear-gradient(135deg, #f0e6ff, #c8a8ff); box-shadow: 0 0 22px rgba(168,124,245,0.8); animation: pop 0.6s 0.2s cubic-bezier(.3,1.8,.5,1); }
       .find.new.r .find-emoji { background: linear-gradient(135deg, #d8f1ff, #9fd5ff); box-shadow: 0 0 18px rgba(124,196,245,0.7); }
       .find.new.l .find-emoji { background: var(--accent-warm); box-shadow: 0 0 26px rgba(245,201,74,0.9); animation: pop 0.6s 0.2s cubic-bezier(.3,1.8,.5,1) 2; }
 
@@ -340,13 +344,28 @@
       .book-head em { color: var(--ink-faint); font-style: normal; font-size: 13px; margin-left: auto; font-weight: 800; }
       .slots { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
       .slot { position: relative; aspect-ratio: 1; border-radius: 16px; display: grid; place-items: center; font-size: 28px; background: #fff; box-shadow: var(--shadow-sm); border: 2px solid transparent; }
+      .slot.u { border-color: var(--c-uncommon); background: linear-gradient(160deg, #fff, #e4fbf3); }
       .slot.r { border-color: var(--c-rare); background: linear-gradient(160deg, #fff, #e3f3ff); }
+      .slot.e { border-color: var(--c-epic); background: linear-gradient(160deg, #fff, #efe6ff); }
       .slot.l { border-color: var(--c-legend); background: linear-gradient(160deg, #fffaf0, #fff0c4); }
       .slot.locked { font-size: 15px; background: rgba(255,255,255,0.35); box-shadow: none; color: var(--ink-faint); }
       .slot i { position: absolute; right: 5px; bottom: 3px; font-size: 10px; font-style: normal; font-weight: 900; color: var(--ink-soft); }
 
       /* shop */
-      .shop-note { font-size: 13px; color: var(--ink-soft); margin: 14px 0 16px; line-height: 1.6; }
+      .shop-note { font-size: 13px; color: var(--ink-soft); margin: 14px 0 10px; line-height: 1.6; }
+      /* pack odds table (collapsible) */
+      .odds { margin: 0 0 14px; font-size: 13px; color: var(--ink-soft); }
+      .odds summary { cursor: pointer; font-weight: 800; color: var(--ink); width: max-content; }
+      .odds table { width: 100%; margin-top: 8px; border-collapse: separate; border-spacing: 0 4px; font-variant-numeric: tabular-nums; }
+      .odds th, .odds td { padding: 5px 6px; text-align: center; white-space: nowrap; }
+      .odds th:first-child, .odds td:first-child { text-align: left; }
+      .odds tbody tr { background: rgba(255,255,255,0.7); }
+      .odds tbody td:first-child { border-radius: 10px 0 0 10px; font-weight: 800; color: var(--ink); }
+      .odds tbody td:last-child { border-radius: 0 10px 10px 0; }
+      .odds .tier { display: inline-block; width: 9px; height: 9px; margin-right: 4px; border-radius: 50%; vertical-align: middle; }
+      .odds .short { display: none; }
+      .odds td small { font-weight: 700; color: var(--ink-soft); }
+      .odds .t-c { background: #d8d4e4; } .odds .t-u { background: var(--c-uncommon); } .odds .t-r { background: var(--c-rare); } .odds .t-e { background: var(--c-epic); } .odds .t-l { background: var(--c-legend); }
       .shiny-text { background: linear-gradient(90deg, #ff8fc4, #e8a91c, #5fb8e8); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 900; }
       .pack-list { display: flex; flex-direction: column; gap: 8px; }
       .pack-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--r); background: rgba(255,255,255,0.7); box-shadow: var(--shadow-sm); }
@@ -361,6 +380,7 @@
       }
       .buy:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(120,100,220,0.28), var(--highlight); }
       .buy:disabled { opacity: 0.4; cursor: default; }
+      .buy.prism { background: linear-gradient(135deg, #e6d8ff, #c8a8ff 45%, #ffc4e1); box-shadow: 0 6px 16px rgba(168,124,245,0.4), var(--highlight); }
       .buy.shiny { background: linear-gradient(120deg, #ffc4e1, #ffeaa6 25%, #bff0dc 50%, #c9c0ff 75%, #ffc4e1); background-size: 200% 100%; animation: shimmer 3s linear infinite; }
 
       /* settings */
@@ -393,7 +413,9 @@
         --c-progress: #3a8fd6;
         --c-done: #e58a00;
         --c-near: #c4579b;
+        --c-uncommon: #2a9d7c;
         --c-rare: #3a8fd6;
+        --c-epic: #b25a9a;
         --c-legend: #e58a00;
         --ink-soft: rgba(61, 53, 96, 0.82);
         --ink-faint: rgba(61, 53, 96, 0.6);
@@ -404,7 +426,9 @@
       }
       body.cb .world-ring.near svg { animation: near-pulse 0.9s ease-in-out infinite; }
       @keyframes near-pulse { 50% { transform: rotate(-90deg) scale(1.12); } }
-      body.cb .slot.r::before, body.cb .slot.l::before { position: absolute; left: 5px; top: 3px; font-size: 11px; line-height: 1; }
+      body.cb .slot.u::before, body.cb .slot.r::before, body.cb .slot.e::before, body.cb .slot.l::before { position: absolute; left: 5px; top: 3px; font-size: 11px; line-height: 1; }
+      body.cb .slot.u::before { content: '●'; color: var(--c-uncommon); font-size: 12px; }
+      body.cb .slot.e::before { content: '▲'; color: var(--c-epic); font-size: 12px; }
       body.cb .slot.r::before { content: '◆'; color: var(--c-rare); font-size: 14px; }
       body.cb .slot.l::before { content: '★'; color: var(--c-legend); font-size: 13px; }
       .danger-zone { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: var(--r); background: rgba(255, 196, 210, 0.35); border: 1px solid rgba(255, 143, 170, 0.45); }
@@ -425,6 +449,7 @@
         background: linear-gradient(160deg, #c3f7e5, #c9bcff); border: 2px solid rgba(255,255,255,0.9);
         box-shadow: var(--shadow-lg), inset 0 0 0 6px rgba(255,255,255,0.35); animation: bob 2.4s ease-in-out infinite;
       }
+      .pack-box.prism { background: linear-gradient(150deg, #efe4ff, #c8a8ff 50%, #ffc8e6); box-shadow: 0 0 70px rgba(168,124,245,0.85), var(--shadow-lg), inset 0 0 0 6px rgba(255,255,255,0.5); }
       .pack-box.premium { background: var(--iridescent); box-shadow: 0 0 60px rgba(255, 220, 140, 0.8), var(--shadow-lg), inset 0 0 0 6px rgba(255,255,255,0.5); }
       .pack-box .pack-emoji { font-size: 84px; filter: drop-shadow(0 8px 10px rgba(90,70,160,0.25)); }
       .pack-box b { font: 600 21px var(--font-display); }
@@ -441,6 +466,9 @@
       .card-back, .card-front { position: absolute; inset: 0; border-radius: 22px; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.95); }
       .card-back { background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.6), transparent 60%), linear-gradient(160deg, #c9bcff, #ffc4e1); box-shadow: var(--shadow-lg); font-size: 46px; color: #fff; text-shadow: 0 4px 12px rgba(120,100,220,0.4); }
       .card-front { transform: rotateY(180deg); background: linear-gradient(170deg, #ffffff, #efeaff); gap: 6px; box-shadow: var(--shadow-lg); overflow: hidden; }
+      .card.u .card-front { background: linear-gradient(170deg, #ffffff, #d4f7ea); box-shadow: 0 0 26px rgba(95,211,176,0.6), var(--shadow-lg); }
+      .card.e .card-front { background: linear-gradient(170deg, #ffffff, #e2d2ff); box-shadow: 0 0 46px rgba(168,124,245,0.9), var(--shadow-lg); }
+      .card.flipped.e { animation: legend 0.6s 0.3s ease-out; }
       .card.r .card-front { background: linear-gradient(170deg, #ffffff, #cfe9ff); box-shadow: 0 0 36px rgba(124,196,245,0.75), var(--shadow-lg); }
       .card.l .card-front { background: linear-gradient(170deg, #fffdf2, #ffe08a); box-shadow: 0 0 56px rgba(245,201,74,0.95), var(--shadow-lg); }
       .card.l.flipped .card-front::after { content: ''; position: absolute; inset: -50%; background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.85) 50%, transparent 60%); animation: sweep 1.6s ease-in-out infinite; }
@@ -525,6 +553,10 @@
         .pack-row { flex-wrap: wrap; gap: 8px 10px; }
         .pack-name { flex: 1 1 calc(100% - 60px); }
         .pack-row .buy { flex: 1; }
+        .odds { font-size: 11.5px; }
+        .odds th, .odds td { padding: 5px 3px; }
+        .odds .long, .odds td small { display: none; }
+        .odds .short { display: inline; }
         .slots { grid-template-columns: repeat(4, 1fr); gap: 6px; }
         .slot { font-size: 24px; border-radius: 14px; }
         .stats { gap: 8px; margin: 14px 0; }

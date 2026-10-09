@@ -374,10 +374,18 @@ export class Sound {
       this.tone({ type: 'triangle', f: midi(95), t: t + 0.06, dur: 0.3, vol: 0.05, verb: 0.5 });
       return;
     }
-    const notes = rarity === 'l' ? [72, 76, 79, 84, 88, 91, 96, 100] : rarity === 'r' ? [76, 79, 84, 88, 91] : [79, 84, 88];
+    // each rarer tier climbs a little longer and rings a little louder
+    const notes = {
+      c: [79, 84, 88],
+      u: [79, 84, 88, 91],
+      r: [76, 79, 84, 88, 91],
+      e: [74, 79, 83, 86, 91, 95],
+      l: [72, 76, 79, 84, 88, 91, 96, 100],
+    }[rarity];
+    const big = rarity === 'e' || rarity === 'l';
     notes.forEach((n, i) => this.tone({ type: 'triangle', f: midi(n), t: t + i * 0.06, dur: 0.8, vol: 0.08, verb: 0.7 }));
-    this.bell(midi(notes[notes.length - 1]), t + notes.length * 0.06, rarity === 'l' ? 0.22 : 0.12, 2.5);
-    if (rarity === 'l') this.bell(midi(notes[notes.length - 1] - 5), t + notes.length * 0.06 + 0.12, 0.2, 3);
+    this.bell(midi(notes[notes.length - 1]), t + notes.length * 0.06, rarity === 'l' ? 0.22 : big ? 0.17 : 0.12, 2.5);
+    if (big) this.bell(midi(notes[notes.length - 1] - 5), t + notes.length * 0.06 + 0.12, rarity === 'l' ? 0.2 : 0.13, 3);
   }
 
   purchase() {

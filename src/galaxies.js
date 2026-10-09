@@ -72,7 +72,7 @@ for (const g of GALAXY_IDS) {
   for (const b of GALAXIES[g].biomes) {
     if (!BIOMES[b]) throw new Error(`galaxy ${g}: unknown biome ${b}`);
     if (GALAXY_IDS.filter((o) => GALAXIES[o].biomes.includes(b)).length > 1) throw new Error(`biome ${b} is in more than one galaxy`);
-    for (const r of ['c', 'r', 'l']) if (!BIOMES[b].finds.some((f) => f[2] === r)) throw new Error(`biome ${b} needs at least one ${r} find`);
+    for (const r of ['c', 'u', 'r', 'e', 'l']) if (!BIOMES[b].finds.some((f) => f[2] === r)) throw new Error(`biome ${b} needs at least one ${r} find`);
   }
 }
 for (const b of Object.keys(BIOMES)) if (!galaxyOfBiome(b)) throw new Error(`biome ${b} isn't in any galaxy`);

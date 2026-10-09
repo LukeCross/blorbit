@@ -3,20 +3,36 @@ import { GALAXIES } from './galaxies.js';
 
 // Shared logic for rolling collectibles, whether from a restored patch or a card pack.
 
-export const RARITY = { c: 'common', r: 'rare', l: 'legendary' };
+// rarity tiers, lowest first
+export const TIERS = ['c', 'u', 'r', 'e', 'l'];
+export const RARITY = { c: 'common', u: 'uncommon', r: 'rare', e: 'epic', l: 'legendary' };
+const rank = (t) => TIERS.indexOf(t);
+
+// Chance of each tier per card. With 3 common, 2 uncommon and 1 each of rare, epic and legendary
+// per biome, each individual find gets steadily harder: ~17% / 13.5% / 13% / 6% / 2% from a spot.
+// `floor`: one card in the pack is at least this tier.
 export const RATES = {
-  patch: { l: 0.05, r: 0.25 },
-  standard: { l: 0.05, r: 0.25 },
-  premium: { l: 0.15, r: 0.5 },
+  patch: { c: 0.52, u: 0.27, r: 0.13, e: 0.06, l: 0.02 },
+  standard: { c: 0.52, u: 0.27, r: 0.13, e: 0.06, l: 0.02, floor: 'u' },
+  premium: { c: 0.15, u: 0.3, r: 0.3, e: 0.18, l: 0.07, floor: 'r' },
+  prism: { c: 0, u: 0.14, r: 0.38, e: 0.32, l: 0.16, floor: 'e' },
 };
+
 export const TOTAL_FINDS = BIOME_IDS.reduce((n, b) => n + BIOMES[b].finds.length, 0);
 export const totalFindsIn = (g) => GALAXIES[g].biomes.reduce((n, b) => n + BIOMES[b].finds.length, 0);
 
+// roll a tier, re-weighted to only the tiers at or above `min`
+function rollTier(rates, min = 'c') {
+  const allowed = TIERS.filter((t) => rank(t) >= rank(min) && rates[t] > 0);
+  const total = allowed.reduce((s, t) => s + rates[t], 0);
+  let x = Math.random() * total;
+  for (const t of allowed) if ((x -= rates[t]) < 0) return t;
+  return allowed[allowed.length - 1];
+}
+
 // Rolls one find, records it in the save, and returns what was drawn.
-export function drawFind(save, biomeId, rates, minRarity = 'c') {
-  const roll = Math.random();
-  let rarity = roll < rates.l ? 'l' : roll < rates.l + rates.r ? 'r' : 'c';
-  if (minRarity === 'r' && rarity === 'c') rarity = 'r';
+export function drawFind(save, biomeId, rates, min = 'c') {
+  const rarity = rollTier(rates, min);
   const pool = BIOMES[biomeId].finds.filter((f) => f[2] === rarity);
   const [emoji, name] = pool[Math.floor(Math.random() * pool.length)];
   const key = `${biomeId}:${name}`;
@@ -25,12 +41,14 @@ export function drawFind(save, biomeId, rates, minRarity = 'c') {
   return { biomeId, emoji, name, rarity, isNew, count: save.finds[key] };
 }
 
-// Three cards. Shiny packs guarantee at least one rare or better.
+// Three cards. If none of the first two reach the pack's floor tier, the third one is lifted to it,
+// so every pack keeps its promise without making the floor tier any more common than it needs to be.
 export function drawPack(save, biomeId, type) {
   const rates = RATES[type];
   const cards = [drawFind(save, biomeId, rates), drawFind(save, biomeId, rates)];
-  const needRare = type === 'premium' && cards.every((c) => c.rarity === 'c');
-  cards.push(drawFind(save, biomeId, rates, needRare ? 'r' : 'c'));
+  const floor = rates.floor ?? 'c';
+  const met = cards.some((c) => rank(c.rarity) >= rank(floor));
+  cards.push(drawFind(save, biomeId, rates, met ? 'c' : floor));
   return cards;
 }
 
