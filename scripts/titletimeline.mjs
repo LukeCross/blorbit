@@ -21,12 +21,16 @@ for (let i = 0; i < 160; i++) {
   await new Promise((r) => setTimeout(r, 250));
   const s = await page.evaluate(() => {
     const vis = (sel) => { const e = document.querySelector(sel); return !!e && getComputedStyle(e).display !== 'none' && !!e.offsetParent; };
-    const hints = `${vis('.controls.keys-only') ? 'DESKTOP' : ''}${vis('.controls.touch-only') ? 'TOUCH' : ''}` || 'none';
-    const btn = document.getElementById('start-btn');
-    const ready = !!document.querySelector('#title-galaxies .galaxy-card') && !document.getElementById('title-galaxies').classList.contains('hidden');
-    return `${hints} hints, ${ready ? 'galaxy picker ready' : `button "${btn?.textContent}"${btn?.disabled ? ' (disabled)' : ''}`}`;
+    // what the player can actually see: the rolling-blob loader, or the title (and which hints it shows)
+    const loader = document.getElementById('loader');
+    const loaderUp = !!loader && getComputedStyle(loader).visibility !== 'hidden' && getComputedStyle(loader).opacity !== '0';
+    const titleEl = document.getElementById('title');
+    const titleSeen = !!titleEl && getComputedStyle(titleEl).visibility !== 'hidden';
+    const hints = titleSeen ? (`${vis('.controls.keys-only') ? 'DESKTOP' : ''}${vis('.controls.touch-only') ? 'TOUCH' : ''}` || 'no') : 'no';
+    const cards = titleSeen ? document.querySelectorAll('#title-galaxies .galaxy-card').length : 0;
+    return `${loaderUp ? 'LOADER' : 'no loader'} | title ${titleSeen ? 'visible' : 'hidden'} | ${hints} hints | ${cards} galaxy cards`;
   }).catch(() => 'loading');
-  if (seen.at(-1)?.s !== s) { seen.push({ t: Date.now() - t0, s }); if (s.startsWith('DESKTOP')) await page.screenshot({ path: '/tmp/title-early.png' }); }
+  if (seen.at(-1)?.s !== s) { seen.push({ t: Date.now() - t0, s }); if (s.includes('title visible')) await page.screenshot({ path: '/tmp/title-early.png' }); }
 }
 console.log(seen.map((x) => `${(x.t / 1000).toFixed(1)}s ${x.s}`).join('  →  '));
 await browser.close();

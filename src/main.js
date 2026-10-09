@@ -682,7 +682,6 @@ function galaxyCards(mode) {
 }
 let titleReady = false;
 function showTitleGalaxies() {
-  $('start-btn').classList.add('hidden');
   $('title-choose').classList.remove('hidden');
   $('title-galaxies').classList.remove('hidden');
   $('title-galaxies').innerHTML = galaxyCards('title');
@@ -1323,12 +1322,32 @@ function frame() {
 }
 frame();
 
-// everything's loaded: swap the loading button for the galaxy picker
+// everything's loaded: show the galaxy picker, then swap the loading screen for it
 checkSkins();
 document.body.classList.add('on-title');
 showTitleGalaxies();
 titleReady = true;
 refreshGalaxyBadge();
+reveal();
+
+// Hide the rolling-blob loader and show the game. Waits for the web fonts (so the title doesn't
+// jump in size as they swap in) and for a couple of drawn frames, and keeps the blob up for at
+// least a moment so a fast load doesn't just flash it.
+async function reveal() {
+  const MIN_SHOWN = 700; // ms since the page started
+  const fonts = document.fonts?.ready ?? Promise.resolve();
+  await Promise.race([fonts, new Promise((r) => setTimeout(r, 2000))]);
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  const wait = MIN_SHOWN - performance.now();
+  if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+  document.body.classList.remove('booting');
+  document.body.classList.add('revealing');
+  $('loader').classList.add('out');
+  setTimeout(() => {
+    $('loader').remove();
+    document.body.classList.remove('revealing');
+  }, 700);
+}
 
 // handy for debugging from the console
 refreshDust();
