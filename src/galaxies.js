@@ -56,6 +56,7 @@ export function unlockProgress(save, g) {
 
 export function isGalaxyUnlocked(save, g) {
   if (!GALAXIES[g].unlockedBy) return true;
+  if (save.adUnlocked?.includes(g)) return true; // unlocked by watching a video
   const [done, need] = unlockProgress(save, g);
   return done >= need;
 }

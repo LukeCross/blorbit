@@ -20,6 +20,7 @@ import { Critters } from './critters.js';
 import { Stardust } from './stardust.js';
 import { RARITY, RATES, TOTAL_FINDS, drawFind, foundCount, foundIn, totalFindsIn } from './collection.js';
 import { Shop, galaxyTabs } from './shop.js';
+import { RewardedAds } from './ads.js';
 import { planetName, timeSeed } from './names.js';
 
 // ---------------------------------------------------------------- save data
@@ -350,7 +351,7 @@ window.addEventListener('keydown', (e) => {
   if (e.code === 'KeyB') toggleBook();
   if (e.code === 'KeyP') shop.toggle();
   if (e.code === 'KeyN') $('new-planet').click();
-  if (e.code === 'Escape') { shop.close(); $('book').classList.add('hidden'); $('galaxies').classList.add('hidden'); closeSettings(); }
+  if (e.code === 'Escape') { shop.closeOffer(); shop.close(); $('book').classList.add('hidden'); $('galaxies').classList.add('hidden'); closeSettings(); }
   if (e.code === 'Minus' || e.code === 'NumpadSubtract') equip('classic');
   const digit = /^(?:Digit|Numpad)(\d)$/.exec(e.code);
   if (digit) equip(hereCreatures()[(Number(digit[1]) + 9) % 10]);
@@ -464,6 +465,7 @@ $('autoroll').addEventListener('click', toggleAutoRoll);
 
 function start() {
   if (state !== 'title') return;
+  document.body.classList.remove('on-title');
   sound.start();
   state = 'play';
   $('title').classList.add('hidden');
@@ -646,6 +648,7 @@ function backToMenu() {
   held.clear();
   Object.keys(keys).forEach((k) => (keys[k] = false));
   state = 'title';
+  document.body.classList.add('on-title');
   showTitleGalaxies();
   $('title').classList.remove('hidden');
 }
@@ -668,9 +671,13 @@ function galaxyCards(mode) {
       const label = isHere ? 'You are here' : mode === 'title' && hasSavedPlanet(g) ? 'Continue' : mode === 'title' ? 'Play' : 'Travel here';
       foot = `<div class="meta"><span>🐾 ${woke}/${total} friends</span><span>📖 ${foundIn(save, g)}/${totalFindsIn(g)} finds</span><span>🪐 ${save.restoredIn[g] || 0} restored</span></div><div class="go">${label}</div>`;
     }
-    return `<button class="galaxy-card ${isHere ? 'here' : ''}" data-g="${g}" ${open ? '' : 'disabled'} style="--a:${def.art[0]};--b:${def.art[1]}">
-      ${isNew ? '<span class="badge">NEW</span>' : ''}${open ? '' : '<span class="badge locked">LOCKED</span><span class="padlock" aria-hidden="true">🔒</span>'}
-      <div class="art"><span>${def.emoji}</span></div><b>${def.name}</b><p>${def.blurb}</p>${foot}</button>`;
+    const inner = `<div class="art"><span>${def.emoji}</span></div><b>${def.name}</b><p>${def.blurb}</p>${foot}`;
+    const style = `style="--a:${def.art[0]};--b:${def.art[1]}"`;
+    if (open) return `<button class="galaxy-card ${isHere ? 'here' : ''}" data-g="${g}" ${style}>${isNew ? '<span class="badge">NEW</span>' : ''}${inner}</button>`;
+    // locked: a plain card (it can't be a button, since it holds one) with an optional video unlock
+    const video = ads.enabled && ads.supported ? `<button class="unlock-video" data-unlock="${g}">🎬 Watch a video to unlock</button>` : '';
+    return `<div class="galaxy-card locked" data-g="${g}" role="group" aria-label="${def.name} (locked)" ${style}>
+      <span class="badge locked">LOCKED</span><span class="padlock" aria-hidden="true">🔒</span>${inner}${video}</div>`;
   }).join('');
 }
 let titleReady = false;
@@ -681,7 +688,9 @@ function showTitleGalaxies() {
   $('title-galaxies').innerHTML = galaxyCards('title');
 }
 $('title-galaxies').addEventListener('click', (e) => {
-  const g = e.target.closest('.galaxy-card:not(:disabled)')?.dataset.g;
+  const unlock = e.target.closest('[data-unlock]')?.dataset.unlock;
+  if (unlock) return offerGalaxyUnlock(unlock);
+  const g = e.target.closest('.galaxy-card:not(.locked)')?.dataset.g;
   if (g) enterGalaxy(g);
 });
 function toggleGalaxies() {
@@ -691,13 +700,38 @@ function toggleGalaxies() {
   el.classList.remove('hidden');
 }
 $('galaxy-list').addEventListener('click', (e) => {
-  const g = e.target.closest('.galaxy-card:not(:disabled)')?.dataset.g;
+  const unlock = e.target.closest('[data-unlock]')?.dataset.unlock;
+  if (unlock) return offerGalaxyUnlock(unlock);
+  const g = e.target.closest('.galaxy-card:not(.locked)')?.dataset.g;
   if (!g) return;
   $('galaxies').classList.add('hidden');
   if (g !== planet.galaxy) travelTo(g, () => (state = 'play'));
 });
 $('galaxy-btn').addEventListener('click', toggleGalaxies);
 $('galaxies-close').addEventListener('click', toggleGalaxies);
+// Watch a rewarded video to unlock a galaxy for good, instead of waking its friends first.
+function offerGalaxyUnlock(g) {
+  const def = GALAXIES[g];
+  const [d, need, total] = unlockProgress(save, g);
+  shop.offerVideo({
+    title: `Unlock ${def.name}?`,
+    body: `<p>Watch a short video to unlock the <b>${def.emoji} ${def.name}</b> galaxy for good: its planets, creatures, finds and packs.</p>
+      <p class="offer-odds">Or keep playing: it unlocks for free once you've woken ${need} of the ${total} ${GALAXIES[def.unlockedBy].name} friends (${d}/${need} so far).</p>`,
+    starting: `${def.name} unlocks as soon as it finishes.`,
+    missed: `${def.name} is still locked`,
+    onReward: () => unlockGalaxyByVideo(g),
+  });
+}
+function unlockGalaxyByVideo(g) {
+  if (isGalaxyUnlocked(save, g)) return;
+  (save.adUnlocked ??= []).push(g);
+  persist();
+  announceGalaxy(g);
+  // refresh whichever galaxy list is on screen
+  if (state === 'title') showTitleGalaxies();
+  if (!$('galaxies').classList.contains('hidden')) $('galaxy-list').innerHTML = galaxyCards('travel');
+}
+
 // a dot on the galaxy button while there's an unlocked galaxy you haven't visited
 function refreshGalaxyBadge() {
   $('galaxy-btn').classList.toggle('new', unlockedGalaxies().some((g) => !save.seenGalaxies.includes(g)));
@@ -827,6 +861,8 @@ function openSettings() {
     if (b.dataset.q === 'auto') b.textContent = `Auto (${quality.tier === 'smooth' ? 'Smooth' : 'Pretty'})`;
   });
   $('touch-picker').querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.dataset.c === save.touchControls));
+  syncConsentButton();
+  $('privacy-note').classList.add('hidden');
   showSensitivity();
   $('colorblind').classList.toggle('on', save.colorblind);
   $('colorblind').setAttribute('aria-checked', save.colorblind);
@@ -838,6 +874,21 @@ function showSensitivity() {
   el.style.setProperty('--fill', `${((save.sensitivity - el.min) / (el.max - el.min)) * 100}%`);
   $('sensitivity-value').textContent = `${Math.round(save.sensitivity * 100)}%`;
 }
+// review Google's consent choices: only offered to visitors covered by European or US state privacy
+// rules (Google's consent tool tells us which), and kept in step if that becomes known later
+const syncConsentButton = () => {
+  $('consent-btn').classList.toggle('hidden', !ads.consentApplies);
+  $('consent-text').classList.toggle('hidden', !ads.consentApplies);
+};
+$('consent-btn').addEventListener('click', async () => {
+  const note = $('privacy-note');
+  note.classList.add('hidden');
+  const ok = await ads.openConsentSettings();
+  if (ok) return closeSettings();
+  note.textContent = "Couldn't open the privacy settings. An ad blocker or privacy extension may be blocking Google's consent tool. If you're not seeing any ads, there's nothing to change.";
+  note.classList.remove('hidden');
+});
+
 $('touch-picker').addEventListener('click', (e) => {
   const c = e.target.closest('button')?.dataset.c;
   if (!c || c === save.touchControls) return;
@@ -894,8 +945,11 @@ $('reset-yes').addEventListener('click', () => {
 
 // ---------------------------------------------------------------- shop
 
+// rewarded videos for free Card packs (Google Ad Manager); off unless an ad unit is configured
+const ads = new RewardedAds({ onPause: () => sound.pauseForAd(true), onResume: () => sound.pauseForAd(false) });
+ads.onChange(syncConsentButton); // privacy rules for this visitor can become known after Settings first opens
 const shop = new Shop({
-  save, persist, sound,
+  save, persist, sound, ads,
   currentGalaxy: () => planet?.galaxy ?? save.galaxy,
   onCollection: updateBookCount,
   onDust: refreshDust,
@@ -1011,7 +1065,8 @@ function announceGalaxy(g) {
   galaxyToVisit = g;
   sound.fanfare();
   refreshGalaxyBadge();
-  toast(`${GALAXIES[g].emoji} New galaxy unlocked: ${GALAXIES[g].name}!<small>Tap ${GALAXIES[planet.galaxy].emoji} next to the planet name to travel there</small>`);
+  const how = state === 'title' ? 'Pick it below to play' : `Tap ${GALAXIES[planet.galaxy].emoji} next to the planet name to travel there`;
+  toast(`${GALAXIES[g].emoji} New galaxy unlocked: ${GALAXIES[g].name}!<small>${how}</small>`);
 }
 $('finale-galaxy').addEventListener('click', () => {
   $('finale').classList.add('hidden');
@@ -1270,10 +1325,11 @@ frame();
 
 // everything's loaded: swap the loading button for the galaxy picker
 checkSkins();
+document.body.classList.add('on-title');
 showTitleGalaxies();
 titleReady = true;
 refreshGalaxyBadge();
 
 // handy for debugging from the console
 refreshDust();
-window.blorbit = { shop, save, newPlanet, travelTo, enterGalaxy, planetKey, galaxyOf: galaxyOfBiome, CAM, camera, backdrop, planet: () => planet, rollFind, toggleBook, completeRegion, completePatch, blob, sound, keys };
+window.blorbit = { shop, ads, save, newPlanet, travelTo, enterGalaxy, planetKey, galaxyOf: galaxyOfBiome, CAM, camera, backdrop, planet: () => planet, rollFind, toggleBook, completeRegion, completePatch, blob, sound, keys };

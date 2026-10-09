@@ -20,6 +20,8 @@ When you boot the game you **choose your galaxy**. Each galaxy is its own set of
 - **🌆 Citylight:** 5 city biomes, 5 creatures and 40 finds. Abandoned grey streets light back up: windows glow, awnings unfurl and the traffic returns. It **unlocks once you've woken 8 of the 10 Wildbloom creatures** (80%).
 - **☁️ Skyhaven:** 5 sky-island biomes, 5 creatures and 40 finds. Grassy islands drift in a sea of cloud that's grey and stormy until you restore it, then soft and sunlit. It **unlocks once you've woken 4 of the 5 Citylight creatures** (80%).
 
+Can't wait? Every locked galaxy card also has **🎬 Watch a video to unlock**. Watch one short rewarded video to the end and that galaxy unlocks for good. Skipping leaves it locked, and you can try again any time.
+
 Travel between unlocked galaxies is **free**. Tap the galaxy icon next to the planet name or press `G`, or go **🏠 Menu** (top left, also on the planet-restored screen) to get back to the galaxy picker. Each galaxy keeps its own half-finished planet, so you can leave one and come back to it later. Your stardust, skins and collection are shared across every galaxy, so a cat can roll around Wildbloom.
 
 ### Biomes and spots
@@ -60,6 +62,9 @@ Each planet gets a randomly generated name and layout, seeded from the date and 
 | 🔮 Prism pack (✨150) | – | 14% | 38% | 32% | 16% | 1 epic or better |
 
   Percentages are the chance per card. Bigger packs are slightly better value: a legendary costs roughly ✨390 in Card packs, ✨365 in Shiny packs and ✨330 in Prism packs (one planet gives about ✨210). The shop's **Pack odds** panel shows the same table.
+
+### Free packs (and galaxies) from videos
+Each biome row in the shop has a **🎬 Free** button. Tapping it asks *"Free Card pack?"*, shows what you'll get and the odds, and plays a short rewarded video only if you choose **Watch video**. If you watch to the end, you get a free Card pack for that biome. If you skip, nothing happens and you can try again. There's no limit on how many you can watch. Videos come from Google Ad Manager (see [Rewarded video ads](#rewarded-video-ads-google-ad-manager) below).
 
 ### Skins
 You start as the classic water blob. Each creature you wake becomes a skin with its own body colour and accessories: ears, shells, spines, antennae and more. All the features tumble with the blob as it rolls.
@@ -119,6 +124,37 @@ To turn it on, open the repo's **Settings → Pages** and set **Source** to **Gi
 
 ---
 
+## Rewarded video ads (Google Ad Manager)
+
+The free-pack videos use **Google Ad Manager rewarded ads** through the Google Publisher Tag (GPT), in `src/ads.js`.
+
+- **Local dev** (`npm run dev`) always uses Google's public demo ad unit, which plays a short sample video, so the whole flow can be tested without an account.
+- **Production builds** only show ads when an ad unit is configured. Without one, GPT never loads and the 🎬 Free buttons are hidden.
+
+### Turning it on
+1. **Ad Manager:** in [Google Ad Manager](https://admanager.google.com), create a rewarded ad unit for the site (Inventory → Ad units) and set up demand for it, e.g. Google AdSense/Ad Exchange or your own line items. Copy the ad unit's path, which looks like `/1234567/blorbit_rewarded`.
+2. **ads.txt:** Ad Manager shows you the `ads.txt` line(s) to publish for your network.
+3. **GitHub:** in the repo, add two **repository variables** (Settings → Secrets and variables → Actions → Variables):
+   - `GAM_REWARDED_UNIT`: the ad unit path from step 1.
+   - `ADS_TXT`: the `ads.txt` line(s) from step 2. Separate several lines with `;`. The build publishes them as `/ads.txt` at the site root.
+4. **Deploy:** push to `main`, or run the workflow by hand. The build picks the variables up automatically.
+
+You can also build locally with them set, e.g. `VITE_GAM_REWARDED_UNIT=/1234567/blorbit_rewarded ADS_TXT="google.com, pub-…, DIRECT, f08c47fec0942fa0" npm run build`.
+
+### Things Google requires
+- **Opt-in and disclosure:** players must choose to watch, and must be told the reward first. The *"Free Card pack?"* prompt does this, including the pack odds (needed because the reward is random) and a clear **No thanks**. See the [policies for ad units that offer rewards](https://support.google.com/admanager/answer/7496282).
+- **Consent banner:** for visitors in the EEA, UK and Switzerland, Google requires a *Google-certified* consent tool (a CMP using the IAB's consent framework). A homemade banner doesn't qualify. The game is set up for Ad Manager's own certified tool, **Privacy & messaging**, which runs through the ad tag the game already loads:
+  1. In Ad Manager, go to **Privacy & messaging** and create a **European regulations** (GDPR) message for your site. Optionally add a **US states** message for "opt out of sale/sharing".
+  2. Publish them. Google then shows the right message to the right visitors, and the ad tag waits for their choice automatically.
+  3. **Settings → Privacy & cookie settings** lets players change their choices, which Google requires. It only appears for visitors covered by privacy rules, as reported by Google's tool:
+     - European visitors get the consent message again;
+     - visitors in US states with privacy laws get Google's "Do not sell or share" dialog;
+     - everyone else, or anyone whose ad blocker stops Google's tool, doesn't see the button, because there's nothing for them to change.
+
+     To test on your live site, add `?fc=alwaysshow&fctype=gdpr` (or `&fctype=ccpa`) to the address. To test the button logic locally, run `node scripts/consentcheck.mjs`.
+- **Privacy policy:** `privacy.html` is published at `/privacy.html` and linked from the title screen and Settings. Before going live, **replace `[YOUR NAME]` and `[YOUR EMAIL]`** in it; every build warns until you do. It's a plain-language starting point covering the save data, hosting, Google Fonts and Google's ads, not legal advice, so have it checked if you're unsure.
+- **Supported pages:** Google only serves rewarded ads on supported, mobile-friendly pages. If a page or device isn't supported, or no video is available, the prompt says so and the player can try again later.
+
 ## How it was built
 
 ### Tech stack
@@ -176,6 +212,7 @@ Touch devices also get touch-specific hints instead of keyboard shortcuts.
 
 ```
 index.html          UI markup and all CSS (design tokens, HUD, panels, responsive layout)
+privacy.html        The privacy policy page
 src/
   main.js           Game loop, state, input, UI, saving and orchestration
   planet.js         Icosphere terrain, biome layout, spots, slime painting, prop layers
@@ -187,6 +224,7 @@ src/
   creature.js       Sleeping/waking creatures on each biome
   critters.js       Wandering ambient critters
   particles.js      Ambient particle systems
+  ads.js            Rewarded video ads (Google Ad Manager / GPT) for free Card packs, and re-opening consent choices
   stardust.js       Collectible stardust trails
   collection.js     Finds, rarities and pack draw rates
   shop.js           Card pack shop and pack-opening animation

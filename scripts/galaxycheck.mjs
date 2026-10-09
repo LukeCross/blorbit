@@ -32,7 +32,7 @@ await ev(() => {
 });
 await load();
 console.log('migrated: old key gone', await ev(() => localStorage.getItem('blorbit-planet-v1') === null), '| resumed seed', await ev(() => window.blorbit.planet().seed), '| galaxy', await ev(() => window.blorbit.planet().galaxy), '| restoredIn', JSON.stringify(await ev(() => window.blorbit.save.restoredIn)));
-const cards = await ev(() => [...document.querySelectorAll('#title-galaxies .galaxy-card')].map((c) => `${c.dataset.g}:${c.disabled ? 'locked' : 'open'}:${c.querySelector('.go, .lock')?.textContent.trim().replace(/\s+/g, ' ')}`));
+const cards = await ev(() => [...document.querySelectorAll('#title-galaxies .galaxy-card')].map((c) => `${c.dataset.g}:${c.classList.contains('locked') ? 'locked' : 'open'}:${c.querySelector('.go, .lock')?.textContent.trim().replace(/\s+/g, ' ')}`));
 console.log('title cards:', cards);
 await shot('1-title');
 
@@ -68,7 +68,7 @@ console.log('planet saved under wild key with galaxy field:', await ev(() => JSO
 
 // ---- 4. galaxy travel panel, shop tabs, book tabs
 await page.click('#galaxy-btn'); await wait(500);
-console.log('travel cards:', await ev(() => [...document.querySelectorAll('#galaxy-list .galaxy-card')].map((c) => `${c.dataset.g}:${c.disabled ? 'locked' : 'open'}:${c.querySelector('.go')?.textContent}`)));
+console.log('travel cards:', await ev(() => [...document.querySelectorAll('#galaxy-list .galaxy-card')].map((c) => `${c.dataset.g}:${c.classList.contains('locked') ? 'locked' : 'open'}:${c.querySelector('.go')?.textContent}`)));
 await shot('3-travel');
 await page.click('#galaxies-close'); await wait(300);
 await page.click('#shop-btn'); await wait(500);

@@ -21,7 +21,7 @@ await ev((w) => { localStorage.clear(); localStorage.setItem('blorbit-save-v1', 
 await page.goto('http://localhost:5173/', { waitUntil: 'load' });
 await page.waitForSelector('#title-galaxies .galaxy-card', { visible: true });
 await wait(600);
-console.log('title:', await ev(() => [...document.querySelectorAll('#title-galaxies .galaxy-card')].map((c) => `${c.dataset.g}:${c.disabled ? 'locked ' + c.querySelector('.lock').textContent.trim() : 'open'}`)));
+console.log('title:', await ev(() => [...document.querySelectorAll('#title-galaxies .galaxy-card')].map((c) => `${c.dataset.g}:${c.classList.contains('locked') ? 'locked ' + c.querySelector('.lock').textContent.trim() : 'open'}`)));
 await shot('1-title');
 
 // go to Citylight, wake a 4th city friend there -> Skyhaven unlocks

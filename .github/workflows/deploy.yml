@@ -34,6 +34,11 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # Rewarded video ads (Google Ad Manager). Set these as repository variables under
+          # Settings -> Secrets and variables -> Actions -> Variables. Without them, the build has no ads.
+          VITE_GAM_REWARDED_UNIT: ${{ vars.GAM_REWARDED_UNIT }}
+          ADS_TXT: ${{ vars.ADS_TXT }}
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

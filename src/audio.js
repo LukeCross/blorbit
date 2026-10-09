@@ -58,7 +58,13 @@ export class Sound {
 
   setMuted(m) {
     this.muted = m;
-    if (this.ctx) this.master.gain.setTargetAtTime(m ? 0 : 0.9, this.now, 0.1);
+    if (this.ctx && !this.adPause) this.master.gain.setTargetAtTime(m ? 0 : 0.9, this.now, 0.1);
+  }
+
+  // silence the game while a video ad plays, without touching the player's own mute setting
+  pauseForAd(on) {
+    this.adPause = on;
+    if (this.ctx) this.master.gain.setTargetAtTime(on || this.muted ? 0 : 0.9, this.now, 0.05);
   }
 
   impulse(dur, decay) {
