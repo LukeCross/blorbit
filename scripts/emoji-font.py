@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+"""Rebuild the self-hosted emoji font (Noto Color Emoji, SIL OFL 1.1) so every device shows the same emojis.
+
+usage (from the repo root; needs fonttools, brotli + lxml, e.g. in a throwaway venv):
+  python3 -m venv /tmp/fv && /tmp/fv/bin/pip install fonttools brotli lxml
+  /tmp/fv/bin/python scripts/emoji-font.py
+
+It finds every emoji used in src/*.js, index.html and about.html, downloads Google's current chunks of the font
+(the COLRv1 build for Chrome/Firefox, the OpenType-SVG build for Safari), trims each chunk to just those emojis and
+writes public/fonts/emoji/*.woff2 plus src/emoji.css. Re-run it whenever you add an emoji; commit the output.
+Text symbols (arrows, ticks, play triangles) are left out on purpose, so they keep their normal look.
+"""
+import glob, re, sys, urllib.request
+from pathlib import Path
+from fontTools import subset
+from fontTools.ttLib import TTFont
+
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / 'public/fonts/emoji'
+CSS_URL = 'https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap'
+UA = {  # Google picks the font build from the user agent
+    'colr': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+    'svg': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+}
+# BMP characters that are emoji by default (no U+FE0F needed); the rest must be followed by U+FE0F in the source
+BMP_EMOJI = {0x231A, 0x231B, 0x23E9, 0x23EA, 0x23EB, 0x23EC, 0x23F0, 0x23F3, 0x25FD, 0x25FE, 0x2614, 0x2615, *range(0x2648, 0x2654), 0x267F, 0x2693,
+             0x26A1, 0x26AA, 0x26AB, 0x26BD, 0x26BE, 0x26C4, 0x26C5, 0x26CE, 0x26D4, 0x26EA, 0x26F2, 0x26F3, 0x26F5, 0x26FA, 0x26FD, 0x2705, 0x270A,
+             0x270B, 0x2728, 0x274C, 0x274E, 0x2753, 0x2754, 0x2755, 0x2757, 0x2795, 0x2796, 0x2797, 0x27B0, 0x27BF, 0x2B1B, 0x2B1C, 0x2B50, 0x2B55}
+
+
+def get(url, ua=None):
+    req = urllib.request.Request(url, headers={'User-Agent': ua} if ua else {})
+    return urllib.request.urlopen(req, timeout=60).read()
+
+
+def emoji_codepoints():
+    text = ''.join(Path(f).read_text() for f in [*glob.glob(str(ROOT / 'src/*.js')), str(ROOT / 'index.html'), str(ROOT / 'about.html')])
+    cps = set()
+    for i, ch in enumerate(text):
+        c = ord(ch)
+        if c >= 0x1F000 and not 0xFE00 <= c <= 0xFE0F:
+            cps.add(c)
+        elif 0x2190 <= c <= 0x2BFF and (c in BMP_EMOJI or text[i + 1:i + 2] == '️'):
+            cps.add(c)
+    return cps
+
+
+def faces(css):
+    """[(url, [(lo, hi), ...])] in the order Google declares them"""
+    out = []
+    for block in re.findall(r'@font-face\s*{[^}]*}', css):
+        url = re.search(r'url\(([^)]+)\)', block).group(1)
+        rng = re.search(r'unicode-range:\s*([^;]+);', block).group(1)
+        spans = []
+        for part in rng.split(','):
+            lo, _, hi = part.strip()[2:].partition('-')
+            spans.append((int(lo, 16), int(hi or lo, 16)))
+        out.append((url, spans))
+    return out
+
+
+def ranges(cps):
+    out = []
+    for c in sorted(cps):
+        if out and c == out[-1][1] + 1:
+            out[-1][1] = c
+        else:
+            out.append([c, c])
+    return out
+
+
+def main():
+    cps = emoji_codepoints()
+    print(f'{len(cps)} emojis used')
+    builds = {k: faces(get(CSS_URL, ua).decode()) for k, ua in UA.items()}
+    n = len(builds['colr'])
+    assert n == len(builds['svg']) and all(a[1] == b[1] for a, b in zip(builds['colr'], builds['svg'])), 'Google chunks changed shape'
+    OUT.mkdir(parents=True, exist_ok=True)
+    for old in OUT.glob('*.woff2'):
+        old.unlink()
+    rules, total = [], 0
+    for i in range(n):
+        spans = builds['colr'][i][1]
+        want = {c for c in cps if any(lo <= c <= hi for lo, hi in spans)}
+        if not want:
+            continue
+        for kind in ('colr', 'svg'):
+            tmp = OUT / f'_{kind}.woff2'
+            tmp.write_bytes(get(builds[kind][i][0]))
+            font = TTFont(tmp)
+            opts = subset.Options(layout_features=['*'], flavor='woff2', glyph_names=False, notdef_outline=True)
+            sub = subset.Subsetter(opts)
+            sub.populate(unicodes=want | {0x200D, 0xFE0F})
+            sub.subset(font)
+            font.flavor = 'woff2'
+            font.save(OUT / f'{kind}-{i}.woff2')
+            tmp.unlink()
+            total += (OUT / f'{kind}-{i}.woff2').stat().st_size
+        rng = ', '.join(f'U+{lo:x}' + (f'-{hi:x}' if hi != lo else '') for lo, hi in ranges(want | {0x200D, 0xFE0F}))
+        rules.append(
+            "@font-face {\n  font-family: 'Blorbit Emoji'; font-display: swap;\n"
+            f"  src: url(/fonts/emoji/colr-{i}.woff2) format('woff2') tech(color-COLRv1), url(/fonts/emoji/svg-{i}.woff2) format('woff2') tech(color-SVG);\n"
+            f'  unicode-range: {rng};\n}}\n')
+    header = '/* generated by scripts/emoji-font.py: Noto Color Emoji (SIL OFL 1.1), trimmed to the emojis the game uses */\n'
+    (ROOT / 'src/emoji.css').write_text(header + ''.join(rules))
+    print(f'{len(rules)} chunks, {total // 1024} KB for both builds (a browser downloads one build)')
+
+
+if __name__ == '__main__':
+    sys.exit(main())

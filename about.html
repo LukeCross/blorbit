@@ -16,12 +16,13 @@
     <meta property="og:description" content="Roll a slime blob around tiny planets, restore 45 biomes across 8 galaxies, wake sleepy creatures and collect 360 cards." />
     <meta property="og:image" content="https://blorbit.io/og-image.png" />
     <meta name="twitter:card" content="summary_large_image" />
-    <!-- system fonts only, so this page doesn't contact any third party -->
+    <!-- system fonts only (plus our own self-hosted emoji), so this page doesn't contact any third party -->
+    <link rel="stylesheet" href="./src/emoji.css" />
     <style>
       :root { --ink: #3d3560; --ink-soft: rgba(61, 53, 96, 0.8); }
       * { box-sizing: border-box; }
       body {
-        margin: 0; color: var(--ink); font: 16px/1.65 ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI', sans-serif;
+        margin: 0; color: var(--ink); font: 16px/1.65 'Blorbit Emoji', ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI', sans-serif;
         background: #f3e8ff linear-gradient(180deg, #d9ccff 0, #f3e8ff 480px, #ffe9f2 100%) no-repeat; min-height: 100vh;
       }
       main { max-width: 820px; margin: 0 auto; padding: 32px 20px 64px; }

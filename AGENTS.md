@@ -59,6 +59,7 @@ src/shop.js    Card pack shop, galaxy tabs (galaxyTabs, renderKeepingTabs)
 src/collection.js  Finds, rarities, pack rates (totals are computed, not hard-coded)
 src/ads.js     Rewarded video ads (Google Ad Manager)
 src/{blob,look,skyfx,particles,stardust,names,noise,quality,shadow}.js  Blob, sky, ambient particles, stardust, naming, PRNG, quality tiers
+src/emoji.css  GENERATED @font-face rules for the self-hosted emoji font (see section 5); public/fonts/emoji/ holds its woff2 files
 scripts/       Puppeteer helpers (screenshots, regression checks); scripts/og/ builds the share image and icons
 public/        Static files: og-image.png (share image, also the About hero), favicon, icons, manifest
 ```
@@ -109,6 +110,12 @@ print([w for w in want if st(w) in U])           # must print []
 - Check **finds, skin emojis and galaxy emojis** together (all three are in those two reads).
 - Beware filter mistakes when enumerating free emojis: substring filters on Unicode names can accidentally drop valid candidates (e.g. "EAR" drops the globes, "FACE" drops animal faces). Cross-check by hand.
 - Roughly exhausted themes (as of Feastvale): ocean life, plants/flowers, weather/sky, gems, most tools/office. Still plentiful: spooky/fantasy (👻 🦇 🕷️ 🕸️ 🧙 🧛 🧟 🐺 🧹 ⚰️ 🏚️ 🗡️), sports (🏀 🏐 🏈 🏏 🏒 🥊 🎿 🏂 🏎️ 🏍️ 🎳), music (🎹 🎺 🎻 🥁 🎤 🪕 🪗), retro tech/games (🕹️ 🎮 🎰 📺 📻 💾 👾 🤖), and many animals (🐯 🐴 🦓 🦍 🦏 🐘 🦙 🦚 🦩 🦘 🦥 🦡 🦨 🦬 🦖 🦕 🦣 🐜 🦗). Re-verify before relying on this list.
+- **Emojis are drawn with a bundled font** (Noto Color Emoji, trimmed to the emojis in the source) so they look the same on every device. After adding or changing any emoji (finds, skins, galaxy icons, UI text), regenerate it and commit `src/emoji.css` and `public/fonts/emoji/`:
+  ```bash
+  python3 -m venv /tmp/fv && /tmp/fv/bin/pip install fonttools brotli lxml   # once
+  /tmp/fv/bin/python scripts/emoji-font.py
+  ```
+  An emoji missing from the subset silently falls back to the device's own emoji font (not broken, just inconsistent). Text symbols (arrows, ticks, ▶) are deliberately excluded. Browsers download COLRv1 (Chrome/Firefox) or OpenType-SVG (Safari) builds, ~450 KB / ~1 MB for everything. Safari/iOS rendering has not been verified from this machine.
 - Multi-codepoint emojis (ZWJ sequences like 🏴‍☠️) work but check they render and compare after stripping `️`.
 
 ---
