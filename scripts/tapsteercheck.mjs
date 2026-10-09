@@ -24,7 +24,7 @@ await page.evaluate(() => localStorage.clear());
 await page.goto('http://localhost:5173/', { waitUntil: 'load' });
 await wait(2500);
 console.log('body.tap-steer', await page.evaluate(() => document.body.classList.contains('tap-steer')), '| title hint:', await page.$eval('.tap-only', (e) => getComputedStyle(e).display !== 'none' && e.textContent));
-await page.tap('#start-btn');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).tap();
 await wait(600);
 await page.screenshot({ path: '/tmp/tap-1-hint.png' });
 await wait(2500);

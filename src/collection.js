@@ -1,4 +1,5 @@
 import { BIOMES, BIOME_IDS } from './biomes.js';
+import { GALAXIES } from './galaxies.js';
 
 // Shared logic for rolling collectibles, whether from a restored patch or a card pack.
 
@@ -9,6 +10,7 @@ export const RATES = {
   premium: { l: 0.15, r: 0.5 },
 };
 export const TOTAL_FINDS = BIOME_IDS.reduce((n, b) => n + BIOMES[b].finds.length, 0);
+export const totalFindsIn = (g) => GALAXIES[g].biomes.reduce((n, b) => n + BIOMES[b].finds.length, 0);
 
 // Rolls one find, records it in the save, and returns what was drawn.
 export function drawFind(save, biomeId, rates, minRarity = 'c') {
@@ -32,4 +34,7 @@ export function drawPack(save, biomeId, type) {
   return cards;
 }
 
-export const foundCount = (save) => Object.keys(save.finds).length;
+// only counts finds that still exist, so a renamed find can't inflate the total
+const foundInBiome = (save, b) => BIOMES[b].finds.filter(([, name]) => save.finds[`${b}:${name}`]).length;
+export const foundCount = (save) => BIOME_IDS.reduce((n, b) => n + foundInBiome(save, b), 0);
+export const foundIn = (save, g) => GALAXIES[g].biomes.reduce((n, b) => n + foundInBiome(save, b), 0);

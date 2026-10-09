@@ -14,11 +14,12 @@ import { Creature } from './creature.js';
 import { Particles } from './particles.js';
 import { Sound } from './audio.js';
 import { SKINS, CREATURE_IDS } from './skins.js';
-import { BIOMES, BIOME_IDS } from './biomes.js';
+import { BIOMES } from './biomes.js';
+import { GALAXIES, GALAXY_IDS, creaturesOf, wokenIn, isGalaxyUnlocked, unlockProgress, unlockHint, checkSkins, galaxyOfBiome } from './galaxies.js';
 import { Critters } from './critters.js';
 import { Stardust } from './stardust.js';
-import { RARITY, RATES, TOTAL_FINDS, drawFind, foundCount } from './collection.js';
-import { Shop } from './shop.js';
+import { RARITY, RATES, TOTAL_FINDS, drawFind, foundCount, foundIn, totalFindsIn } from './collection.js';
+import { Shop, galaxyTabs } from './shop.js';
 import { planetName, timeSeed } from './names.js';
 
 // ---------------------------------------------------------------- save data
@@ -33,6 +34,10 @@ save.quality ??= 'auto';
 save.sensitivity ??= 1; // multiplies the blob's turn speed
 save.colorblind ??= false;
 save.touchControls ??= 'tap'; // touch devices: 'tap' = rolls by itself, hold a side to turn; 'stick' = drag joystick
+// galaxies: which one you're in, planets restored in each, and which ones you've seen (for the NEW badge)
+save.restoredIn ??= { wild: save.restored || 0 };
+save.seenGalaxies ??= ['wild'];
+if (!GALAXIES[save.galaxy] || !isGalaxyUnlocked(save, save.galaxy)) save.galaxy = 'wild';
 document.body.classList.toggle('cb', save.colorblind);
 quality.tier = save.quality === 'auto' ? detectTier() : save.quality;
 // trails were removed from the shop: give back any stardust spent on them
@@ -45,9 +50,16 @@ if (save.trailsOwned) {
 }
 let resetting = false; // once a reset starts, nothing may write the old progress back
 const persist = () => !resetting && localStorage.setItem(SAVE_KEY, JSON.stringify(save));
-const SKIN_ORDER = ['classic', ...CREATURE_IDS];
-// '-' wears Classic Goo; 1-9 then 0 wear the ten creature skins in bar order
-const skinKey = (id) => (id === 'classic' ? '-' : String((CREATURE_IDS.indexOf(id) + 1) % 10));
+// The skin bar shows Classic, this galaxy's creatures (locked ones too), then any skins you've
+// unlocked in other galaxies. '-' wears Classic Goo; 1-9 then 0 wear this galaxy's creatures.
+const hereCreatures = () => creaturesOf(planet?.galaxy ?? save.galaxy);
+const skinOrder = () => ['classic', ...hereCreatures(), ...CREATURE_IDS.filter((c) => !hereCreatures().includes(c) && save.unlocked.includes(c))];
+function skinKey(id) {
+  if (id === 'classic') return '-';
+  const i = hereCreatures().indexOf(id);
+  return i >= 0 && i < 10 ? String((i + 1) % 10) : '';
+}
+const unlockedGalaxies = () => GALAXY_IDS.filter((g) => isGalaxyUnlocked(save, g));
 
 // ---------------------------------------------------------------- renderer & scene
 
@@ -145,13 +157,13 @@ const $ = (id) => document.getElementById(id);
 const CIRC = 2 * Math.PI * 16;
 const CIRC_W = 2 * Math.PI * 23;
 
-function newPlanet(seed = timeSeed()) {
+function newPlanet(seed = timeSeed(), galaxy = save.galaxy) {
   planet?.dispose();
   critters?.dispose();
   stardust?.dispose();
   creatures.forEach((c) => c.dispose());
   popups.splice(0).forEach((p) => p.el.remove());
-  planet = new Planet(scene, seed);
+  planet = new Planet(scene, seed, galaxy);
   planet.setSlimeColor(SKINS[blob.skinId].slime);
   creatures = planet.creatureOrder.map((id, r) => new Creature(scene, planet, id, planet.centers[r]));
   critters = new Critters(scene, planet, (dir) => {
@@ -171,7 +183,10 @@ function newPlanet(seed = timeSeed()) {
 
   $('planet-name').textContent = planetName(seed);
   $('planet-name').title = `seed ${seed}`;
+  $('galaxy-emoji').textContent = GALAXIES[galaxy].emoji;
+  $('galaxy-btn').title = `${GALAXIES[galaxy].name} galaxy: travel to another (G)`;
   buildRegionUI();
+  updateBookCount();
 }
 
 // ---------------------------------------------------------------- UI
@@ -195,12 +210,14 @@ function buildRegionUI() {
 }
 
 function buildSkinBar() {
-  $('skins').innerHTML = SKIN_ORDER
-    .map((id, i) => {
+  $('skins').innerHTML = skinOrder()
+    .filter((id) => SKINS[id])
+    .map((id) => {
       const unlocked = save.unlocked.includes(id);
       const s = SKINS[id];
+      const key = skinKey(id);
       return `<button class="skin ${unlocked ? '' : 'locked'} ${blob.skinId === id ? 'active' : ''}" data-id="${id}"
-        title="${unlocked ? `${s.name} (press ${skinKey(id)})` : 'Wake this creature to unlock'}">${unlocked ? s.emoji : '🔒'}<i class="key">${skinKey(id)}</i></button>`;
+        title="${unlocked ? `${s.name}${key ? ` (press ${key})` : ''}` : 'Wake this creature to unlock'}">${unlocked ? s.emoji : '🔒'}${key ? `<i class="key">${key}</i>` : ''}</button>`;
     })
     .join('');
   $('skins').querySelectorAll('.skin').forEach((b) => b.addEventListener('click', () => equip(b.dataset.id)));
@@ -310,7 +327,11 @@ const KEYMAP = { ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'ri
 const stick = { id: null, x0: 0, y0: 0, dx: 0, dy: 0 };
 
 window.addEventListener('keydown', (e) => {
-  if (state === 'title') return start();
+  // on the title, Enter jumps back into the galaxy you were last in; everything else waits for a pick
+  if (state === 'title') {
+    if (e.code === 'Enter' && !(e.target instanceof HTMLButtonElement) && titleReady) enterGalaxy(save.galaxy);
+    return;
+  }
   if (e.target instanceof HTMLInputElement) return; // arrow keys belong to a focused slider, not the blob
   if (KEYMAP[e.code]) {
     keys[KEYMAP[e.code]] = true;
@@ -321,10 +342,11 @@ window.addEventListener('keydown', (e) => {
   if (e.code === 'KeyB') toggleBook();
   if (e.code === 'KeyP') shop.toggle();
   if (e.code === 'KeyN') $('new-planet').click();
-  if (e.code === 'Escape') { shop.close(); $('book').classList.add('hidden'); closeSettings(); }
+  if (e.code === 'Escape') { shop.close(); $('book').classList.add('hidden'); $('galaxies').classList.add('hidden'); closeSettings(); }
   if (e.code === 'Minus' || e.code === 'NumpadSubtract') equip('classic');
   const digit = /^(?:Digit|Numpad)(\d)$/.exec(e.code);
-  if (digit) equip(CREATURE_IDS[(Number(digit[1]) + 9) % 10]);
+  if (digit) equip(hereCreatures()[(Number(digit[1]) + 9) % 10]);
+  if (e.code === 'KeyG') toggleGalaxies();
 });
 window.addEventListener('keyup', (e) => {
   if (KEYMAP[e.code]) keys[KEYMAP[e.code]] = false;
@@ -431,7 +453,6 @@ function toggleAutoRoll() {
 $('autoroll').classList.toggle('on', save.autoRoll);
 $('mute').addEventListener('click', toggleMute);
 $('autoroll').addEventListener('click', toggleAutoRoll);
-$('title').addEventListener('pointerdown', () => start());
 
 function start() {
   if (state !== 'title') return;
@@ -454,7 +475,12 @@ $('next-planet').addEventListener('click', () => {
 });
 // ---------------------------------------------------------------- resume
 
-const PLANET_KEY = 'blorbit-planet-v1';
+// one saved planet per galaxy, so you can leave a half-restored world and come back to it
+const OLD_PLANET_KEY = 'blorbit-planet-v1';
+const planetKey = (g) => `${OLD_PLANET_KEY}:${g}`;
+// before galaxies there was a single planet save: it belongs to Wildbloom
+if (localStorage.getItem(OLD_PLANET_KEY) && !localStorage.getItem(planetKey('wild'))) localStorage.setItem(planetKey('wild'), localStorage.getItem(OLD_PLANET_KEY));
+localStorage.removeItem(OLD_PLANET_KEY);
 function packBits(arr) {
   const bytes = new Uint8Array(Math.ceil(arr.length / 8));
   for (let i = 0; i < arr.length; i++) if (arr[i]) bytes[i >> 3] |= 1 << (i & 7);
@@ -471,7 +497,8 @@ function unpackBits(str, n) {
 
 function savePlanet() {
   if (!planet || resetting) return;
-  localStorage.setItem(PLANET_KEY, JSON.stringify({
+  localStorage.setItem(planetKey(planet.galaxy), JSON.stringify({
+    galaxy: planet.galaxy,
     seed: planet.seed,
     painted: packBits(planet.painted),
     regions: planet.regionDone.map((d) => d >= 0),
@@ -484,8 +511,8 @@ function savePlanet() {
 }
 
 // Rebuild a saved planet in its restored state (no celebrations, it all just pops back in).
-function resumePlanet(data) {
-  newPlanet(data.seed);
+function resumePlanet(data, galaxy) {
+  newPlanet(data.seed, galaxy);
   const painted = unpackBits(data.painted, planet.count);
   const restore = (i, flag) => {
     planet.markPainted(i);
@@ -523,6 +550,23 @@ function resumePlanet(data) {
   planet.waterAttr.needsUpdate = true;
 }
 
+// a galaxy's saved planet if it's unfinished, otherwise a brand-new one
+function loadGalaxyPlanet(g) {
+  const saved = JSON.parse(localStorage.getItem(planetKey(g)) || 'null');
+  if (saved && !saved.finished && (saved.galaxy ?? 'wild') === g) {
+    try {
+      return resumePlanet(saved, g);
+    } catch (err) {
+      console.warn('Could not resume planet, starting fresh', err);
+    }
+  }
+  newPlanet(timeSeed(), g);
+}
+const hasSavedPlanet = (g) => {
+  const saved = JSON.parse(localStorage.getItem(planetKey(g)) || 'null');
+  return !!saved && !saved.finished;
+};
+
 setInterval(() => state !== 'title' && savePlanet(), 4000);
 document.addEventListener('visibilitychange', () => document.hidden && savePlanet());
 window.addEventListener('pagehide', savePlanet);
@@ -544,6 +588,111 @@ function warpToNewPlanet() {
     toast(`Welcome to ${$('planet-name').textContent}<small>A brand-new planet, just for you</small>`);
     warping = false;
   }, 450);
+}
+
+// ---------------------------------------------------------------- galaxies
+
+// Free travel: save where you are, load (or make) the other galaxy's planet, swoop in.
+function travelTo(g, then, fresh = false) {
+  if (warping || !isGalaxyUnlocked(save, g)) return;
+  if (g === planet.galaxy && !fresh) return then?.();
+  warping = true;
+  sound.warp();
+  $('warp').classList.add('on');
+  setTimeout(() => {
+    savePlanet();
+    save.galaxy = g;
+    if (!save.seenGalaxies.includes(g)) save.seenGalaxies.push(g);
+    persist();
+    loadGalaxyPlanet(g);
+    savePlanet();
+    cam.pos.copy(blob.p).multiplyScalar(40);
+    fovKick = 12;
+    buildSkinBar();
+    updateBookCount();
+    refreshGalaxyBadge();
+    $('warp').classList.remove('on');
+    warping = false;
+    then?.();
+    toast(`${GALAXIES[g].emoji} Welcome to ${GALAXIES[g].name}<small>${$('planet-name').textContent}</small>`);
+  }, 450);
+}
+
+// from the title screen: pick a galaxy, then start playing there. Picking the galaxy you're
+// already in carries on with its planet, or starts a fresh one if you'd just finished it.
+function enterGalaxy(g) {
+  if (state !== 'title' || !isGalaxyUnlocked(save, g)) return;
+  if (!save.seenGalaxies.includes(g)) { save.seenGalaxies.push(g); persist(); }
+  if (g === planet.galaxy && completed < NUM_REGIONS) { save.galaxy = g; persist(); return start(); }
+  travelTo(g, start, true);
+}
+
+// back to the title screen's galaxy picker (the planet is saved, so nothing is lost)
+function backToMenu() {
+  if (state === 'title' || warping) return;
+  savePlanet();
+  shop.close();
+  closeSettings();
+  ['book', 'galaxies', 'finale'].forEach((id) => $(id).classList.add('hidden'));
+  ['hud-top', 'skins', 'biome-label', 'autoroll', 'hud-left'].forEach((id) => $(id).classList.add('hidden'));
+  held.clear();
+  Object.keys(keys).forEach((k) => (keys[k] = false));
+  state = 'title';
+  showTitleGalaxies();
+  $('title').classList.remove('hidden');
+}
+$('menu-btn').addEventListener('click', backToMenu);
+$('finale-menu').addEventListener('click', backToMenu);
+
+function galaxyCards(mode) {
+  const here = planet.galaxy;
+  return GALAXY_IDS.map((g) => {
+    const def = GALAXIES[g];
+    const open = isGalaxyUnlocked(save, g);
+    const [woke, total] = wokenIn(save, g);
+    const isNew = open && !save.seenGalaxies.includes(g);
+    const isHere = mode === 'travel' && g === here;
+    let foot;
+    if (!open) {
+      const [d, need] = unlockProgress(save, g);
+      foot = `<div class="lock">${unlockHint(save, g)} · ${d}/${need}<div class="bar"><i style="width:${Math.min(1, d / need) * 100}%"></i></div></div>`;
+    } else {
+      const label = isHere ? 'You are here' : mode === 'title' && hasSavedPlanet(g) ? 'Continue' : mode === 'title' ? 'Play' : 'Travel here';
+      foot = `<div class="meta"><span>🐾 ${woke}/${total} friends</span><span>📖 ${foundIn(save, g)}/${totalFindsIn(g)} finds</span><span>🪐 ${save.restoredIn[g] || 0} restored</span></div><div class="go">${label}</div>`;
+    }
+    return `<button class="galaxy-card ${isHere ? 'here' : ''}" data-g="${g}" ${open ? '' : 'disabled'} style="--a:${def.art[0]};--b:${def.art[1]}">
+      ${isNew ? '<span class="badge">NEW</span>' : ''}${open ? '' : '<span class="badge locked">LOCKED</span><span class="padlock" aria-hidden="true">🔒</span>'}
+      <div class="art"><span>${def.emoji}</span></div><b>${def.name}</b><p>${def.blurb}</p>${foot}</button>`;
+  }).join('');
+}
+let titleReady = false;
+function showTitleGalaxies() {
+  $('start-btn').classList.add('hidden');
+  $('title-choose').classList.remove('hidden');
+  $('title-galaxies').classList.remove('hidden');
+  $('title-galaxies').innerHTML = galaxyCards('title');
+}
+$('title-galaxies').addEventListener('click', (e) => {
+  const g = e.target.closest('.galaxy-card:not(:disabled)')?.dataset.g;
+  if (g) enterGalaxy(g);
+});
+function toggleGalaxies() {
+  const el = $('galaxies');
+  if (!el.classList.contains('hidden')) return el.classList.add('hidden');
+  $('galaxy-list').innerHTML = galaxyCards('travel');
+  el.classList.remove('hidden');
+}
+$('galaxy-list').addEventListener('click', (e) => {
+  const g = e.target.closest('.galaxy-card:not(:disabled)')?.dataset.g;
+  if (!g) return;
+  $('galaxies').classList.add('hidden');
+  if (g !== planet.galaxy) travelTo(g, () => (state = 'play'));
+});
+$('galaxy-btn').addEventListener('click', toggleGalaxies);
+$('galaxies-close').addEventListener('click', toggleGalaxies);
+// a dot on the galaxy button while there's an unlocked galaxy you haven't visited
+function refreshGalaxyBadge() {
+  $('galaxy-btn').classList.toggle('new', unlockedGalaxies().some((g) => !save.seenGalaxies.includes(g)));
 }
 
 // two taps to confirm, so you never lose a planet by accident
@@ -636,7 +785,8 @@ function findCard(emoji, name, rarity, isNew, count) {
 }
 
 function updateBookCount() {
-  $('book-count').textContent = `${foundCount(save)}/${TOTAL_FINDS}`;
+  const g = planet?.galaxy ?? save.galaxy;
+  $('book-count').textContent = `${foundIn(save, g)}/${totalFindsIn(g)}`;
 }
 
 function refreshDust() {
@@ -646,7 +796,7 @@ function refreshDust() {
 // ---------------------------------------------------------------- settings + reset
 
 function openSettings() {
-  // Classic Goo is always yours, so only the ten creature skins count
+  // Classic Goo is always yours, so only creature skins count (across every galaxy)
   const unlockedSkins = save.unlocked.filter((id) => CREATURE_IDS.includes(id)).length;
   $('settings-stats').innerHTML = [
     ['Skins unlocked', `${unlockedSkins}/${CREATURE_IDS.length}`],
@@ -721,7 +871,7 @@ $('reset-cancel').addEventListener('click', () => {
 $('reset-yes').addEventListener('click', () => {
   resetting = true;
   localStorage.removeItem(SAVE_KEY);
-  localStorage.removeItem(PLANET_KEY);
+  GALAXY_IDS.forEach((g) => localStorage.removeItem(planetKey(g)));
   $('warp').classList.add('on');
   setTimeout(() => location.replace(location.pathname), 450);
 });
@@ -730,6 +880,7 @@ $('reset-yes').addEventListener('click', () => {
 
 const shop = new Shop({
   save, persist, sound,
+  currentGalaxy: () => planet?.galaxy ?? save.galaxy,
   onCollection: updateBookCount,
   onDust: refreshDust,
   onClose: () => {
@@ -760,10 +911,17 @@ function spawnDrips(dt, moving) {
   particles.spawn(p, v, new THREE.Color(SKINS[blob.skinId].slime).multiplyScalar(0.7), 0.22, 0.5, 9);
 }
 
+let bookTab = 'wild';
 function toggleBook() {
   const book = $('book');
   if (!book.classList.contains('hidden')) return book.classList.add('hidden');
-  $('book-grid').innerHTML = BIOME_IDS.map((b) => {
+  bookTab = planet.galaxy;
+  renderBook();
+  book.classList.remove('hidden');
+}
+function renderBook() {
+  const g = bookTab;
+  $('book-grid').innerHTML = galaxyTabs(save, g, planet.galaxy) + GALAXIES[g].biomes.map((b) => {
     const def = BIOMES[b];
     const woke = save.unlocked.includes(def.creature);
     const items = def.finds.map(([emoji, name, rarity]) => {
@@ -773,9 +931,13 @@ function toggleBook() {
     const found = def.finds.filter(([, name]) => save.finds[`${b}:${name}`]).length;
     return `<div class="book-row"><div class="book-head"><span class="${woke ? '' : 'dim'}">${woke ? SKINS[def.creature].emoji : '❔'}</span><b>${def.name}</b><em>${found}/${def.finds.length}</em></div><div class="slots">${items}</div></div>`;
   }).join('');
-  $('book-total').textContent = `${foundCount(save)} of ${TOTAL_FINDS} found · ✨ ${save.stardust} stardust · ${save.restored} planet${save.restored === 1 ? "" : "s"} restored`;
-  book.classList.remove('hidden');
+  const restored = save.restoredIn[g] || 0;
+  $('book-total').textContent = `${foundIn(save, g)} of ${totalFindsIn(g)} ${GALAXIES[g].name} finds · ✨ ${save.stardust} stardust · ${restored} planet${restored === 1 ? '' : 's'} restored here`;
 }
+$('book-grid').addEventListener('click', (e) => {
+  const tab = e.target.closest('[data-action="tab"]');
+  if (tab) { bookTab = tab.dataset.id; renderBook(); }
+});
 $('book-btn').addEventListener('click', toggleBook);
 $('book-close').addEventListener('click', toggleBook);
 updateBookCount();
@@ -808,7 +970,10 @@ function completeRegion(i) {
   setTimeout(() => {
     const skin = SKINS[r.id];
     if (!save.unlocked.includes(r.id)) {
+      const before = unlockedGalaxies();
       save.unlocked.push(r.id);
+      const opened = unlockedGalaxies().filter((g) => !before.includes(g));
+      if (opened.length) setTimeout(() => announceGalaxy(opened[0]), 3200);
       persist();
       sound.unlock();
       buildSkinBar();
@@ -824,9 +989,25 @@ function completeRegion(i) {
   if (completed === NUM_REGIONS) setTimeout(() => p === planet && finale(), 3400);
 }
 
+// a newly unlocked galaxy: celebrate, badge the galaxy button, offer it on the finale card
+let galaxyToVisit = null;
+function announceGalaxy(g) {
+  galaxyToVisit = g;
+  sound.fanfare();
+  refreshGalaxyBadge();
+  toast(`${GALAXIES[g].emoji} New galaxy unlocked: ${GALAXIES[g].name}!<small>Tap ${GALAXIES[planet.galaxy].emoji} next to the planet name to travel there</small>`);
+}
+$('finale-galaxy').addEventListener('click', () => {
+  $('finale').classList.add('hidden');
+  const g = galaxyToVisit;
+  galaxyToVisit = null;
+  travelTo(g, () => (state = 'play'));
+});
+
 function finale() {
   state = 'finale';
   save.restored++;
+  save.restoredIn[planet.galaxy] = (save.restoredIn[planet.galaxy] || 0) + 1;
   persist();
   sound.fanfare();
   const colors = [...planet.aliveCols, WHITE, GOLD];
@@ -838,6 +1019,9 @@ function finale() {
   }
   $('finale-creatures').textContent = regions.map((r) => SKINS[r.id].emoji).join('');
   $('finale-dust').textContent = save.stardust;
+  const g = galaxyToVisit && galaxyToVisit !== planet.galaxy ? galaxyToVisit : null;
+  $('finale-galaxy').classList.toggle('hidden', !g);
+  if (g) $('finale-galaxy').textContent = `${GALAXIES[g].emoji} Visit ${GALAXIES[g].name}`;
   setTimeout(() => $('finale').classList.remove('hidden'), 1800);
 }
 
@@ -1012,17 +1196,11 @@ function updateCamera(dt) {
 
 // ?seed=123 visits a specific planet; otherwise resume the last unfinished one, or make a new one
 {
-  const urlSeed = Number(new URLSearchParams(location.search).get('seed'));
-  const saved = JSON.parse(localStorage.getItem(PLANET_KEY) || 'null');
-  if (urlSeed) newPlanet(urlSeed);
-  else if (saved && !saved.finished) {
-    try {
-      resumePlanet(saved);
-    } catch (err) {
-      console.warn('Could not resume planet, starting fresh', err);
-      newPlanet();
-    }
-  } else newPlanet();
+  const params = new URLSearchParams(location.search);
+  const urlSeed = Number(params.get('seed'));
+  const urlGalaxy = GALAXIES[params.get('galaxy')] ? params.get('galaxy') : save.galaxy;
+  if (urlSeed) newPlanet(urlSeed, urlGalaxy);
+  else loadGalaxyPlanet(save.galaxy);
 }
 let last = performance.now();
 
@@ -1074,10 +1252,12 @@ function frame() {
 }
 frame();
 
-// everything's loaded: the title's start button can go live
-$('start-btn').disabled = false;
-$('start-btn').textContent = 'Start rolling';
+// everything's loaded: swap the loading button for the galaxy picker
+checkSkins();
+showTitleGalaxies();
+titleReady = true;
+refreshGalaxyBadge();
 
 // handy for debugging from the console
 refreshDust();
-window.blorbit = { shop, save, newPlanet, CAM, camera, backdrop, planet: () => planet, rollFind, toggleBook, completeRegion, completePatch, blob, sound, keys };
+window.blorbit = { shop, save, newPlanet, travelTo, enterGalaxy, planetKey, galaxyOf: galaxyOfBiome, CAM, camera, backdrop, planet: () => planet, rollFind, toggleBook, completeRegion, completePatch, blob, sound, keys };

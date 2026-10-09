@@ -5,13 +5,19 @@ const browser = await puppeteer.launch({ executablePath: '/Applications/Google C
 const page = await browser.newPage();
 await page.setViewport({ width: 1280, height: 800 });
 page.on('pageerror', (e) => console.log('[pageerror]', e.message));
-await page.goto('http://localhost:5173/', { waitUntil: 'networkidle0' });
-await page.evaluate(() => localStorage.clear());
-await page.reload({ waitUntil: 'networkidle0' });
-// keep rolling new planets until one has the biome we want
-await page.evaluate((id) => { for (let s = 1; s < 200 && !window.blorbit.planet().biomes.includes(id); s++) window.blorbit.newPlanet(s); }, process.env.BIOME);
-await page.keyboard.press('Space');
-await page.keyboard.press('KeyR'); // auto-roll off so the blob stays put
+page.setDefaultTimeout(120000);
+await page.goto('http://localhost:5173/', { waitUntil: 'load' });
+// every Wildbloom friend awake, so locked galaxies (Citylight) are open too
+await page.evaluate(() => { localStorage.clear(); localStorage.setItem('blorbit-save-v1', JSON.stringify({ unlocked: ['classic', 'bunny', 'frog', 'fox', 'penguin', 'moth', 'snail', 'turtle', 'lizard', 'bear', 'hedgehog'], v: 3 })); });
+await page.reload({ waitUntil: 'load' });
+await page.waitForSelector('#title-galaxies .galaxy-card', { visible: true });
+// keep rolling new planets in the biome's galaxy until one has the biome we want, then play it
+await page.evaluate((id) => {
+  const g = Object.keys({ wild: 1, city: 1 }).find((k) => window.blorbit.galaxyOf(id) === k);
+  for (let s = 1; s < 200 && !window.blorbit.planet().biomes.includes(id); s++) window.blorbit.newPlanet(s, g);
+  window.blorbit.save.galaxy = g;
+  window.blorbit.enterGalaxy(g);
+}, process.env.BIOME);
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const r = await page.evaluate((id) => {
   const b = window.blorbit, p = b.planet();

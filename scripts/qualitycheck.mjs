@@ -10,7 +10,7 @@ for (const q of ['smooth', 'pretty']) {
   await page.evaluate((q) => { localStorage.clear(); localStorage.setItem('blorbit-save-v1', JSON.stringify({ unlocked: ['classic', 'fox'], equipped: 'fox', v: 3, quality: q })); }, q);
   await page.goto('http://localhost:5173/?seed=42', { waitUntil: 'load', timeout: 120000 });
   await page.waitForFunction(() => window.blorbit, { timeout: 120000 });
-  await page.click('#start-btn');
+  await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click();
   await page.evaluate(() => { const b = window.blorbit; const p = b.planet(); b.completeRegion(p.regionAt(b.blob.p)); });
   await new Promise((r) => setTimeout(r, 15000));
   await page.screenshot({ path: `/tmp/quality-${q}.png` });

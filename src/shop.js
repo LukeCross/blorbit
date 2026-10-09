@@ -1,8 +1,10 @@
-import { BIOMES, BIOME_IDS } from './biomes.js';
+import { BIOMES } from './biomes.js';
+import { GALAXIES, GALAXY_IDS, isGalaxyUnlocked, unlockProgress } from './galaxies.js';
 import { SKINS } from './skins.js';
 import { RARITY, RATES, drawPack } from './collection.js';
 
-// Stardust shop: a standard and a shiny card pack for every biome.
+// Stardust shop: a standard and a shiny card pack for every biome. Opens on the current
+// galaxy's biomes, with tabs for any other galaxy you've unlocked.
 
 export const PACKS = {
   standard: { name: 'Card pack', cost: 25 },
@@ -13,15 +15,34 @@ export const PACKS = {
 const $ = (id) => document.getElementById(id);
 const pct = (x) => `${Math.round(x * 100)}%`;
 
+// tab strip for switching galaxies (shared by the shop and the collection book). Every galaxy
+// gets a tab so you know what's out there; locked ones are disabled and show their unlock progress.
+export function galaxyTabs(save, active, current) {
+  return `<div class="galaxy-tabs" role="tablist">${GALAXY_IDS.map((g) => {
+    const def = GALAXIES[g];
+    if (!isGalaxyUnlocked(save, g)) {
+      // lead with progress toward what's needed, matching the "6/8" on the tab itself
+      const [done, need] = unlockProgress(save, g);
+      const from = GALAXIES[def.unlockedBy].name;
+      const left = need - done;
+      const why = `Locked: ${done} of ${need} ${from} friends woken. Wake ${left} more to unlock`;
+      return `<button role="tab" class="locked" disabled aria-disabled="true" title="${why}" aria-label="${def.name}. ${why}">🔒 ${def.name} <small>${done}/${need}</small></button>`;
+    }
+    return `<button role="tab" data-action="tab" data-id="${g}" class="${g === active ? 'active' : ''}" aria-selected="${g === active}">${def.emoji} ${def.name}${g === current ? ' <small>(here)</small>' : ''}</button>`;
+  }).join('')}</div>`;
+}
+
 export class Shop {
-  constructor({ save, persist, sound, onCollection, onDust, onClose }) {
-    Object.assign(this, { save, persist, sound, onCollection, onDust, onClose });
+  constructor({ save, persist, sound, onCollection, onDust, onClose, currentGalaxy }) {
+    Object.assign(this, { save, persist, sound, onCollection, onDust, onClose, currentGalaxy });
+    this.tab = currentGalaxy();
     $('shop-close').addEventListener('click', () => this.close());
     $('shop-body').addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-action]');
       if (!btn) return;
       const { action, id, type } = btn.dataset;
       if (action === 'pack') this.buyPack(id, type);
+      if (action === 'tab') { this.tab = id; this.render(); }
     });
   }
 
@@ -35,6 +56,7 @@ export class Shop {
   }
 
   open() {
+    this.tab = this.currentGalaxy();
     $('shop').classList.remove('hidden');
     this.render();
   }
@@ -52,7 +74,8 @@ export class Shop {
     $('shop-body').innerHTML = `
       <p class="shop-note">Every pack holds <b>3 cards</b> from one biome's collection.
       Card pack: ${pct(s.l)} legendary · ${pct(s.r)} rare. <span class="shiny-text">Shiny pack</span>: ${pct(p.l)} legendary · ${pct(p.r)} rare · always at least one rare.</p>
-      <div class="pack-list">${BIOME_IDS.map((b) => {
+      ${galaxyTabs(this.save, this.tab, this.currentGalaxy())}
+      <div class="pack-list">${GALAXIES[this.tab].biomes.map((b) => {
         const def = BIOMES[b];
         const found = def.finds.filter(([, n]) => this.save.finds[`${b}:${n}`]).length;
         return `<div class="pack-row">

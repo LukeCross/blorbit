@@ -20,7 +20,7 @@ const hidden = (id) => page.evaluate((id) => document.getElementById(id).classLi
 const tag = mobile ? 'mobile' : 'desktop';
 
 await wait(2500);
-await page.click('#start-btn');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click();
 await wait(1500);
 await page.evaluate(() => { window.blorbit.save.stardust = 140; for (let r = 0; r < 4; r++) window.blorbit.completeRegion(r); });
 await page.waitForFunction(() => !document.getElementById('finale').classList.contains('hidden'), { timeout: 60000 });

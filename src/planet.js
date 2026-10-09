@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { makeNoise3, mulberry32 } from './noise.js';
-import { BIOMES, BIOME_IDS } from './biomes.js';
+import { BIOMES } from './biomes.js';
+import { GALAXIES } from './galaxies.js';
 import { PROP_KINDS, NO_DEAD } from './props.js';
 import { matte } from './quality.js';
 
@@ -22,15 +23,16 @@ const vert = /* glsl */ `
   attribute vec4 aDyn;
   attribute float aWater;
   attribute vec2 aEdge;
+  attribute float aPave;
   varying vec3 vN, vP, vWorld, vDead, vAlive, vWaterCol;
   varying vec4 vDyn, vStyle;
-  varying float vWater;
+  varying float vWater, vPave;
   varying vec2 vEdge;
   void main() {
     vN = normalize(normal);
     vP = position;
     vDead = aDead; vAlive = aAlive; vStyle = aStyle; vWaterCol = aWaterCol;
-    vDyn = aDyn; vWater = aWater; vEdge = aEdge;
+    vDyn = aDyn; vWater = aWater; vEdge = aEdge; vPave = aPave;
     vec4 wp = modelMatrix * vec4(position, 1.0);
     vWorld = wp.xyz;
     gl_Position = projectionMatrix * viewMatrix * wp;
@@ -43,7 +45,7 @@ const frag = /* glsl */ `
   uniform vec3 uSunDir;
   varying vec3 vN, vP, vWorld, vDead, vAlive, vWaterCol;
   varying vec4 vDyn, vStyle;
-  varying float vWater;
+  varying float vWater, vPave;
   varying vec2 vEdge;
 
   float hash(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
@@ -70,6 +72,16 @@ const frag = /* glsl */ `
     float ripple = sin(dot(vP, vec3(2.3, 1.1, 1.7)) * 7.0 + nz * 7.0);
     alive *= 1.0 + ripple * 0.07 * sand;
     dead *= 1.0 + ripple * 0.04 * sand;
+
+    // paved ground (city): square slabs with faint seams and a little per-slab variation.
+    // Planes of a 3D grid cut the sphere into roughly square tiles.
+    if (vPave > 0.001) {
+      vec3 tq = abs(fract(vP * 1.7) - 0.5);
+      float seam = smoothstep(0.43, 0.49, max(tq.x, max(tq.y, tq.z)));
+      float slab = 1.0 + (hash(floor(vP * 1.7)) - 0.5) * 0.1;
+      alive = mix(alive, vAlive * slab * (1.0 - seam * 0.2), vPave);
+      dead *= 1.0 - seam * 0.12 * vPave;
+    }
 
     vec3 col = mix(dead, alive, life);
 
@@ -268,9 +280,10 @@ class PropLayer {
 }
 
 export class Planet {
-  constructor(scene, seed) {
+  constructor(scene, seed, galaxy = 'wild') {
     this.scene = scene;
     this.seed = seed;
+    this.galaxy = galaxy;
     this.R = 8;
     this.time = 0;
     this.group = new THREE.Group();
@@ -299,7 +312,8 @@ export class Planet {
   // ------------------------------------------------------------- biome layout
 
   chooseBiomes() {
-    const ids = [...BIOME_IDS];
+    // only this galaxy's biomes are shuffled, so adding galaxies never changes existing seeds
+    const ids = [...GALAXIES[this.galaxy].biomes];
     for (let i = ids.length - 1; i > 0; i--) {
       const j = Math.floor(this.rand() * (i + 1));
       [ids[i], ids[j]] = [ids[j], ids[i]];
@@ -381,6 +395,12 @@ export class Planet {
         return 1.5 * (1 - smoothstep(0, 0.5, ang)) - 0.9 * (1 - smoothstep(0, 0.13, ang)) + 0.12 * f(n.x * 3, n.y * 3, n.z * 3);
       }
       case 'bumps': return 0.75 * smoothstep(-0.1, 0.35, f(n.x * 2.6 + 1, n.y * 2.6, n.z * 2.6)) - 0.2;
+      case 'city': {
+        // gentle terraces, like blocks of a hilly town
+        const q = (this.fbm(n.x * 1.6 + 7, n.y * 1.6, n.z * 1.6) + 1) * 2;
+        const step = Math.floor(q);
+        return 0.12 * (step + smoothstep(0.35, 0.65, q - step)) - 0.25;
+      }
       case 'hillocks': return 0.55 * Math.max(0, f(n.x * 3.2, n.y * 3.2, n.z * 3.2)) + 0.2 * f(n.x * 1.3, n.y * 1.3 + 2, n.z * 1.3);
       default: return 0;
     }
@@ -586,6 +606,7 @@ export class Planet {
     const dead = new Float32Array(n * 3);
     const alive = new Float32Array(n * 3);
     const style = new Float32Array(n * 4);
+    const pave = new Float32Array(n); // 0..1 how paved the restored ground is (city)
     const waterCol = new Float32Array(n * 3);
     const edge = new Float32Array(n * 2);
     this.waterTarget = new Float32Array(n);
@@ -608,13 +629,13 @@ export class Planet {
       const h = this.heightAt(v);
       pos.setXYZ(i, v.x * h, v.y * h, v.z * h);
       const w = this.softWeights(v);
-      let dr = 0, dg = 0, db = 0, ar = 0, ag = 0, ab = 0, s0 = 0, s1 = 0, s2 = 0;
+      let dr = 0, dg = 0, db = 0, ar = 0, ag = 0, ab = 0, s0 = 0, s1 = 0, s2 = 0, pv = 0;
       for (let r = 0; r < NUM_REGIONS; r++) {
         if (w[r] < 0.002) continue;
         const d = this.deadCols[r], a = this.aliveCols[r], st = this.defs[r].style;
         dr += d.r * w[r]; dg += d.g * w[r]; db += d.b * w[r];
         ar += a.r * w[r]; ag += a.g * w[r]; ab += a.b * w[r];
-        s0 += st[0] * w[r]; s1 += st[1] * w[r]; s2 += st[2] * w[r];
+        s0 += st[0] * w[r]; s1 += st[1] * w[r]; s2 += st[2] * w[r]; pv += (st[3] || 0) * w[r];
       }
       const p = this.patchId[i];
       if (p >= 0) {
@@ -622,6 +643,7 @@ export class Planet {
         pastelDead(c.set(patch.def.dead)); dr = c.r; dg = c.g; db = c.b;
         pastel(c.set(patch.def.alive)); ar = c.r; ag = c.g; ab = c.b;
         if (patch.def.emissive) style[i * 4 + 3] = patch.def.emissive;
+        if (patch.def.pave !== undefined) pv = patch.def.pave;
         if (patch.water) {
           c.set(patch.water).lerp(WHITE, 0.12);
           waterCol.set([c.r, c.g, c.b], i * 3);
@@ -631,6 +653,7 @@ export class Planet {
       dead.set([dr, dg, db], i * 3);
       alive.set([ar, ag, ab], i * 3);
       style[i * 4] = s0; style[i * 4 + 1] = s1; style[i * 4 + 2] = s2;
+      pave[i] = pv;
     }
 
     // edges: neighbours in a different biome / patch
@@ -661,6 +684,8 @@ export class Planet {
     geo.setAttribute('aAlive', attr(alive, 3));
     this.smooth(style, 4, idx, 1);
     geo.setAttribute('aStyle', attr(style, 4));
+    this.smooth(pave, 1, idx, 1);
+    geo.setAttribute('aPave', attr(pave, 1));
     geo.setAttribute('aWaterCol', attr(waterCol, 3));
     geo.setAttribute('aEdge', attr(edge, 2));
     this.dynAttr = attr(this.dyn, 4, true);
@@ -724,6 +749,10 @@ export class Planet {
   buildProps() {
     const groups = {};
     const add = (kind, trigger, it) => {
+      if (!PROP_KINDS[kind]) {
+        if (!this.warned?.has(kind)) (this.warned ??= new Set()).add(kind) && console.warn(`unknown prop kind: ${kind}`);
+        return;
+      }
       const s = PROP_KINDS[kind].scale;
       it.scale *= s[0] + this.rand() * (s[1] - s[0]);
       (groups[`${kind}|${trigger}`] ??= { kind, trigger, items: [] }).items.push(it);

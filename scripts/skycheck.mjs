@@ -12,7 +12,7 @@ await page.evaluate(() => { document.getElementById('title').style.display = 'no
 await wait(800);
 await page.screenshot({ path: '/tmp/sky-title.png' });
 await page.evaluate(() => { document.getElementById('title').style.display = ''; });
-await page.click('#start-btn');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click();
 await wait(2500);
 await page.evaluate(() => { const b = window.blorbit; for (let i = 0; i < 6; i++) b.backdrop.spawnShootingStar(b.camera, 0); b.backdrop.shooting.forEach((s) => (s.age = 0.35)); });
 await wait(300);

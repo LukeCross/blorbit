@@ -18,9 +18,14 @@ export const SKINS = {
   lizard: { name: 'Lizard Blob', emoji: '🦎', body: 0xff6a3a, slime: 0xffb080 },
   bear: { name: 'Gummy Bear Blob', emoji: '🐻', body: 0xff5a7a, slime: 0xffb8c8 },
   hedgehog: { name: 'Hedgehog Blob', emoji: '🦔', body: 0xc8946a, slime: 0xffd8a8 },
+  squirrel: { name: 'Squirrel Blob', emoji: '🐿️', body: 0xd9895a, slime: 0xffc8a0 },
+  cat: { name: 'Cat Blob', emoji: '🐱', body: 0xf7b47e, slime: 0xffe0b8 },
+  dog: { name: 'Dog Blob', emoji: '🐶', body: 0xf0d29c, slime: 0xfff2c4 },
+  raccoon: { name: 'Raccoon Blob', emoji: '🦝', body: 0xb8b4c4, slime: 0xd8d0f4 },
+  seagull: { name: 'Seagull Blob', emoji: '🐦', body: 0xfaf8f4, slime: 0xc8ecff },
 };
 
-export const CREATURE_IDS = ['bunny', 'frog', 'fox', 'penguin', 'moth', 'snail', 'turtle', 'lizard', 'bear', 'hedgehog'];
+export const CREATURE_IDS = ['bunny', 'frog', 'fox', 'penguin', 'moth', 'snail', 'turtle', 'lizard', 'bear', 'hedgehog', 'squirrel', 'cat', 'dog', 'raccoon', 'seagull'];
 
 // ---------------------------------------------------------------- materials
 
@@ -31,7 +36,7 @@ const gummy = (color) => shiny(color, { transparent: true, opacity: 0.88 });
 const soft = (color, extra = {}) => matte(color, { roughness: 0.6, ...extra });
 
 // what each sleeping creature's body is made of
-const BODY_STYLE = { fox: fur, bunny: fur, hedgehog: fur, moth: fur, penguin: soft, turtle: soft, frog: gloss, lizard: gloss, snail: gloss, bear: gummy };
+const BODY_STYLE = { fox: fur, bunny: fur, hedgehog: fur, moth: fur, penguin: soft, turtle: soft, frog: gloss, lizard: gloss, snail: gloss, bear: gummy, squirrel: fur, cat: fur, dog: fur, raccoon: fur, seagull: soft };
 export const bodyMaterial = (id) => (BODY_STYLE[id] || soft)(SKINS[id].body);
 
 // ---------------------------------------------------------------- shape helpers
@@ -396,6 +401,162 @@ export function buildAccessories(id) {
     muzzle.rotation.x = Math.PI / 2;
     g.add(muzzle);
     g.add(mesh(sphere(0.085), gloss(0x2a1a1a), 0, -0.12, 1.33));
+  }
+
+  if (id === 'squirrel') {
+    const russet = fur(skin.body);
+    const cream = fur(0xfff0dc);
+    for (const s of [-1, 1]) {
+      const ear = new THREE.Group();
+      ear.position.set(s * 0.38, 0.8, -0.08);
+      ear.rotation.z = -s * 0.25;
+      const outer = mesh(roundedCone(0.15, 0.3, 0.35, 24), russet);
+      outer.scale.set(1, 1, 0.7);
+      const tuft = mesh(roundedCone(0.05, 0.16, 0.5, 12), fur(0x9a5a3a), 0, 0.26, 0);
+      ear.add(outer, tuft);
+      g.add(ear);
+      anims.push((t) => (ear.rotation.z = -s * (0.25 + Math.sin(t * 3.1 + s) * 0.06)));
+    }
+    // a big bushy tail curling up over the back, paler towards the tip
+    const tail = new THREE.Group();
+    tail.position.set(0, -0.3, -0.7);
+    const tube = taperedTube([[0, 0, 0], [0, 0.3, -0.42], [0, 0.95, -0.55], [0, 1.45, -0.3], [0, 1.6, 0.12], [0, 1.42, 0.38]], (t) => 0.12 + 0.24 * Math.pow(Math.sin(Math.PI * Math.min(1, t * 1.05)), 0.7), 72, 20);
+    const along = tube.geo.attributes.along.array;
+    gradient(tube.geo, (i) => along[i], skin.body, 0xffd8b4, 0.55, 1);
+    tail.add(new THREE.Mesh(tube.geo, fur(0xffffff, { vertexColors: true })), new THREE.Mesh(tube.caps[0], russet), new THREE.Mesh(tube.caps[1], fur(0xffd8b4)));
+    g.add(tail);
+    anims.push((t) => (tail.rotation.x = Math.sin(t * 2.4) * 0.08));
+    g.add(surfacePatch(cream, [0, -0.35, 0.94], 0.36, 1.0, 1.05, 0.93));
+    g.add(onSurface(mesh(sphere(0.05), gloss(0xff9ab0)), [0, 0.43, 0.9], 1.01));
+    // little buck teeth just under the smile
+    for (const s of [-1, 1]) g.add(onSurface(mesh(new THREE.BoxGeometry(0.035, 0.05, 0.02), gloss(0xffffff)), [s * 0.02, 0.19, 0.98], 1.0));
+  }
+
+  if (id === 'cat') {
+    const coat = fur(skin.body);
+    for (const s of [-1, 1]) {
+      const ear = new THREE.Group();
+      ear.position.set(s * 0.46, 0.74, -0.04);
+      ear.rotation.set(-0.05, 0, -s * 0.32);
+      const outer = mesh(roundedCone(0.26, 0.42, 0.18), coat);
+      outer.scale.set(1, 1, 0.6);
+      const inner = mesh(roundedCone(0.15, 0.28, 0.2), fur(0xffc8d4), 0, 0.03, 0.08);
+      inner.scale.set(1, 1, 0.4);
+      ear.add(outer, inner);
+      g.add(ear);
+      anims.push((t) => (ear.rotation.z = -s * (0.32 + Math.max(0, Math.sin(t * 0.9 + s * 2)) ** 8 * 0.25))); // the odd flick
+      // whiskers fanning out from the cheeks
+      for (const k of [-1, 0, 1]) {
+        const w = mesh(new THREE.CylinderGeometry(0.008, 0.004, 0.42, 5), soft(0x6a5a6a), s * 0.62, 0.3 + k * 0.05, 0.82);
+        w.rotation.set(0, -s * 0.3, s * (Math.PI / 2 + k * 0.18));
+        g.add(w);
+      }
+    }
+    // darker tabby stripes over the head and back
+    const stripe = fur(0xe0905a);
+    for (const p of [[0, 0.97, 0.2], [0.25, 0.92, -0.2], [-0.25, 0.92, -0.2], [0, 0.75, -0.65], [0, 0.35, -0.94]]) {
+      const m = onSurface(mesh(sphere(0.2, 24, 16), stripe), p, 0.965);
+      m.scale.set(1.3, 0.35, 0.3);
+      g.add(m);
+    }
+    g.add(surfacePatch(fur(0xfff4e8), [0, -0.05, 1], 0.32, 1.25, 0.8, 0.94));
+    const nose = onSurface(mesh(roundedCone(0.06, 0.06, 0.5, 3), gloss(0xff8aa8)), [0, 0.42, 0.9], 1.0);
+    g.add(nose);
+    // curling tail that sways lazily
+    const tail = new THREE.Group();
+    tail.position.set(0, -0.4, -0.78);
+    const tube = taperedTube([[0, 0, 0], [0, 0.25, -0.45], [0.18, 0.8, -0.55], [0.35, 1.15, -0.35], [0.3, 1.32, -0.12]], (t) => 0.1 - t * 0.02, 56, 14);
+    tail.add(tubeGroup(tube, coat));
+    g.add(tail);
+    anims.push((t) => (tail.rotation.z = Math.sin(t * 1.6) * 0.3));
+  }
+
+  if (id === 'dog') {
+    const coat = fur(skin.body);
+    const brown = fur(0xc8865a);
+    for (const s of [-1, 1]) {
+      // floppy ears that bounce as it rolls
+      const ear = new THREE.Group();
+      ear.position.set(s * 0.52, 0.72, -0.02);
+      const tube = taperedTube([[0, 0, 0], [s * 0.22, 0.02, 0.02], [s * 0.36, -0.25, 0.06], [s * 0.38, -0.55, 0.08]], (t) => 0.1 + 0.08 * Math.sin(Math.PI * Math.min(1, t * 1.2)), 40, 16);
+      const flap = tubeGroup(tube, brown);
+      flap.scale.set(1, 1, 0.55);
+      ear.add(flap);
+      g.add(ear);
+      anims.push((t) => (ear.rotation.z = s * Math.sin(t * 5 + s) * 0.12));
+    }
+    g.add(surfacePatch(fur(0xfff4e0), [0, -0.05, 1], 0.36, 1.2, 0.85, 0.9));
+    const nose = onSurface(mesh(sphere(0.085), gloss(0x2a1f2a)), [0, 0.42, 0.9], 1.02);
+    nose.scale.set(1.3, 0.9, 1);
+    g.add(nose);
+    // a happy little tongue under the smile
+    const tongue = onSurface(mesh(sphere(0.07, 24, 16), gloss(0xff8aa8)), [0, 0.16, 0.98], 0.99);
+    tongue.scale.set(1, 1.3, 0.45);
+    g.add(tongue);
+    g.add(surfacePatch(brown, [0.55, 0.7, -0.45], 0.32, 1.1, 0.9, 0.92));
+    const tail = new THREE.Group();
+    tail.position.set(0, 0.0, -0.9);
+    const tube = taperedTube([[0, 0, 0], [0, 0.22, -0.2], [0, 0.48, -0.26]], (t) => 0.09 - t * 0.04, 24, 12);
+    tail.add(tubeGroup(tube, coat));
+    g.add(tail);
+    anims.push((t) => (tail.rotation.z = Math.sin(t * 11) * 0.5));
+  }
+
+  if (id === 'raccoon') {
+    const coat = fur(skin.body);
+    const dark = fur(0x4a4458);
+    // the bandit mask sits under the eyes so they still pop on top
+    g.add(surfacePatch(dark, [0, 0.58, 0.82], 0.4, 1.75, 0.55, 0.9));
+    g.add(surfacePatch(fur(0xfdf8ff), [0, 0.22, 1], 0.26, 1.3, 0.8, 0.95));
+    g.add(onSurface(mesh(sphere(0.065), gloss(0x2a1f2a)), [0, 0.42, 0.9], 1.02));
+    for (const s of [-1, 1]) {
+      const ear = mesh(sphere(0.2, 32, 20), coat, s * 0.52, 0.76, -0.08);
+      ear.scale.set(1, 1, 0.5);
+      const inner = mesh(sphere(0.12, 24, 16), fur(0xe8e0f0), s * 0.52, 0.77, 0.02);
+      inner.scale.set(1, 1, 0.4);
+      g.add(ear, inner);
+    }
+    // ringed tail
+    const tail = new THREE.Group();
+    tail.position.set(0, -0.3, -0.75);
+    const tube = taperedTube([[0, 0, 0], [0, 0.25, -0.4], [0, 0.75, -0.6], [0.05, 1.15, -0.5]], (t) => 0.12 + 0.12 * Math.sin(Math.PI * Math.min(1, t * 1.1)), 64, 18);
+    const along = tube.geo.attributes.along.array;
+    gradient(tube.geo, (i) => 0.5 + 0.5 * Math.sin(along[i] * Math.PI * 9), skin.body, 0x4a4458, 0.35, 0.65);
+    tail.add(new THREE.Mesh(tube.geo, fur(0xffffff, { vertexColors: true })), new THREE.Mesh(tube.caps[0], coat), new THREE.Mesh(tube.caps[1], dark));
+    g.add(tail);
+    anims.push((t) => (tail.rotation.y = Math.sin(t * 2.2) * 0.3));
+  }
+
+  if (id === 'seagull') {
+    const yellow = gloss(0xffd04a);
+    const wingMat = soft(0xa4aec4);
+    const beak = mesh(roundedCone(0.15, 0.44, 0.3), yellow, 0, 0.12, 0.92);
+    beak.rotation.x = Math.PI / 2 + 0.12;
+    g.add(beak);
+    g.add(mesh(sphere(0.04), gloss(0xff5a5a), 0, 0.06, 1.24));
+    for (const s of [-1, 1]) {
+      // folded grey wings with dark tips, gently flapping
+      const pivot = new THREE.Group();
+      pivot.position.set(s * 0.86, 0.2, -0.05);
+      // long folded wing sweeping down towards the tail
+      const wing = mesh(sphere(0.46, 32, 20), wingMat, s * 0.1, -0.05, -0.28);
+      wing.scale.set(0.24, 0.5, 1.5);
+      wing.rotation.x = -0.4;
+      const tip = mesh(sphere(0.2, 20, 14), soft(0x4a4458), s * 0.1, -0.36, -0.86);
+      tip.scale.set(0.26, 0.45, 0.9);
+      tip.rotation.x = -0.4;
+      pivot.add(wing, tip);
+      g.add(pivot);
+      anims.push((t) => (pivot.rotation.z = s * (0.12 + Math.sin(t * 3 + s) * 0.12)));
+      const foot = mesh(sphere(0.18), gloss(0xffa23a), s * 0.32, -0.86, 0.34);
+      foot.scale.set(1, 0.35, 1.3);
+      g.add(foot);
+    }
+    for (const [x, r] of [[-0.12, 0.35], [0, 0], [0.12, -0.35]]) {
+      const feather = mesh(roundedCone(0.08, 0.34, 0.4, 12), soft(0xc8cede), x, -0.1, -0.95);
+      feather.rotation.set(-Math.PI / 2 - 0.3, 0, r);
+      g.add(feather);
+    }
   }
 
   g.userData.animate = (t) => anims.forEach((a) => a(t));

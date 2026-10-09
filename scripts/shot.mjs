@@ -22,7 +22,7 @@ const shot = (name) => page.screenshot({ path: `${out}/${name}.png` });
 
 await wait(2000);
 await shot('1-title');
-await page.keyboard.press('Space');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click();
 await wait(500);
 console.log(await page.evaluate(() => {
   const p = window.blorbit.planet();

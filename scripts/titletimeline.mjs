@@ -23,7 +23,8 @@ for (let i = 0; i < 160; i++) {
     const vis = (sel) => { const e = document.querySelector(sel); return !!e && getComputedStyle(e).display !== 'none' && !!e.offsetParent; };
     const hints = `${vis('.controls.keys-only') ? 'DESKTOP' : ''}${vis('.controls.touch-only') ? 'TOUCH' : ''}` || 'none';
     const btn = document.getElementById('start-btn');
-    return `${hints} hints, button "${btn?.textContent}"${btn?.disabled ? ' (disabled)' : ''}`;
+    const ready = !!document.querySelector('#title-galaxies .galaxy-card') && !document.getElementById('title-galaxies').classList.contains('hidden');
+    return `${hints} hints, ${ready ? 'galaxy picker ready' : `button "${btn?.textContent}"${btn?.disabled ? ' (disabled)' : ''}`}`;
   }).catch(() => 'loading');
   if (seen.at(-1)?.s !== s) { seen.push({ t: Date.now() - t0, s }); if (s.startsWith('DESKTOP')) await page.screenshot({ path: '/tmp/title-early.png' }); }
 }

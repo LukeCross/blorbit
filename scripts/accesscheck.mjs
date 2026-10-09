@@ -14,7 +14,7 @@ await page.setViewport(mobile ? { width: 390, height: 844, isMobile: true, hasTo
 page.on('pageerror', (e) => console.log('[pageerror]', e.message));
 page.setDefaultTimeout(120000);
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-const load = async () => { await page.goto('http://localhost:5173/', { waitUntil: 'load' }); await wait(2500); await page.click('#start-btn'); await wait(1200); };
+const load = async () => { await page.goto('http://localhost:5173/', { waitUntil: 'load' }); await wait(2500); await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click(); await wait(1200); };
 const turnRate = () => page.evaluate(() => window.blorbit.blob.turnRate.toFixed(3));
 
 await page.goto('http://localhost:5173/', { waitUntil: 'load' });

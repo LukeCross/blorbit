@@ -20,7 +20,7 @@ const snapshot = () => page.evaluate(() => {
 await page.goto('http://localhost:5173/', { waitUntil: 'networkidle0' });
 await page.evaluate(() => localStorage.clear());
 await page.reload({ waitUntil: 'networkidle0' });
-await page.keyboard.press('Space');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click();
 await page.evaluate(() => { const b = window.blorbit; b.completeRegion(1); [0, 1, 2].forEach((k) => b.completePatch(k)); });
 await wait(5000);
 await page.keyboard.press('KeyR'); // stop rolling so the saved position is stable
@@ -32,7 +32,7 @@ await wait(500);
 const after = await snapshot();
 console.log('before', before);
 console.log('after ', after);
-await page.keyboard.press('Space');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click();
 await wait(3000);
 await page.screenshot({ path: '/tmp/blorbit-resumed.png' });
 await browser.close();

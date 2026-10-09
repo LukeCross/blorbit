@@ -13,21 +13,29 @@ Everything runs in the browser: there's no server, no account and no downloads. 
 ### Restore the planet
 Each planet starts grey and withered. Wherever your blob rolls, it leaves a glistening slime trail. The slime fades into life: grass sprouts, flowers pop up, trees regrow, ponds refill and critters return.
 
-### Biomes and spots
-Every planet is split into **4 biomes**, picked at random from 10:
+### Galaxies
+When you boot the game you **choose your galaxy**. Each galaxy is its own set of biomes, creatures and collectibles:
 
-| Biome | Sleeping creature |
-| --- | --- |
-| Bunny Meadow | 🐰 Bunny |
-| Sleepy Pond | 🐸 Frog |
-| Dusty Dunes | 🦊 Fox |
-| Frosty Peaks | 🐧 Penguin |
-| Moonlit Grove | 🦋 Moth |
-| Snail Garden | 🐌 Snail |
-| Sunny Shore | 🐢 Turtle |
-| Ember Crags | 🦎 Lizard |
-| Sugar Hills | 🐻 Bear |
-| Maple Hollow | 🦔 Hedgehog |
+- **🌸 Wildbloom:** 10 wild biomes, 10 creatures and 80 finds. Open from the start.
+- **🌆 Citylight:** 5 city biomes, 5 creatures and 40 finds. Abandoned grey streets light back up: windows glow, awnings unfurl and the traffic returns. It **unlocks once you've woken 8 of the 10 Wildbloom creatures** (80%).
+
+Travel between unlocked galaxies is **free**. Tap the galaxy icon next to the planet name or press `G`, or go **🏠 Menu** (top left, also on the planet-restored screen) to get back to the galaxy picker. Each galaxy keeps its own half-finished planet, so you can leave one and come back to it later. Your stardust, skins and collection are shared across every galaxy, so a cat can roll around Wildbloom.
+
+### Biomes and spots
+Every planet is split into **4 biomes**, picked at random from its galaxy:
+
+| Wildbloom biome | Sleeping creature | | Citylight biome | Sleeping creature |
+| --- | --- | --- | --- | --- |
+| Bunny Meadow | 🐰 Bunny | | Plaza Park | 🐿️ Squirrel |
+| Sleepy Pond | 🐸 Frog | | Neon Downtown | 🐱 Cat |
+| Dusty Dunes | 🦊 Fox | | Sleepy Suburbs | 🐶 Dog |
+| Frosty Peaks | 🐧 Penguin | | Funfair Pier | 🦝 Raccoon |
+| Moonlit Grove | 🦋 Moth | | Dockside Harbour | 🐦 Seagull |
+| Snail Garden | 🐌 Snail | | | |
+| Sunny Shore | 🐢 Turtle | | | |
+| Ember Crags | 🦎 Lizard | | | |
+| Sugar Hills | 🐻 Bear | | | |
+| Maple Hollow | 🦔 Hedgehog | | | |
 
 Each biome has its own terrain, colours, sky tint, props, critters, ambient particles and soundscape. It's also scattered with smaller named **spots**, like a flower bed, an old dirt road, an oasis or a frozen lake. Slime enough of a spot to clear it, which earns a chime, a burst of nature and a chance at a collectible find.
 
@@ -40,8 +48,8 @@ Each planet gets a randomly generated name and layout, seeded from the date and 
 
 ### Stardust, finds and the shop
 - **Stardust** ✨ is scattered in little trails across every planet. Roll over it to collect it.
-- **Finds** are collectibles: 8 per biome, 80 in total. Each one is *common*, *rare* or *legendary*. You can roll one by clearing a spot, and they all live in your **Collection** book.
-- The **Shop** sells card packs for each biome. Every pack holds 3 cards from that biome's collection:
+- **Finds** are collectibles: 8 per biome (80 in Wildbloom, 40 in Citylight). Each one is *common*, *rare* or *legendary*. You can roll one by clearing a spot, and they all live in your **Collection** book, which has a tab per galaxy.
+- The **Shop** sells card packs for each biome. It opens on your current galaxy, with a tab for every galaxy: unlocked ones let you buy their packs without travelling, and locked ones show greyed out with their unlock progress. Every pack holds 3 cards from that biome's collection:
   - **Card pack** (✨25): 5% legendary, 25% rare.
   - **Shiny pack** (✨75): 15% legendary, 50% rare, and always at least one rare.
 
@@ -60,12 +68,13 @@ You start as the classic water blob. Each creature you wake becomes a skin with 
 | `B` | Open/close the Collection book |
 | `P` | Open/close the Shop |
 | `N` | New planet (asks you to confirm) |
+| `G` | Open the galaxy picker |
 | `M` | Mute/unmute |
 | `-` | Equip the classic blob skin |
-| `1`–`9`, `0` | Equip creature skins 1–10 (if unlocked) |
+| `1`–`9`, `0` | Equip this galaxy's creature skins, in order (if unlocked) |
 | `Esc` | Close any open panel |
 
-Press any key, or click/tap anywhere on the title screen, to start.
+Pick a galaxy on the title screen to start, or press `Enter` to jump back into the galaxy you were last in.
 
 ### Touch (phones and tablets)
 - **Tap sides** (default): your blob rolls forward by itself. **Hold the left or right half** of the screen to turn; the turn starts gentle and builds up the longer you hold. Quick taps give a small nudge, and both thumbs down goes straight.
@@ -134,8 +143,9 @@ There are no models, textures or sound assets. Everything you see and hear is ge
 - Shooting stars streak across the open sky around the planet every few seconds, now and then as a little shower.
 
 ### Determinism and saving
-- Every planet is generated from a single seed using a seeded PRNG (**mulberry32**) and seeded noise. Given the seed, the terrain, biomes, spots, props and stardust are identical every time.
+- Every planet is generated from a single seed using a seeded PRNG (**mulberry32**) and seeded noise. Given the seed and its galaxy, the terrain, biomes, spots, props and stardust are identical every time. Each planet only shuffles its own galaxy's biome list, so adding a galaxy never changes existing planets.
 - That keeps saves tiny. The save stores the seed plus compact **bitsets** (base64) of painted vertices and collected stardust, the blob's position, and which spots and biomes are done. Progress is saved every few seconds, when the tab is hidden and after every completion.
+- **Saves and galaxies:** one main save (`blorbit-save-v1`) holds everything shared across galaxies: stardust, skins, finds, settings, which galaxy you're in and planets restored per galaxy. Each galaxy has its own planet save (`blorbit-planet-v1:<galaxy>`). Finds are keyed `biomeId:name`, and biome ids are unique across galaxies, so they don't need a galaxy prefix. Saves from before galaxies existed migrate to Wildbloom automatically.
 
 ### Performance
 The game is tuned to run on low-end laptops and phones:
@@ -161,7 +171,8 @@ index.html          UI markup and all CSS (design tokens, HUD, panels, responsiv
 src/
   main.js           Game loop, state, input, UI, saving and orchestration
   planet.js         Icosphere terrain, biome layout, spots, slime painting, prop layers
-  biomes.js         The 10 biome definitions (terrain, colours, props, critters, finds)
+  galaxies.js       Galaxy definitions (which biomes belong to which galaxy) and unlock rules
+  biomes.js         The 15 biome definitions (terrain, colours, props, critters, finds)
   props.js          Procedural prop models
   blob.js           The player blob: movement, rolling, jelly shader, squash and stretch
   skins.js          Creature skins: accessories, body materials, eyes

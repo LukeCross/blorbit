@@ -6,7 +6,7 @@ const page = await browser.newPage();
 await page.setViewport({ width: 1280, height: 800 });
 page.on('pageerror', (e) => console.log('[pageerror]', e.message));
 await page.goto('http://localhost:5173/?seed=42', { waitUntil: 'networkidle0' });
-await page.keyboard.press('Space');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click();
 await page.keyboard.press('KeyR');
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 for (const [i, v] of variants.entries()) {

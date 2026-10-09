@@ -10,7 +10,7 @@ await page.goto('http://localhost:5173/', { waitUntil: 'load', timeout: 120000 }
 await page.evaluate((ids) => { localStorage.clear(); localStorage.setItem('blorbit-save-v1', JSON.stringify({ unlocked: ids, v: 3, autoRoll: false })); }, ids);
 await page.goto('http://localhost:5173/?seed=5', { waitUntil: 'load', timeout: 120000 });
 await page.waitForFunction(() => window.blorbit, { timeout: 120000 });
-await page.click('#start-btn');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click();
 // camera in front of the blob, three-quarter view, looking at its face
 await page.evaluate((VIEW) => {
   Object.assign(window.blorbit.CAM, VIEW === 'back' ? { up: 3.2, back: 3.4, ahead: 0, drop: -0.2 } : { up: 1.6, back: -3.6, ahead: 0, drop: -0.35 });

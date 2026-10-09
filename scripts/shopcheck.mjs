@@ -9,7 +9,7 @@ await page.goto('http://localhost:5173/', { waitUntil: 'networkidle0' });
 await page.evaluate(() => { localStorage.clear(); localStorage.setItem('blorbit-save-v1', JSON.stringify({ stardust: 400 })); });
 await page.reload({ waitUntil: 'networkidle0' });
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-await page.keyboard.press('Space');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click();
 await wait(800);
 await page.keyboard.press('KeyP');
 await wait(600);

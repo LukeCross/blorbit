@@ -14,7 +14,7 @@ await page.evaluate(() => {
 await page.reload({ waitUntil: 'networkidle0' });
 const s1 = JSON.parse((await storage()).save);
 console.log('after load: stardust', s1.stardust, '(50 + 60 sparkle + 220 rainbow refund = 330)', '| trail fields left:', 'trailsOwned' in s1 || 'trail' in s1);
-await page.click('#start-btn');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click();
 await wait(5000); // let the autosave write a planet
 await page.keyboard.press('KeyP');
 await wait(400);

@@ -11,7 +11,7 @@ await page.evaluate(() => { localStorage.clear(); localStorage.setItem('blorbit-
 await page.goto('http://localhost:5173/?seed=' + (process.env.SEED || 42), { waitUntil: 'networkidle0' });
 await wait(2500);
 await page.screenshot({ path: '/tmp/polish-1-title.png' });
-await page.click('#start-btn');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click();
 await wait(4000);
 await page.screenshot({ path: '/tmp/polish-2-play.png' });
 await page.evaluate(() => { const b = window.blorbit; const p = b.planet(); const r = p.regionAt(b.blob.p); b.completeRegion(r); });

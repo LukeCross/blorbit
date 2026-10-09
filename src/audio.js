@@ -294,6 +294,36 @@ export class Sound {
         if (Math.random() < 0.6) this.noiseBurst({ t, dur: 0.6, vol: 0.025, f: 3500, f2: 2000, q: 0.8, type: 'highpass', verb: 0.3 });
         else this.birdChirp();
         break;
+      // ---- Citylight
+      case 'park':
+        if (Math.random() < 0.35) for (let i = 0; i < 4; i++) this.noiseBurst({ t: t + i * 0.07 + Math.random() * 0.05, dur: 0.12, vol: 0.012, f: 2600 + Math.random() * 1500, q: 3, verb: 0.5 }); // fountain trickle
+        else this.birdChirp();
+        break;
+      case 'downtown': {
+        const r = Math.random();
+        if (r < 0.4) this.noiseBurst({ t, dur: 2.6, vol: 0.03, f: 160, f2: 240, q: 0.7, type: 'lowpass', verb: 0.3 }); // traffic swell
+        else if (r < 0.7) for (const [k, f] of [[0, 330], [0.22, 415]]) this.tone({ type: 'square', f, t: t + k, dur: 0.18, vol: 0.008, verb: 0.9, pan }); // distant horn
+        else this.tone({ type: 'sawtooth', f: 120, t, dur: 0.9, vol: 0.004, attack: 0.05, verb: 0.2, pan }); // neon buzz
+        break;
+      }
+      case 'suburbs':
+        if (Math.random() < 0.3) for (let i = 0; i < 2; i++) this.tone({ type: 'square', f: 330, f2: 210, t: t + i * 0.2, dur: 0.09, vol: 0.02, verb: 0.6, pan, glide: 0.07 }); // woof woof
+        else if (Math.random() < 0.5) for (let i = 0; i < 3; i++) this.tone({ type: 'triangle', f: midi(86 + pentaStep(Math.floor(Math.random() * 7))), t: t + i * 0.25, dur: 1.4, vol: 0.012, verb: 0.9, pan }); // wind chimes
+        else this.birdChirp();
+        break;
+      case 'funfair': {
+        // a few bars of calliope
+        const start = Math.floor(Math.random() * 5);
+        for (let i = 0; i < 6; i++) this.tone({ type: 'square', f: midi(72 + pentaStep(start + [0, 2, 4, 2, 5, 4][i])), t: t + i * 0.16, dur: 0.14, vol: 0.006, verb: 0.7, pan });
+        break;
+      }
+      case 'harbour': {
+        const r = Math.random();
+        if (r < 0.4) this.tone({ f: 1700, f2: 1050, t, dur: 0.4, vol: 0.03, verb: 0.6, pan, glide: 0.35 }); // gull
+        else if (r < 0.8) this.noiseBurst({ t, dur: 2.6, vol: 0.03, f: 380, f2: 1200, q: 0.5, type: 'lowpass', verb: 0.5 }); // lapping water
+        else this.tone({ type: 'sawtooth', f: 82, t, dur: 2, vol: 0.012, attack: 0.4, verb: 0.9 }); // foghorn far away
+        break;
+      }
       default:
         this.birdChirp();
     }
@@ -375,7 +405,7 @@ export class Sound {
   // rolling timbre per surface: [filter centre, Q, low thump]
   setBiome(id) {
     this.biome = id;
-    this.rollTimbre = { snow: [1700, 0.9, 0.3], desert: [2600, 0.6, 0.2], pond: [320, 1.6, 1.3], grove: [500, 1.2, 1], shore: [2200, 0.6, 0.4], volcano: [700, 1, 1.5], candy: [600, 2.2, 1.2], autumn: [2000, 0.8, 0.5] }[id] || [450, 1.4, 1];
+    this.rollTimbre = { snow: [1700, 0.9, 0.3], desert: [2600, 0.6, 0.2], pond: [320, 1.6, 1.3], grove: [500, 1.2, 1], shore: [2200, 0.6, 0.4], volcano: [700, 1, 1.5], candy: [600, 2.2, 1.2], autumn: [2000, 0.8, 0.5], park: [800, 1.1, 0.8], downtown: [1400, 0.8, 0.6], suburbs: [600, 1.3, 0.9], funfair: [1100, 1, 1.1], harbour: [700, 1.1, 1] }[id] || [450, 1.4, 1];
   }
 
   setLife(x) {

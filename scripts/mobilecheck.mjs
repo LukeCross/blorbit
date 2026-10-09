@@ -17,7 +17,7 @@ await page.goto('http://localhost:5173/?seed=42', { waitUntil: 'load', timeout: 
 await page.waitForFunction(() => window.blorbit, { timeout: 120000 });
 await wait(2500);
 await shot('1-title');
-await page.tap('#start-btn');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).tap();
 await wait(4000);
 await page.evaluate(() => { const b = window.blorbit; const p = b.planet(); const k = p.patches.findIndex((q) => q.region === p.regionAt(b.blob.p)); b.completePatch(k); });
 await wait(1500);

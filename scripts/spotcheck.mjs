@@ -5,7 +5,7 @@ const page = await browser.newPage();
 page.on('pageerror', (e) => console.log('[pageerror]', e.message));
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 await page.goto('http://localhost:5173/?seed=42', { waitUntil: 'networkidle0' });
-await page.click('#start-btn');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click();
 await page.keyboard.press('KeyR');
 await wait(500);
 const r = await page.evaluate(() => window.blorbit.planet().regionAt(window.blorbit.blob.p));

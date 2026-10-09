@@ -8,7 +8,7 @@ const skin = process.env.SKIN || 'fox';
 await page.goto('http://localhost:5173/?seed=7', { waitUntil: 'networkidle0' });
 await page.evaluate((skin) => { localStorage.clear(); localStorage.setItem('blorbit-save-v1', JSON.stringify({ unlocked: ['classic', skin], equipped: skin, autoRoll: false, v: 3 })); }, skin);
 await page.reload({ waitUntil: 'networkidle0' });
-await page.keyboard.press('Space');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click();
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 await wait(1500);
 await page.keyboard.down('ArrowUp');

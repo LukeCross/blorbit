@@ -11,7 +11,7 @@ const a = await name();
 await page.reload({ waitUntil: 'networkidle0' });
 const b = await name();
 console.log('boot 1:', a, '| boot 2:', b);
-await page.keyboard.press('Space');
+await (await page.waitForSelector('#title-galaxies .galaxy-card[data-g="wild"]', { visible: true })).click();
 await wait(4000); // auto-roll paints some ground, so leaving needs a confirm
 await page.click('#new-planet');
 await wait(300);

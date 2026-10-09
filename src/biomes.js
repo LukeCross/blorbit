@@ -195,4 +195,102 @@ export const BIOMES = {
   },
 };
 
+
+// ---------------------------------------------------------------- Citylight galaxy
+// Abandoned grey streets that light back up: windows glow, awnings unfurl, the traffic returns.
+// style[3] = paved: restored ground shows paving-slab seams.
+
+Object.assign(BIOMES, {
+  park: {
+    name: 'Plaza Park', creature: 'squirrel', weight: 0.1, terrain: 'gentle',
+    dead: 0x6a6670, alive: 0x7fd36a, sky: ['#8fa8f0', '#ffe6d0'], style: [0, 0, 0, 0.25],
+    small: [['grass', 0.1], ['flower', 0.03]],
+    big: [['parkTree', 0.004]],
+    critters: [['bird', 3], ['butterfly', 2]],
+    particles: [[0xffffff, 0xfff3a0], -0.5, 5],
+    patches: [
+      { name: 'Fountain square', shape: 'blob', center: true, rFrac: 0.3, dead: 0x77727a, alive: 0xe8dcc8, pave: 1, props: [['fountain', 0.012, 'inner'], ['bench', 0.04, 'rim'], ['lampPost', 0.025, 'rim']], critters: [['bird', 2]] },
+      { name: 'Flower beds', shape: 'blob', ...M, dead: 0x5e5658, alive: 0x8fe070, props: [['planter', 0.08], ['flower', 0.3]], critters: [['butterfly', 2]] },
+      { name: 'Tree-lined avenue', shape: 'path', dead: 0x807a78, alive: 0xdcd2c2, pave: 1, props: [['parkTree', 0.03, 'rim'], ['lampPost', 0.015, 'rim']] },
+      { name: 'Picnic lawn', shape: 'blob', ...L, dead: 0x635e5a, alive: 0x74d060, props: [['grass', 0.3], ['bench', 0.02, 'rim']] },
+      { name: 'Hot dog corner', shape: 'blob', ...S, dead: 0x726c70, alive: 0xe6d8c0, pave: 1, props: [['hotdogCart', 0.04, 'inner'], ['bench', 0.05, 'rim']] },
+      { name: 'Hedge maze', shape: 'blob', ...M, dead: 0x5a5a52, alive: 0x6cc85a, props: [['hedge', 0.12]] },
+    ],
+    patchCount: 10,
+    finds: [['🥨', 'Pretzel', 'c'], ['🌭', 'Hot dog', 'c'], ['🎈', 'Red balloon', 'c'], ['🥜', 'Peanuts', 'c'], ['🪁', 'Kite', 'r'], ['🛹', 'Skateboard', 'r'], ['🥏', 'Frisbee', 'r'], ['⛲', 'Wishing fountain', 'l']],
+  },
+  downtown: {
+    name: 'Neon Downtown', creature: 'cat', weight: 0.06, terrain: 'city',
+    dead: 0x5e5a68, alive: 0xb8b0d8, sky: ['#5a4f9a', '#ffb8d8'], style: [0, 0, 0.15, 0.9],
+    small: [['hydrant', 0.003]],
+    big: [['tower', 0.006]],
+    critters: [['firefly', 4], ['bird', 2]],
+    particles: [[0xff8fd8, 0x8fd8ff, 0xfff3a0], -0.4, 6],
+    patches: [
+      { name: 'Skyscraper block', shape: 'blob', ...L, dead: 0x5a5664, alive: 0xc8c0e0, pave: 1, props: [['tower', 0.06, 'inner']] },
+      { name: 'Main street', shape: 'path', dead: 0x55525e, alive: 0x8a86a0, pave: 1, props: [['car', 0.03], ['trafficLight', 0.015, 'rim'], ['lampPost', 0.02, 'rim']] },
+      { name: 'Shopping row', shape: 'blob', ...M, dead: 0x5e5a66, alive: 0xd8c8e0, pave: 1, props: [['shopFront', 0.05]] },
+      { name: 'Billboard corner', shape: 'blob', ...S, dead: 0x5a5662, alive: 0xc0b8e0, pave: 1, props: [['billboard', 0.04, 'inner'], ['hydrant', 0.03, 'rim']] },
+      { name: 'Neon alley', shape: 'path', emissive: 0.35, dead: 0x4e4a58, alive: 0xb090e0, pave: 1, props: [['neonSign', 0.05, 'rim']], critters: [['firefly', 2]] },
+      { name: 'Pocket plaza', shape: 'blob', ...S, dead: 0x625e6a, alive: 0xe0d6e8, pave: 1, props: [['bench', 0.05], ['planter', 0.05]] },
+    ],
+    patchCount: 10,
+    finds: [['☕', 'Coffee cup', 'c'], ['🍕', 'Pizza slice', 'c'], ['🚕', 'Taxi', 'c'], ['🗞️', 'Newspaper', 'c'], ['🎧', 'Headphones', 'r'], ['🎭', 'Theatre masks', 'r'], ['🎷', 'Saxophone', 'r'], ['🌃', 'Neon skyline', 'l']],
+  },
+  suburbs: {
+    name: 'Sleepy Suburbs', creature: 'dog', weight: 0.12, terrain: 'gentle',
+    dead: 0x6c6a5c, alive: 0x86d86a, sky: ['#9fb6f0', '#ffe9c8'], style: [0, 0, 0, 0],
+    small: [['grass', 0.12], ['flower', 0.04]],
+    big: [['house', 0.004]],
+    critters: [['butterfly', 3], ['bird', 2]],
+    particles: [[0xffffff, 0xfff8d0], -0.3, 5],
+    patches: [
+      { name: 'Cul-de-sac', shape: 'blob', ...L, dead: 0x6a6664, alive: 0x8ad46e, props: [['house', 0.03, 'inner'], ['bush', 0.04, 'rim']] },
+      { name: 'Picket fence lane', shape: 'path', dead: 0x7c766e, alive: 0xd8ccb8, pave: 0.6, props: [['fence', 0.1, 'rim'], ['mailbox', 0.02, 'rim']] },
+      { name: 'Front garden', shape: 'blob', ...M, dead: 0x5e584e, alive: 0x92e070, props: [['gnome', 0.03], ['flower', 0.3], ['bush', 0.05]] },
+      { name: 'Backyard pool', shape: 'blob', ...S, dead: 0x625e54, alive: 0x7ad86a, props: [['paddlingPool', 0.03, 'inner'], ['grass', 0.2]] },
+      { name: 'Driveway', shape: 'blob', ...S, dead: 0x6e6a6c, alive: 0xc8c4c0, pave: 1, props: [['car', 0.04, 'inner']] },
+      { name: 'Hedge row', shape: 'path', dead: 0x5c5a50, alive: 0x70c860, props: [['hedge', 0.06, 'rim']] },
+    ],
+    patchCount: 10,
+    finds: [['🦴', 'Dog bone', 'c'], ['🎾', 'Tennis ball', 'c'], ['🍪', 'Cookie', 'c'], ['🥛', 'Milk bottle', 'c'], ['🧸', 'Teddy bear', 'r'], ['🛼', 'Roller skate', 'r'], ['🪀', 'Yo-yo', 'r'], ['🏆', 'Best in show', 'l']],
+  },
+  funfair: {
+    name: 'Funfair Pier', creature: 'raccoon', weight: 0.04, terrain: 'beach',
+    dead: 0x6a6460, alive: 0xe8c89a, sky: ['#a88ae8', '#ffd2a8'], style: [0.2, 0, 0, 0.3],
+    small: [['balloons', 0.002]],
+    big: [['ferrisWheel', 0.0012]],
+    critters: [['bird', 2]],
+    particles: [[0xff8fc4, 0xffe14d, 0x8fd8ff, 0xb4ff86], 0.35, 8],
+    patches: [
+      { name: 'Ferris wheel', shape: 'blob', center: true, rFrac: 0.28, dead: 0x6e6862, alive: 0xf0d8b0, pave: 0.6, props: [['ferrisWheel', 0.01, 'inner'], ['balloons', 0.03, 'rim']] },
+      { name: 'Carousel', shape: 'blob', ...M, dead: 0x6a645e, alive: 0xf0d0b8, pave: 0.6, props: [['carousel', 0.02, 'inner'], ['bunting', 0.03, 'rim']] },
+      { name: 'Food stalls', shape: 'path', dead: 0x746c66, alive: 0xe8c8a0, props: [['stall', 0.04, 'rim'], ['balloons', 0.015]] },
+      { name: 'Boardwalk', shape: 'path', dead: 0x6e665e, alive: 0xd8b088, props: [['plank', 0.05], ['lampPost', 0.02, 'rim']] },
+      { name: 'Balloon stand', shape: 'blob', ...S, dead: 0x6a6460, alive: 0xf0d8c0, props: [['balloons', 0.12]] },
+      { name: 'Bunting square', shape: 'blob', ...S, dead: 0x6e6862, alive: 0xf4dcb8, pave: 0.6, props: [['bunting', 0.08]] },
+    ],
+    patchCount: 10,
+    finds: [['🍿', 'Popcorn', 'c'], ['🍦', 'Ice cream', 'c'], ['🎟️', 'Ride ticket', 'c'], ['🥤', 'Fizzy pop', 'c'], ['🎯', 'Bullseye', 'r'], ['🎠', 'Carousel horse', 'r'], ['🎪', 'Big top', 'r'], ['🎫', 'Golden ticket', 'l']],
+  },
+  harbour: {
+    name: 'Dockside Harbour', creature: 'seagull', weight: -0.06, terrain: 'basin',
+    dead: 0x5c6068, alive: 0x9ab8c8, sky: ['#7fa8e8', '#ffe0d0'], style: [0, 0, 0, 0.6],
+    small: [['bollard', 0.004]],
+    big: [['crane', 0.003]],
+    critters: [['bird', 4], ['fish', 2]],
+    particles: [[0xffffff, 0xd8f0ff], -0.2, 4],
+    patches: [
+      { name: 'The harbour', shape: 'blob', center: true, rFrac: 0.5, water: 0x3a9ec9, dead: 0x4e5258, alive: 0x5a8aa0, props: [['tugboat', 0.01, 'inner'], ['buoy', 0.02, 'inner'], ['bollard', 0.04, 'rim']], critters: [['fish', 3], ['bird', 2]] },
+      { name: 'Container yard', shape: 'blob', ...M, dead: 0x5e626a, alive: 0xb8c4cc, pave: 1, props: [['container', 0.08]] },
+      { name: 'The quay', shape: 'path', dead: 0x60646c, alive: 0xb0bcc4, pave: 1, props: [['bollard', 0.08, 'rim'], ['crane', 0.008, 'rim']] },
+      { name: 'Lighthouse point', shape: 'blob', ...S, dead: 0x5a5e66, alive: 0xc8ccd0, props: [['lighthouse', 0.03, 'inner']] },
+      { name: 'Fish market', shape: 'blob', ...S, dead: 0x62666c, alive: 0xd0d4d8, pave: 1, props: [['stall', 0.05]] },
+      { name: 'Little mooring', shape: 'blob', ...S, water: 0x4ab0d0, dead: 0x50545a, alive: 0x6a98a8, props: [['buoy', 0.06, 'inner']], critters: [['fish', 1]] },
+    ],
+    patchCount: 9,
+    finds: [['🐟', 'Sardine', 'c'], ['⚓', 'Anchor', 'c'], ['🦐', 'Shrimp', 'c'], ['🧢', 'Sailor cap', 'c'], ['🧭', 'Compass', 'r'], ['🚢', 'Model ship', 'r'], ['🦞', 'Lobster', 'r'], ['🐳', 'Friendly whale', 'l']],
+  },
+});
+
 export const BIOME_IDS = Object.keys(BIOMES);
