@@ -102,7 +102,7 @@ export const BIOMES = {
       { name: 'Moon trees', shape: 'blob', ...L, dead: 0x3f3a4a, alive: 0x5a4ab0, props: [['moonTree', 0.04]], critters: [['firefly', 2]] },
     ],
     patchCount: 8,
-    finds: [['🍄', 'Glowcap', 'c'], ['🪻', 'Moonflower', 'c'], ['🕯️', 'Candle', 'c'], ['🌿', 'Silver fern', 'u'], ['🌙', 'Moonstone', 'u'], ['🦉', 'Owl', 'r'], ['🔮', 'Crystal ball', 'e'], ['🧚', 'Fairy', 'l']],
+    finds: [['🍄', 'Glowcap', 'c'], ['🪻', 'Moonflower', 'c'], ['🕯️', 'Candle', 'c'], ['🌿', 'Silver fern', 'u'], ['🌛', 'Moonstone', 'u'], ['🦉', 'Owl', 'r'], ['🔮', 'Crystal ball', 'e'], ['🧚', 'Fairy', 'l']],
   },
   garden: {
     name: 'Snail Garden', creature: 'snail', weight: 0.06, terrain: 'gentle',
@@ -120,7 +120,7 @@ export const BIOMES = {
       { name: 'Gnome corner', shape: 'blob', ...S, dead: 0x645a54, alive: 0x90d070, props: [['gnome', 0.04], ['shroom', 0.08]] },
     ],
     patchCount: 9,
-    finds: [['🥕', 'Carrot', 'c'], ['🥬', 'Cabbage', 'c'], ['🍓', 'Strawberry', 'c'], ['🐛', 'Caterpillar', 'u'], ['🪴', 'Potted fern', 'u'], ['🐦', 'Robin', 'r'], ['🌹', 'Rose', 'e'], ['🍉', 'Prize melon', 'l']],
+    finds: [['🥕', 'Carrot', 'c'], ['🥬', 'Cabbage', 'c'], ['🍓', 'Strawberry', 'c'], ['🐛', 'Caterpillar', 'u'], ['🪴', 'Potted fern', 'u'], ['🐤', 'Robin', 'r'], ['🌹', 'Rose', 'e'], ['🍉', 'Prize melon', 'l']],
   },
   shore: {
     name: 'Sunny Shore', creature: 'turtle', weight: 0.02, terrain: 'beach',
@@ -174,7 +174,7 @@ export const BIOMES = {
       { name: 'Donut den', shape: 'blob', ...S, dead: 0x746a72, alive: 0xffd0e4, props: [['donut', 0.06]] },
     ],
     patchCount: 8,
-    finds: [['🍭', 'Lollipop', 'c'], ['🍬', 'Sweetie', 'c'], ['🍪', 'Cookie', 'c'], ['🧁', 'Cupcake', 'u'], ['🍩', 'Donut', 'u'], ['🍫', 'Chocolate bar', 'r'], ['🎂', 'Birthday cake', 'e'], ['🌈', 'Rainbow drop', 'l']],
+    finds: [['🍭', 'Lollipop', 'c'], ['🍬', 'Sweetie', 'c'], ['🍪', 'Cookie', 'c'], ['🧁', 'Cupcake', 'u'], ['🍩', 'Donut', 'u'], ['🍫', 'Chocolate bar', 'r'], ['🎂', 'Birthday cake', 'e'], ['🎊', 'Rainbow drop', 'l']],
   },
   autumn: {
     name: 'Maple Hollow', creature: 'hedgehog', weight: 0.08, terrain: 'rolling',
@@ -254,7 +254,7 @@ Object.assign(BIOMES, {
       { name: 'Hedge row', shape: 'path', dead: 0x5c5a50, alive: 0x70c860, props: [['hedge', 0.06, 'rim']] },
     ],
     patchCount: 10,
-    finds: [['🦴', 'Dog bone', 'c'], ['🎾', 'Tennis ball', 'c'], ['🍪', 'Cookie', 'c'], ['🥛', 'Milk bottle', 'u'], ['🪀', 'Yo-yo', 'u'], ['🛼', 'Roller skate', 'r'], ['🧸', 'Teddy bear', 'e'], ['🏆', 'Best in show', 'l']],
+    finds: [['🍖', 'Dog bone', 'c'], ['🎾', 'Tennis ball', 'c'], ['🍘', 'Cookie', 'c'], ['🥛', 'Milk bottle', 'u'], ['🪀', 'Yo-yo', 'u'], ['🛼', 'Roller skate', 'r'], ['🧸', 'Teddy bear', 'e'], ['🏆', 'Best in show', 'l']],
   },
   funfair: {
     name: 'Funfair Pier', creature: 'raccoon', weight: 0.04, terrain: 'beach',
@@ -290,7 +290,7 @@ Object.assign(BIOMES, {
       { name: 'Little mooring', shape: 'blob', ...S, water: 0x4ab0d0, dead: 0x50545a, alive: 0x6a98a8, props: [['buoy', 0.06, 'inner']], critters: [['fish', 1]] },
     ],
     patchCount: 9,
-    finds: [['🐟', 'Sardine', 'c'], ['🦐', 'Shrimp', 'c'], ['⚓', 'Anchor', 'c'], ['🧢', 'Sailor cap', 'u'], ['🧭', 'Compass', 'u'], ['🦞', 'Lobster', 'r'], ['🚢', 'Model ship', 'e'], ['🐳', 'Friendly whale', 'l']],
+    finds: [['🥫', 'Sardine', 'c'], ['🍤', 'Shrimp', 'c'], ['⚓', 'Anchor', 'c'], ['🧢', 'Sailor cap', 'u'], ['🧭', 'Compass', 'u'], ['🦞', 'Lobster', 'r'], ['🚢', 'Model ship', 'e'], ['🐳', 'Friendly whale', 'l']],
   },
 });
 
@@ -316,7 +316,7 @@ Object.assign(BIOMES, {
       { name: 'Clover hill', shape: 'blob', ...L, dead: 0x62665a, alive: 0x7cd468, props: [['grass', 0.3], ['flower', 0.05]] },
     ],
     patchCount: 10,
-    finds: [['🧶', 'Ball of wool', 'c'], ['🍞', 'Fresh loaf', 'c'], ['🧀', 'Cheese wheel', 'c'], ['🔔', 'Sheep bell', 'u'], ['🥾', 'Hiking boot', 'u'], ['🧣', 'Knitted scarf', 'r'], ['🎐', 'Wind chime', 'e'], ['☀️', 'Bottled sunshine', 'l']],
+    finds: [['🧶', 'Ball of wool', 'c'], ['🍞', 'Fresh loaf', 'c'], ['🧀', 'Cheese wheel', 'c'], ['🔔', 'Sheep bell', 'u'], ['🥾', 'Hiking boot', 'u'], ['🧵', 'Knitted scarf', 'r'], ['🎐', 'Wind chime', 'e'], ['☀️', 'Bottled sunshine', 'l']],
   },
   cliffs: {
     name: 'Windmill Cliffs', creature: 'goat', weight: 0.04, terrain: 'cliffs',
@@ -334,7 +334,7 @@ Object.assign(BIOMES, {
       { name: 'Wildflower ledge', shape: 'blob', ...S, dead: 0x666266, alive: 0xa8e08c, props: [['flower', 0.4], ['bluebell', 0.1]], critters: [['butterfly', 2]] },
     ],
     patchCount: 9,
-    finds: [['🌾', 'Wheat sheaf', 'c'], ['🪨', 'Cliff pebble', 'c'], ['🍃', 'Windblown leaf', 'c'], ['🌬️', 'Breeze in a jar', 'u'], ['🎏', 'Carp streamer', 'u'], ['🪂', 'Parachute', 'r'], ['⛰️', 'Summit stone', 'e'], ['🌪️', 'Tame tornado', 'l']],
+    finds: [['🌾', 'Wheat sheaf', 'c'], ['🌑', 'Cliff pebble', 'c'], ['🍃', 'Windblown leaf', 'c'], ['🌬️', 'Breeze in a jar', 'u'], ['🎏', 'Carp streamer', 'u'], ['🪂', 'Parachute', 'r'], ['⛰️', 'Summit stone', 'e'], ['🌪️', 'Tame tornado', 'l']],
   },
   rainbow: {
     name: 'Rainbow Falls', creature: 'unicorn', weight: 0.06, terrain: 'islands',
@@ -352,7 +352,7 @@ Object.assign(BIOMES, {
       { name: 'Misty spring', shape: 'blob', ...S, water: 0xa8e4f8, dead: 0x5a5c64, alive: 0x88d0c0, props: [['lily', 0.1, 'inner']] },
     ],
     patchCount: 10,
-    finds: [['💧', 'Water droplet', 'c'], ['☂️', 'Umbrella', 'c'], ['🖍️', 'Crayon', 'c'], ['🎨', 'Paint palette', 'u'], ['💎', 'Prism gem', 'u'], ['🪄', 'Magic wand', 'r'], ['🔮', 'Crystal ball', 'e'], ['🌈', 'Rainbow in a jar', 'l']],
+    finds: [['💦', 'Water droplet', 'c'], ['☂️', 'Umbrella', 'c'], ['🖍️', 'Crayon', 'c'], ['🎨', 'Paint palette', 'u'], ['🔷', 'Prism gem', 'u'], ['🪄', 'Magic wand', 'r'], ['🔵', 'Crystal ball', 'e'], ['🌈', 'Rainbow in a jar', 'l']],
   },
   balloons: {
     name: 'Balloon Meadow', creature: 'eagle', weight: 0.1, terrain: 'islands',
@@ -370,7 +370,7 @@ Object.assign(BIOMES, {
       { name: 'Wildflower field', shape: 'blob', ...L, dead: 0x62645c, alive: 0x9ae080, props: [['flower', 0.35], ['bluebell', 0.1]], critters: [['butterfly', 2]] },
     ],
     patchCount: 10,
-    finds: [['🍓', 'Strawberries', 'c'], ['🥪', 'Sandwich', 'c'], ['🧃', 'Juice box', 'c'], ['🍋', 'Lemon', 'u'], ['🍰', 'Picnic cake', 'u'], ['🎩', "Balloonist's hat", 'r'], ['🗺️', 'Sky map', 'e'], ['🪶', 'Golden feather', 'l']],
+    finds: [['🍧', 'Strawberries', 'c'], ['🥪', 'Sandwich', 'c'], ['🧃', 'Juice box', 'c'], ['🍋', 'Lemon', 'u'], ['🍰', 'Picnic cake', 'u'], ['👒', "Balloonist's hat", 'r'], ['🗺️', 'Sky map', 'e'], ['🏅', 'Golden feather', 'l']],
   },
   stargazer: {
     name: "Stargazer's Peak", creature: 'owl', weight: 0.02, terrain: 'peaks',
@@ -388,7 +388,7 @@ Object.assign(BIOMES, {
       { name: 'Star-chart circle', shape: 'blob', ...S, emissive: 0.3, dead: 0x5a586a, alive: 0xc0b8f0, props: [['glowStone', 0.1]] },
     ],
     patchCount: 9,
-    finds: [['⭐', 'Wishing star', 'c'], ['🕯️', 'Candle', 'c'], ['🌙', 'Crescent moon', 'c'], ['📜', 'Star chart', 'u'], ['🔭', 'Telescope', 'u'], ['☄️', 'Comet', 'r'], ['🪐', 'Ringed planet', 'e'], ['🌌', 'Milky Way', 'l']],
+    finds: [['🌟', 'Wishing star', 'c'], ['💡', 'Candle', 'c'], ['🌙', 'Crescent moon', 'c'], ['📜', 'Star chart', 'u'], ['🔭', 'Telescope', 'u'], ['💫', 'Comet', 'r'], ['🪐', 'Ringed planet', 'e'], ['🌌', 'Milky Way', 'l']],
   },
 });
 
@@ -547,7 +547,7 @@ Object.assign(BIOMES, {
       { name: 'Cannon row', shape: 'blob', ...M, dead: 0x54565a, alive: 0xb8b0a0, props: [['barrel', 0.08], ['pillar', 0.04]], critters: [['minnow', 2]] },
     ],
     patchCount: 9,
-    finds: [['🏴‍☠️', 'Pirate flag', 'c'], ['🔦', "Ship's lantern", 'c'], ['🧱', 'Ballast brick', 'c'], ['🎩', "Captain's hat", 'u'], ['⚖️', 'Brass scales', 'u'], ['🔱', 'Trident', 'r'], ['💰', 'Treasure chest', 'e'], ['🏛️', 'Lost temple', 'l']],
+    finds: [['🏴‍☠️', 'Pirate flag', 'c'], ['🔆', "Ship's lantern", 'c'], ['🧱', 'Ballast brick', 'c'], ['👨‍✈️', "Captain's hat", 'u'], ['⚖️', 'Brass scales', 'u'], ['🔱', 'Trident', 'r'], ['🧳', 'Treasure chest', 'e'], ['🏛️', 'Lost temple', 'l']],
   },
   jellyglow: {
     name: 'Jellyglow Gardens', creature: 'jellyfish', weight: 0.02, terrain: 'hillocks',
