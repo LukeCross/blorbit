@@ -531,7 +531,46 @@
       .buy.shiny { background: linear-gradient(120deg, #ffc4e1, #ffeaa6 25%, #bff0dc 50%, #c9c0ff 75%, #ffc4e1); background-size: 200% 100%; animation: shimmer 3s linear infinite; }
 
       /* settings */
+      /* profile */
+      .profile-panel { width: min(640px, 94vw); }
+      .avatar { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; font-size: 20px; line-height: 1; background: #fff; }
+      .avatar.empty { background: rgba(61,53,96,0.08); box-shadow: inset 0 0 0 2px rgba(61,53,96,0.25); }
+      .avatar.empty::after { content: ''; width: 55%; height: 55%; background: rgba(61,53,96,0.35);
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='8' r='4.5'/%3E%3Cpath d='M3 22c0-5 4-8 9-8s9 3 9 8z'/%3E%3C/svg%3E") center / contain no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='8' r='4.5'/%3E%3Cpath d='M3 22c0-5 4-8 9-8s9 3 9 8z'/%3E%3C/svg%3E") center / contain no-repeat; }
+      .avatar.big { width: 76px; height: 76px; font-size: 44px; box-shadow: var(--shadow-sm); }
+      .avatar.big.empty { box-shadow: inset 0 0 0 3px rgba(61,53,96,0.22); }
+      #profile-btn { overflow: hidden; }
+      .profile-id { display: flex; align-items: center; gap: 14px; margin: 18px 0 4px; padding: 14px 16px; border-radius: var(--r); background: rgba(255,255,255,0.75); box-shadow: var(--shadow-sm); }
+      .profile-name { flex: 1; min-width: 0; }
+      .profile-name small { display: block; color: var(--ink-soft); font-size: 12px; font-weight: 800; }
+      .profile-name b { display: block; font: 600 24px var(--font-display); overflow-wrap: anywhere; }
+      #name-regen svg.i { transition: transform 0.4s; }
+      #name-regen.spin svg.i { transform: rotate(360deg); }
+      .profile-h { font: 600 18px var(--font-display); margin: 20px 0 8px; }
+      .avatar-picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 8px; }
+      .avatar-picker button { aspect-ratio: 1; border-radius: 16px; border: 2px solid transparent; cursor: pointer; font-size: 28px; display: grid; place-items: center; background: #fff; box-shadow: var(--shadow-sm); }
+      .avatar-picker button:hover { transform: translateY(-1px); }
+      .avatar-picker button.active { border-color: var(--lilac-deep); background: #f0eaff; }
+      .avatar-picker button.none { font: 800 12px var(--font); color: var(--ink-soft); }
+      .profile-note { display: block; margin-top: 8px; color: var(--ink-soft); font-size: 13px; }
+      .profile-panel .stats { grid-template-columns: repeat(3, 1fr); margin: 0 0 10px; }
+      .rarity-row { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; font-weight: 800; color: var(--ink-soft); }
+      .rarity-row .tier { display: inline-block; width: 9px; height: 9px; margin-right: 5px; border-radius: 50%; }
+      .g-row { padding: 12px 16px; margin-bottom: 10px; border-radius: var(--r); background: rgba(255,255,255,0.75); box-shadow: var(--shadow-sm); }
+      .g-row.locked { opacity: 0.55; }
+      .g-row header { display: flex; align-items: center; gap: 8px; font: 600 17px var(--font-display); }
+      .g-row header em { margin-left: auto; font: 800 13px var(--font); font-style: normal; color: var(--ink-soft); }
+      .g-bars { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 16px; margin-top: 8px; }
+      .g-bar small { display: flex; justify-content: space-between; color: var(--ink-soft); font-size: 12px; font-weight: 800; }
+      .g-bar i { display: block; height: 7px; margin-top: 3px; border-radius: 99px; background: rgba(61,53,96,0.1); overflow: hidden; }
+      .g-bar i::after { content: ''; display: block; height: 100%; width: var(--p, 0%); border-radius: 99px; background: var(--c-progress); }
+      .g-rarity { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; font-weight: 800; color: var(--ink-soft); }
+      .rarity-row .t-c, .g-rarity .t-c { background: #d8d4e4; } .rarity-row .t-u, .g-rarity .t-u { background: var(--c-uncommon); } .rarity-row .t-r, .g-rarity .t-r { background: var(--c-rare); }
+      .rarity-row .t-e, .g-rarity .t-e { background: var(--c-epic); } .rarity-row .t-l, .g-rarity .t-l { background: var(--c-legend); }
+      .g-rarity .tier { display: inline-block; width: 8px; height: 8px; margin-right: 4px; border-radius: 50%; }
       .settings-panel { width: min(560px, 94vw); }
+      .settings-panel .panel-head { margin-bottom: 18px; } /* the stats tiles used to provide this gap */
       .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
       .stat { padding: 14px 16px; border-radius: var(--r); background: rgba(255,255,255,0.75); box-shadow: var(--shadow-sm); }
       .stat small { display: block; color: var(--ink-soft); font-size: 12px; font-weight: 800; }
@@ -725,6 +764,8 @@
         .slots { grid-template-columns: repeat(4, 1fr); gap: 6px; }
         .slot { font-size: 24px; border-radius: 14px; }
         .stats { gap: 8px; margin: 14px 0; }
+        .profile-panel .stats { grid-template-columns: repeat(2, 1fr); }
+        .g-bars { grid-template-columns: 1fr; }
         .stat { padding: 10px 12px; }
         .stat b { font-size: 20px; }
         .setting-row, .danger-zone { flex-direction: column; align-items: stretch; gap: 10px; }
@@ -926,6 +967,9 @@
     <!-- top right: settings -->
     <div id="hud-right">
       <button id="autoroll" class="pill-btn glass hidden" title="Toggle auto-roll (R)"><svg class="i compact-only" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7" /><path d="M20 4v5h-5" /></svg><span class="label">Auto-roll</span><span class="switch"></span></button>
+      <button id="profile-btn" class="pill-btn icon-btn glass" title="Profile">
+        <span class="avatar empty" id="profile-btn-avatar"></span>
+      </button>
       <button id="settings-btn" class="pill-btn icon-btn glass" title="Settings">
         <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></svg>
       </button>
@@ -1038,7 +1082,6 @@
           <h2>⚙️ Settings</h2><span class="spacer"></span>
           <button class="btn secondary small" id="settings-close">Close</button>
         </div>
-        <div class="stats" id="settings-stats"></div>
         <div class="setting-row">
           <div>
             <b>Graphics</b>
@@ -1110,6 +1153,34 @@
     </div>
     <div id="pack-flash"></div>
     <div id="warp"></div>
+
+    <!-- profile -->
+    <div id="profile" class="overlay hidden">
+      <div class="panel profile-panel">
+        <div class="panel-head">
+          <h2>Profile</h2><span class="spacer"></span>
+          <button class="btn secondary small" id="profile-close">Close</button>
+        </div>
+        <div class="profile-id">
+          <span class="avatar big empty" id="profile-avatar"></span>
+          <div class="profile-name">
+            <small>Your name</small>
+            <b id="profile-name"></b>
+          </div>
+          <button class="pill-btn icon-btn" id="name-regen" title="New name" aria-label="Generate a new name">
+            <svg class="i" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7" /><path d="M20 4v5h-5" /></svg>
+          </button>
+        </div>
+        <h3 class="profile-h">Avatar</h3>
+        <div class="avatar-picker" id="avatar-picker" role="radiogroup" aria-label="Choose your avatar"></div>
+        <small class="profile-note" id="avatar-note"></small>
+        <h3 class="profile-h">Stats</h3>
+        <div class="stats" id="profile-stats"></div>
+        <div class="rarity-row" id="profile-rarity"></div>
+        <h3 class="profile-h">By galaxy</h3>
+        <div id="profile-galaxies"></div>
+      </div>
+    </div>
 
     <!-- free pack for a rewarded video: the player always opts in here first -->
     <div id="ad-offer" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="ad-offer-title">

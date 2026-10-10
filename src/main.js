@@ -19,10 +19,10 @@ import { BIOMES } from './biomes.js';
 import { GALAXIES, GALAXY_IDS, creaturesOf, wokenIn, isGalaxyUnlocked, unlockProgress, unlockHint, checkSkins, galaxyOfBiome } from './galaxies.js';
 import { Critters } from './critters.js';
 import { Stardust } from './stardust.js';
-import { RARITY, RATES, TOTAL_FINDS, drawFind, foundCount, foundIn, totalFindsIn } from './collection.js';
+import { RARITY, RATES, TIERS as RARITY_TIERS, TOTAL_FINDS, drawFind, foundCount, foundIn, totalFindsIn, rarityCounts, cardsCollected } from './collection.js';
 import { Shop, galaxyTabs, renderKeepingTabs } from './shop.js';
 import { RewardedAds } from './ads.js';
-import { planetName, timeSeed } from './names.js';
+import { planetName, timeSeed, blobName } from './names.js';
 
 // ---------------------------------------------------------------- save data
 
@@ -39,6 +39,9 @@ save.touchControls ??= 'tap'; // touch devices: 'tap' = rolls by itself, hold a 
 // galaxies: which one you're in, planets restored in each, and which ones you've seen (for the NEW badge)
 save.restoredIn ??= { wild: save.restored || 0 };
 save.seenGalaxies ??= ['wild'];
+// profile: a random silly name to start with, and no avatar until the player picks one of their skins
+save.name ??= blobName();
+if (!save.unlocked.includes(save.avatar)) save.avatar = null;
 if (!GALAXIES[save.galaxy] || !isGalaxyUnlocked(save, save.galaxy)) save.galaxy = 'wild';
 document.body.classList.toggle('cb', save.colorblind);
 quality.tier = save.quality === 'auto' ? detectTier() : save.quality;
@@ -356,7 +359,7 @@ window.addEventListener('keydown', (e) => {
   if (e.code === 'KeyB') toggleBook();
   if (e.code === 'KeyP') shop.toggle();
   if (e.code === 'KeyN') $('new-planet').click();
-  if (e.code === 'Escape') { shop.closeOffer(); shop.close(); $('book').classList.add('hidden'); $('galaxies').classList.add('hidden'); closeSettings(); }
+  if (e.code === 'Escape') { shop.closeOffer(); shop.close(); $('book').classList.add('hidden'); $('galaxies').classList.add('hidden'); closeSettings(); closeProfile(); }
   if (e.code === 'Minus' || e.code === 'NumpadSubtract') equip('classic');
   const digit = /^(?:Digit|Numpad)(\d)$/.exec(e.code);
   if (digit) equip(hereCreatures()[(Number(digit[1]) + 9) % 10]);
@@ -648,6 +651,7 @@ function backToMenu() {
   savePlanet();
   shop.close();
   closeSettings();
+  closeProfile();
   ['book', 'galaxies', 'finale'].forEach((id) => $(id).classList.add('hidden'));
   ['hud-top', 'skins', 'biome-label', 'autoroll', 'hud-left'].forEach((id) => $(id).classList.add('hidden'));
   held.clear();
@@ -860,14 +864,6 @@ function refreshDust() {
 // ---------------------------------------------------------------- settings + reset
 
 function openSettings() {
-  // Classic Goo is always yours, so only creature skins count (across every galaxy)
-  const unlockedSkins = save.unlocked.filter((id) => CREATURE_IDS.includes(id)).length;
-  $('settings-stats').innerHTML = [
-    ['Skins unlocked', `${unlockedSkins}/${CREATURE_IDS.length}`],
-    ['Collection', `${foundCount(save)}/${TOTAL_FINDS}`],
-    ['Stardust', save.stardust],
-    ['Planets restored', save.restored],
-  ].map(([label, value]) => `<div class="stat"><small>${label}</small><b>${value}</b></div>`).join('');
   $('reset-start').classList.remove('hidden');
   $('reset-confirm').classList.add('hidden');
   $('quality-picker').querySelectorAll('button').forEach((b) => {
@@ -956,6 +952,87 @@ $('reset-yes').addEventListener('click', () => {
   $('warp').classList.add('on');
   setTimeout(() => location.replace(location.pathname), 450);
 });
+
+// ---------------------------------------------------------------- profile
+
+const avatarHtml = () => (save.avatar ? SKINS[save.avatar].emoji : '');
+function showAvatar(el) {
+  el.textContent = avatarHtml();
+  el.classList.toggle('empty', !save.avatar);
+  el.title = save.avatar ? SKINS[save.avatar].name : 'No avatar yet';
+}
+function refreshProfileBadge() {
+  showAvatar($('profile-btn-avatar'));
+  $('profile-btn').title = `Profile: ${save.name}`;
+}
+function openProfile() {
+  renderProfile();
+  $('profile').classList.remove('hidden');
+}
+function closeProfile() {
+  $('profile').classList.add('hidden');
+}
+function renderProfile() {
+  $('profile-name').textContent = save.name;
+  showAvatar($('profile-avatar'));
+  // Classic Goo is always yours, so only creature skins count (across every galaxy)
+  const mine = CREATURE_IDS.filter((id) => save.unlocked.includes(id));
+  const picks = ['classic', ...mine];
+  $('avatar-picker').innerHTML = `<button class="none ${save.avatar ? '' : 'active'}" data-id="" role="radio" aria-checked="${!save.avatar}" title="No avatar">None</button>`
+    + picks.map((id) => `<button class="${save.avatar === id ? 'active' : ''}" data-id="${id}" role="radio" aria-checked="${save.avatar === id}" title="${SKINS[id].name}">${SKINS[id].emoji}</button>`).join('');
+  $('avatar-note').textContent = mine.length < CREATURE_IDS.length
+    ? `Wake more creatures to unlock more avatars (${mine.length} of ${CREATURE_IDS.length} so far).`
+    : 'You have every avatar!';
+
+  const open = unlockedGalaxies().length;
+  $('profile-stats').innerHTML = [
+    ['Skins unlocked', `${mine.length}/${CREATURE_IDS.length}`],
+    ['Collection', `${foundCount(save)}/${TOTAL_FINDS}`],
+    ['Cards collected', cardsCollected(save)],
+    ['Stardust', save.stardust],
+    ['Planets restored', save.restored],
+    ['Galaxies unlocked', `${open}/${GALAXY_IDS.length}`],
+  ].map(([label, value]) => `<div class="stat"><small>${label}</small><b>${value}</b></div>`).join('');
+  const rarityPips = (counts) => RARITY_TIERS.map((t) => `<span><span class="tier t-${t}"></span>${RARITY[t]} ${counts[t][0]}/${counts[t][1]}</span>`).join('');
+  $('profile-rarity').innerHTML = rarityPips(rarityCounts(save));
+
+  const bar = (label, done, total) => `<div class="g-bar"><small><span>${label}</span><span>${done}/${total}</span></small><i style="--p:${total ? (done / total) * 100 : 0}%"></i></div>`;
+  $('profile-galaxies').innerHTML = GALAXY_IDS.map((g) => {
+    const def = GALAXIES[g];
+    if (!isGalaxyUnlocked(save, g)) return `<div class="g-row locked"><header>🔒 ${def.name}<em>Locked</em></header></div>`;
+    const [woken, creatures] = wokenIn(save, g);
+    const restored = save.restoredIn[g] || 0;
+    return `<div class="g-row"><header>${def.emoji} ${def.name}<em>🪐 ${restored} restored</em></header><div class="g-bars">`
+      + bar('Creatures woken', woken, creatures)
+      + bar('Finds', foundIn(save, g), totalFindsIn(g))
+      + `<div class="g-rarity">${rarityPips(rarityCounts(save, def.biomes))}</div></div></div>`;
+  }).join('');
+}
+$('profile-btn').addEventListener('click', openProfile);
+$('profile-close').addEventListener('click', closeProfile);
+$('name-regen').addEventListener('click', () => {
+  let name;
+  do name = blobName(); while (name === save.name);
+  save.name = name;
+  persist();
+  $('profile-name').textContent = name;
+  refreshProfileBadge();
+  const b = $('name-regen');
+  b.classList.remove('spin');
+  void b.offsetWidth;
+  b.classList.add('spin');
+});
+$('avatar-picker').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  const id = b.dataset.id || null;
+  if (id && !save.unlocked.includes(id)) return;
+  save.avatar = id;
+  persist();
+  renderProfile();
+  refreshProfileBadge();
+});
+refreshProfileBadge();
 
 // ---------------------------------------------------------------- shop
 
@@ -1307,7 +1384,7 @@ function frame() {
   } else {
     timeScale += (1 - timeScale) * Math.min(1, realDt * 9);
   }
-  const paused = shop.isOpen() || !$('book').classList.contains('hidden') || !$('settings').classList.contains('hidden');
+  const paused = shop.isOpen() || !$('book').classList.contains('hidden') || !$('settings').classList.contains('hidden') || !$('profile').classList.contains('hidden');
   const dt = paused ? 0 : realDt * timeScale;
   gameTime += dt;
 

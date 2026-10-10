@@ -56,3 +56,17 @@ export function drawPack(save, biomeId, type) {
 const foundInBiome = (save, b) => BIOMES[b].finds.filter(([, name]) => save.finds[`${b}:${name}`]).length;
 export const foundCount = (save) => BIOME_IDS.reduce((n, b) => n + foundInBiome(save, b), 0);
 export const foundIn = (save, g) => GALAXIES[g].biomes.reduce((n, b) => n + foundInBiome(save, b), 0);
+
+// finds discovered vs possible, per rarity tier, across the given biomes: { c: [found, total], ... }
+export function rarityCounts(save, biomeIds = BIOME_IDS) {
+  const out = Object.fromEntries(TIERS.map((t) => [t, [0, 0]]));
+  for (const b of biomeIds) {
+    for (const [, name, t] of BIOMES[b].finds) {
+      out[t][1]++;
+      if (save.finds[`${b}:${name}`]) out[t][0]++;
+    }
+  }
+  return out;
+}
+// every card ever drawn, duplicates included
+export const cardsCollected = (save) => Object.values(save.finds).reduce((n, c) => n + c, 0);

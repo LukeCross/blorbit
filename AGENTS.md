@@ -46,7 +46,7 @@ Deploys: pushing to `main` runs `.github/workflows/deploy.yml` (GitHub Pages, si
 index.html     All CSS (design tokens, HUD, panels, responsive rules), UI markup, SEO/share tags
 about.html     About & how-to-play page (static HTML, galaxy cards + counts are hand-written)
 privacy.html   Privacy policy
-src/main.js    Game loop, state, input, UI, saves, galaxy picker/travel, collection book. Exposes window.blorbit for scripts
+src/main.js    Game loop, state, input, UI, saves, galaxy picker/travel, collection book, profile panel (name, avatar, per-galaxy stats). Exposes window.blorbit for scripts
 src/planet.js  Icosphere terrain (terrain() switch), biome layout, patches ("spots"), slime painting, GLSL ground shader, prop layers
 src/galaxies.js  GALAXIES definitions, unlock rules, startup sanity checks
 src/biomes.js  BIOMES: terrain, colours, props, critters, particles, patches, finds
@@ -59,7 +59,7 @@ src/audio.js   Synthesised sound: per-biome ambient cases + rolling timbre
 src/shop.js    Card pack shop, galaxy tabs (galaxyTabs, renderKeepingTabs)
 src/collection.js  Finds, rarities, pack rates (totals are computed, not hard-coded)
 src/ads.js     Rewarded video ads (Google Ad Manager)
-src/{blob,look,skyfx,particles,stardust,names,noise,quality,shadow}.js  Blob, sky, ambient particles, stardust, naming, PRNG, quality tiers
+src/{blob,look,skyfx,particles,stardust,names,noise,quality,shadow}.js  Blob, sky, ambient particles, stardust, naming (planet names, the profile's quirky player names), PRNG, quality tiers
 src/emoji.css  GENERATED @font-face rules for the self-hosted emoji font (see section 5); public/fonts/emoji/ holds its woff2 files
 scripts/       Puppeteer helpers (screenshots, regression checks); scripts/og/ builds the share image and icons
 public/        Static files: og-image.png (share image, also the About hero), favicon, icons, manifest
@@ -67,7 +67,7 @@ public/        Static files: og-image.png (share image, also the About hero), fa
 
 Key facts:
 - A **planet** picks **4 biomes** (`NUM_REGIONS = 4` in `planet.js`) from one galaxy. Planets are deterministic from `seed + galaxy`; each planet only shuffles its own galaxy's biome list, so **adding a galaxy never changes existing planets** (but adding/removing a biome inside an existing galaxy does).
-- Saves: main save `blorbit-save-v1` (stardust, skins, finds, settings, current galaxy, restored counts, `unlocked` creature ids, `seenGalaxies`, `adUnlocked`); one planet save per galaxy `blorbit-planet-v1:<galaxy>`.
+- Saves: main save `blorbit-save-v1` (stardust, skins, finds, settings, profile `name`/`avatar`, current galaxy, restored counts, `unlocked` creature ids, `seenGalaxies`, `adUnlocked`); one planet save per galaxy `blorbit-planet-v1:<galaxy>`.
 - Galaxy unlock: `unlockedBy` (previous galaxy id) + `unlockAt` (0.8 = 80% of that galaxy's creatures woken). The chain today is a straight line. Players can also unlock one by watching a rewarded video (`save.adUnlocked`).
 - Unknown galaxy ids fall back to `'wild'` in `main.js` (`save.galaxy`, `bookTab`, planet-save migration). Don't change those.
 - `window.blorbit` (bottom of `main.js`) exposes `save, newPlanet, travelTo, enterGalaxy, planet(), completeRegion(i), completePatch(k), galaxyOf(biomeId), blob, sound, shop, ...` for scripts.

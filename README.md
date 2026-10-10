@@ -97,7 +97,7 @@ Pick a galaxy on the title screen to start, or press `Enter` to jump back into t
 ### Touch (phones and tablets)
 - **Tap sides** (default): your blob rolls forward by itself. **Hold the left or right half** of the screen to turn; the turn starts gentle and builds up the longer you hold. Quick taps give a small nudge, and both thumbs down goes straight.
 - **Joystick** (optional, in Settings → Touch controls): **drag anywhere** to use a virtual joystick. Push up to roll forward and left/right to steer.
-- Tap the icons in the top bar for the Collection, Shop, auto-roll, Settings and sound.
+- Tap the icons in the top bar for the Collection, Shop, auto-roll, Profile, Settings and sound. Profile has your quirky name (re-roll it as often as you like), an avatar picked from your unlocked skins, and your stats overall and per galaxy.
 - Swipe the skin strip at the bottom to browse and equip skins.
 
 ### Settings
@@ -216,7 +216,7 @@ There are no models, textures or sound assets. Everything you see and hear is ge
 ### Determinism and saving
 - Every planet is generated from a single seed using a seeded PRNG (**mulberry32**) and seeded noise. Given the seed and its galaxy, the terrain, biomes, spots, props and stardust are identical every time. Each planet only shuffles its own galaxy's biome list, so adding a galaxy never changes existing planets.
 - That keeps saves tiny. The save stores the seed plus compact **bitsets** (base64) of painted vertices and collected stardust, the blob's position, and which spots and biomes are done. Progress is saved every few seconds, when the tab is hidden and after every completion.
-- **Saves and galaxies:** one main save (`blorbit-save-v1`) holds everything shared across galaxies: stardust, skins, finds, settings, which galaxy you're in and planets restored per galaxy. Each galaxy has its own planet save (`blorbit-planet-v1:<galaxy>`). Finds are keyed `biomeId:name`, and biome ids are unique across galaxies, so they don't need a galaxy prefix. Saves from before galaxies existed migrate to Wildbloom automatically.
+- **Saves and galaxies:** one main save (`blorbit-save-v1`) holds everything shared across galaxies: stardust, skins, finds, settings, profile (`name`, `avatar`), which galaxy you're in and planets restored per galaxy. Each galaxy has its own planet save (`blorbit-planet-v1:<galaxy>`). Finds are keyed `biomeId:name`, and biome ids are unique across galaxies, so they don't need a galaxy prefix. Saves from before galaxies existed migrate to Wildbloom automatically.
 
 ### Performance
 The game is tuned to run on low-end laptops and phones:
@@ -254,14 +254,14 @@ src/
   particles.js      Ambient particle systems
   ads.js            Rewarded video ads (Google Ad Manager / GPT) for free Card packs, and re-opening consent choices
   stardust.js       Collectible stardust trails
-  collection.js     Finds, rarities and pack draw rates
+  collection.js     Finds, rarities, pack draw rates and the profile's find stats
   shop.js           Card pack shop and pack-opening animation
   audio.js          Synthesised Web Audio sound effects and soundscapes
   look.js           Sky gradient, atmosphere glow, colour-grade shader
   skyfx.js          Stars, nebula, distant planets, shooting stars
   atmosphere.js     Per-galaxy space colours, lighting and weather
   quality.js        Quality tiers, device detection, material helpers
-  names.js          Planet name generator and time-based seeds
+  names.js          Planet and player name generators, and time-based seeds
   noise.js          Seeded noise and PRNG
   shadow.js         Soft contact shadows
 public/             Static files copied as-is: share image, favicon and app icons, web app manifest

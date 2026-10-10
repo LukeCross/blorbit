@@ -39,3 +39,47 @@ export function timeSeed() {
   h = Math.imul(h ^ (h >>> 16), 0x45d9f3b);
   return (h ^ (h >>> 16)) >>> 0;
 }
+
+// Quirky names for the player's profile. Random each time: it's the "regenerate" button's job.
+// Several shapes over big word banks, so repeats are rare (well over 100,000 combinations).
+const ADJECTIVES = ['Soggy', 'Wobbly', 'Grumpy', 'Sleepy', 'Fancy', 'Squishy', 'Suspicious', 'Majestic', 'Dizzy', 'Crunchy', 'Sneaky',
+  'Bouncy', 'Tiny', 'Sparkly', 'Mighty', 'Confused', 'Gloopy', 'Dramatic', 'Chonky', 'Lucky', 'Cranky', 'Jolly', 'Wiggly', 'Moist',
+  'Cosmic', 'Feral', 'Unbothered', 'Fluffy', 'Gigantic', 'Sticky', 'Spicy', 'Wholesome', 'Haunted', 'Radical', 'Smol', 'Zesty',
+  'Sassy', 'Lumpy', 'Cheeky', 'Peculiar', 'Frosty', 'Bashful', 'Dapper', 'Giggly', 'Jiggly', 'Nervous', 'Overcaffeinated', 'Precious',
+  'Rowdy', 'Slippery', 'Smug', 'Soft', 'Squeaky', 'Sweaty', 'Tipsy', 'Wonky', 'Boneless', 'Gelatinous', 'Questionable', 'Enchanted'];
+const NOUNS = ['Waffle', 'Noodle', 'Pickle', 'Biscuit', 'Muffin', 'Pancake', 'Turnip', 'Crumpet', 'Dumpling', 'Pudding', 'Gizmo',
+  'Wombat', 'Tumbleweed', 'Meatball', 'Doodle', 'Bagel', 'Nugget', 'Sprout', 'Jellybean', 'Marshmallow', 'Boop', 'Mango',
+  'Blobfish', 'Pretzel', 'Splat', 'Cupcake', 'Gumdrop', 'Potato', 'Wibble', 'Snorkel', 'Kumquat', 'Bubbles', 'Toast', 'Pebble',
+  'Spatula', 'Banjo', 'Walrus', 'Gnocchi', 'Crouton', 'Beanbag', 'Doughnut', 'Fidget', 'Hiccup', 'Kazoo', 'Lasagna', 'Moustache',
+  'Noodlebug', 'Omelette', 'Pogo', 'Quokka', 'Radish', 'Sock', 'Teapot', 'Trombone', 'Umbrella', 'Wafer', 'Yoyo', 'Zucchini',
+  'Giblet', 'Mittens', 'Ravioli', 'Scone', 'Tadpole', 'Piglet', 'Thimble', 'Goblin'];
+const TITLES = ['Captain', 'Sir', 'Professor', 'Lord', 'Lady', 'Doctor', 'Admiral', 'Baron', 'Duchess', 'Grand Wizard', 'Chief', 'Agent',
+  'Commander', 'Count', 'Madame', 'General', 'Major', 'Sheriff'];
+const FIRST = ['Gerald', 'Bartholomew', 'Doris', 'Gus', 'Mabel', 'Reginald', 'Phyllis', 'Barry', 'Wendell', 'Gladys', 'Norbert', 'Ethel',
+  'Cornelius', 'Beatrice', 'Dennis', 'Tilly', 'Humphrey', 'Agatha', 'Clive', 'Prudence', 'Walter', 'Bernadette'];
+const LAST = ['Splodge', 'Wobblesworth', 'McSquish', 'Gloopington', 'Von Blob', 'Blobsworth', 'Bumblewick', 'Fluffernutter', 'Snugglebottom',
+  'Pudgington', 'Wigglesby', 'Squelchworth', 'Goober', 'Dribbleton', 'Puddlesworth', 'Slimington'];
+const TRAITS = ['the Brave', 'the Damp', 'the Unready', 'the Magnificent', 'the Squishy', 'the Curious', 'the Slightly Lost', 'the Bouncy',
+  'the Gooey', 'the Mysterious', 'the Hungry', 'the Wise-ish', 'the Last Blob', 'of Many Puddles', 'of the Squelch', 'from Next Door',
+  'the Third', 'the Great', 'the Snack', 'the Not-So-Terrible'];
+const WHOLE = ['Sir Wobbles-a-Lot', 'Glorp', 'Blobert', 'Not a Puddle', 'Blobby McBlobface', 'Slimothy', 'Mr. Splodge', 'Gloop Troop',
+  'Squelch', 'Just a Guy', 'Blorb Jr.', 'Sticky Ricky', 'Glooby', 'Big Splat Energy', 'Definitely Not Slime', 'Plop', 'Blip Blop',
+  'Sir Splats-a-Lot', 'Gooseph', 'Slimey Joe', 'Splish Splash', 'Boingo', 'Mildly Damp', 'Blob Ross', 'Gloop Dogg', 'Squishmund'];
+
+export function blobName() {
+  const pick = (a) => a[Math.floor(Math.random() * a.length)];
+  const shapes = [
+    () => `${pick(ADJECTIVES)} ${pick(NOUNS)}`,
+    () => `${pick(ADJECTIVES)} ${pick(NOUNS)}`,
+    () => `${pick(ADJECTIVES)} ${pick(NOUNS)}`,
+    () => `${pick(TITLES)} ${pick(NOUNS)}`,
+    () => `${pick(TITLES)} ${pick(ADJECTIVES)} ${pick(NOUNS)}`,
+    () => `${pick(NOUNS)} ${pick(TRAITS)}`,
+    () => `${pick(FIRST)} ${pick(LAST)}`,
+    () => `${pick(TITLES)} ${pick(FIRST)} ${pick(LAST)}`,
+    () => `${pick(FIRST)} ${pick(TRAITS)}`,
+    () => `${pick(NOUNS)}${pick(NOUNS).toLowerCase()}`,
+    () => pick(WHOLE),
+  ];
+  return pick(shapes)();
+}
