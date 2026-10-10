@@ -325,10 +325,9 @@
       /* on the title screen the corner buttons sit above the title layer so they can be tapped */
       body.on-title #hud-left, body.on-title #hud-right { z-index: 6; }
       body.on-title #menu-btn { display: none; }
-      #dust .num, #book-btn .num { font-variant-numeric: tabular-nums; }
-      #dust svg.i { color: #e8a91c; }
+      #shop-btn .num, #book-btn .num { font-variant-numeric: tabular-nums; }
       #shop-btn { background: var(--accent-warm); }
-      #dust.bump, #book-btn.bump { animation: pop 0.35s cubic-bezier(.3,1.8,.5,1); }
+      #shop-btn.bump, #book-btn.bump { animation: pop 0.35s cubic-bezier(.3,1.8,.5,1); }
       #book-btn.bump { animation: pop 0.6s cubic-bezier(.3,1.8,.5,1), glow 1.2s ease-in-out 2; }
 
       .switch { display: block; flex: none; width: 30px; height: 18px; border-radius: 99px; background: rgba(61,53,96,0.16); position: relative; transition: background 0.25s; }
@@ -738,7 +737,7 @@
         .icon-btn { width: 38px; padding: 0; }
         #hud-left .label, #autoroll .label { display: none; }
         #book-btn .num { display: none; }
-        #shop-btn, #book-btn { width: 38px; padding: 0; justify-content: center; }
+        #book-btn { width: 38px; padding: 0; justify-content: center; }
         #autoroll .switch { width: 26px; height: 16px; }
         #autoroll .switch::after { width: 12px; height: 12px; }
         #autoroll.on .switch::after { transform: translateX(10px); }
@@ -966,23 +965,20 @@
     </div>
     <div id="biome-label" class="glass hidden"><span id="biome-name"></span><span id="biome-progress"></span></div>
 
-    <!-- top left: currency + collection + shop (also on the title; the menu button only while playing) -->
+    <!-- top left: collection + shop, which also shows the stardust count (also on the title; the menu button only while playing) -->
     <div id="hud-left">
       <button id="menu-btn" class="pill-btn glass" title="Back to the main menu (switch galaxy)" aria-label="Back to the main menu">
         <svg class="i" viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5" /><path d="M6.5 9.8V19h11V9.8" /><path d="M10 19v-5h4v5" /></svg>
         <span class="label">Menu</span>
       </button>
-      <button id="dust" class="pill-btn glass" title="Stardust (opens the shop)">
-        <svg class="i" viewBox="0 0 24 24"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z" fill="currentColor" stroke="none" /><path d="M19 3v4M17 5h4" /></svg>
-        <span class="num" id="dust-count">0</span>
-      </button>
       <button id="book-btn" class="pill-btn glass" title="Collection book (B)">
         <svg class="i" viewBox="0 0 24 24"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z" /><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3" /><path d="M9 7.5h6" /></svg>
         <span class="num" id="book-count">0/0</span>
       </button>
-      <button id="shop-btn" class="pill-btn glass" title="Shop (P)">
-        <svg class="i" viewBox="0 0 24 24"><path d="M5.5 8h13l-1.2 12h-10.6z" /><path d="M9 10V7a3 3 0 0 1 6 0v3" /></svg>
+      <button id="shop-btn" class="pill-btn glass" title="Shop (P): spend your stardust">
+        <svg class="i" viewBox="0 0 24 24"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z" fill="currentColor" stroke="none" /><path d="M19 3v4M17 5h4" /></svg>
         <span class="label">Shop</span>
+        <span class="num" id="dust-count">0</span>
       </button>
     </div>
 

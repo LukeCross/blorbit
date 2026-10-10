@@ -1161,7 +1161,6 @@ $('finale-shop').addEventListener('click', () => {
   shop.open();
 });
 $('shop-btn').addEventListener('click', () => shop.toggle());
-$('dust').addEventListener('click', () => shop.open());
 
 // little slime droplets flicking off the back of the blob
 function spawnDrips(dt, moving) {
@@ -1348,9 +1347,9 @@ function updatePlay(dt) {
     sound.pickup(dustCombo);
     save.stardust++;
     particles.burst(pos, blob.p, [GOLD, WHITE], 8, 3, 0.3, 0.6);
-    $('dust').classList.remove('bump');
-    void $('dust').offsetWidth;
-    $('dust').classList.add('bump');
+    $('shop-btn').classList.remove('bump');
+    void $('shop-btn').offsetWidth;
+    $('shop-btn').classList.add('bump');
   }
   if (got.length) {
     refreshDust();
