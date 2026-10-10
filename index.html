@@ -831,13 +831,17 @@
       }
       /* mouse users get no swipe gesture and macOS hides overlay scrollbars, so draw a visible one on the sideways-scrolling rows */
       @media (hover: hover) and (pointer: fine) {
-        .galaxy-tabs, #title .galaxy-cards { scrollbar-width: auto; }
+        .galaxy-tabs, #title .galaxy-cards, #skins { scrollbar-width: auto; }
         /* Chrome ignores the ::-webkit-scrollbar rules below if scrollbar-color is set, so only Firefox gets it */
-        @supports (-moz-appearance: none) { .galaxy-tabs, #title .galaxy-cards { scrollbar-width: thin; scrollbar-color: var(--lilac-deep) rgba(61,53,96,0.1); } }
-        .galaxy-tabs::-webkit-scrollbar, #title .galaxy-cards::-webkit-scrollbar { display: block; height: 10px; }
+        @supports (-moz-appearance: none) { .galaxy-tabs, #title .galaxy-cards, #skins { scrollbar-width: thin; scrollbar-color: var(--lilac-deep) rgba(61,53,96,0.1); } }
+        .galaxy-tabs::-webkit-scrollbar, #skins::-webkit-scrollbar { display: block; height: 6px; }
+        #title .galaxy-cards::-webkit-scrollbar { display: block; height: 10px; }
         .galaxy-tabs::-webkit-scrollbar-track, #title .galaxy-cards::-webkit-scrollbar-track { background: rgba(61,53,96,0.1); border-radius: 99px; }
         .galaxy-tabs::-webkit-scrollbar-thumb, #title .galaxy-cards::-webkit-scrollbar-thumb { background: var(--lilac-deep); border-radius: 99px; }
-        .galaxy-tabs { padding-bottom: 8px; }
+        .galaxy-tabs { padding-bottom: 6px; }
+        /* the tabs and the skin dock get a thinner bar than the title row */
+        #skins::-webkit-scrollbar-track { background: rgba(61,53,96,0.1); border-radius: 99px; margin: 0 14px; }
+        #skins::-webkit-scrollbar-thumb { background: var(--lilac-deep); border-radius: 99px; }
       }
     </style>
   </head>
