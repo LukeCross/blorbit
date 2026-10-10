@@ -7,6 +7,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { Sky, makeAtmosphere, GradeShader } from './look.js';
 import { Backdrop } from './skyfx.js';
+import { Atmosphere } from './atmosphere.js';
 import { quality, TIERS, detectTier } from './quality.js';
 import { Planet, NUM_REGIONS } from './planet.js';
 import { Blob } from './blob.js';
@@ -75,7 +76,8 @@ document.body.prepend(renderer.domElement);
 const scene = new THREE.Scene();
 const sky = new Sky();
 scene.background = sky.texture;
-scene.add(makeAtmosphere(10.3));
+const halo = makeAtmosphere(10.3);
+scene.add(halo);
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 scene.environmentIntensity = 0.7;
@@ -132,6 +134,7 @@ const smallScreen = () => window.innerWidth <= 720 || window.innerHeight <= 500;
 const sound = new Sound();
 const backdrop = new Backdrop(scene, sound);
 const particles = new Particles(scene);
+const atmosphere = new Atmosphere({ scene, hemi, sun, halo, backdrop, sound });
 const blob = new Blob(scene);
 if (!SKINS[save.equipped]) save.equipped = 'classic';
 blob.setSkin(save.equipped);
@@ -165,6 +168,7 @@ function newPlanet(seed = timeSeed(), galaxy = save.galaxy) {
   creatures.forEach((c) => c.dispose());
   popups.splice(0).forEach((p) => p.el.remove());
   planet = new Planet(scene, seed, galaxy);
+  atmosphere.setGalaxy(galaxy);
   planet.setSlimeColor(SKINS[blob.skinId].slime);
   creatures = planet.creatureOrder.map((id, r) => new Creature(scene, planet, id, planet.centers[r]));
   critters = new Critters(scene, planet, (dir) => {
@@ -326,6 +330,7 @@ function setBiome(r) {
   void $('biome-label').offsetWidth;
   $('biome-label').classList.add('bump');
   sky.set(...def.sky);
+  atmosphere.setBiome(planet.biomes[r]);
   sound.setBiome(planet.biomes[r]);
 }
 
@@ -1313,6 +1318,8 @@ function frame() {
   particles.update(dt);
   updateCamera(realDt);
   backdrop.update(realDt, camera);
+  atmosphere.pixelRatio = renderer.getPixelRatio();
+  atmosphere.update(dt, blob.position);
   updateUI(realDt);
   if (TIERS[quality.tier].post) composer.render();
   else renderer.render(scene, camera);
@@ -1348,4 +1355,4 @@ async function reveal() {
 
 // handy for debugging from the console
 refreshDust();
-window.blorbit = { shop, ads, save, newPlanet, travelTo, enterGalaxy, planetKey, galaxyOf: galaxyOfBiome, CAM, camera, backdrop, planet: () => planet, rollFind, toggleBook, completeRegion, completePatch, blob, sound, keys };
+window.blorbit = { atmosphere, shop, ads, save, newPlanet, travelTo, enterGalaxy, planetKey, galaxyOf: galaxyOfBiome, CAM, camera, backdrop, planet: () => planet, rollFind, toggleBook, completeRegion, completePatch, blob, sound, keys };

@@ -11,6 +11,21 @@ const CHORDS = [
   [43, 50, 55, 59, 66], // G with a lydian lift
 ];
 
+// weather bed per kind: filter centre, Q, level, and how much the level swells
+const WEATHER_SOUND = {
+  rain: { f: 5200, q: 0.5, g: 0.03 },
+  snow: { f: 900, q: 0.5, g: 0.006, swell: 0.004 },
+  wisps: { f: 500, q: 0.6, g: 0.01, swell: 0.006 },
+  dust: { f: 1100, q: 0.8, g: 0.02, swell: 0.012 },
+  ash: { f: 700, q: 0.7, g: 0.012, swell: 0.008 },
+  fog: { f: 140, q: 0.7, g: 0.03, swell: 0.012 },
+  bubbles: { f: 300, q: 1, g: 0.006 },
+  embers: { f: 2200, q: 1.2, g: 0.006 },
+  leaves: { f: 2600, q: 0.8, g: 0.01, swell: 0.006 },
+  petals: { f: 800, q: 0.5, g: 0.004 },
+  sprinkles: { f: 800, q: 0.5, g: 0 },
+};
+
 export class Sound {
   constructor() {
     this.ctx = null;
@@ -18,6 +33,7 @@ export class Sound {
     this.life = 0;
     this.lastTinkle = 0;
     this.biome = 'meadow';
+    this.weatherKind = null;
   }
 
   start() {
@@ -48,6 +64,7 @@ export class Sound {
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
 
     this.startAmbient();
+    this.startWeather();
     this.startRoll();
   }
 
@@ -215,6 +232,79 @@ export class Sound {
         this.tone({ type: 'triangle', f: midi(n), dur: 1.2, vol: 0.02, verb: 0.9, pan: Math.random() * 1.6 - 0.8 });
       }
     }, 500);
+  }
+
+  // ---- weather ----------------------------------------------------------------
+  // One looping noise bed whose filter and level glide to each weather's setting, plus the
+  // odd little event (a raindrop plink, a bubble, a crackle). setWeather may be called before
+  // the audio has started; the kind is remembered and applied then.
+
+  startWeather() {
+    const ctx = this.ctx;
+    const src = ctx.createBufferSource();
+    src.buffer = this.noise;
+    src.loop = true;
+    this.wxFilter = ctx.createBiquadFilter();
+    this.wxFilter.type = 'bandpass';
+    this.wxFilter.frequency.value = 800;
+    this.wxGain = ctx.createGain();
+    this.wxGain.gain.value = 0;
+    // slow swell so wind and fog breathe instead of hissing flat
+    const lfo = ctx.createOscillator();
+    this.wxLfo = ctx.createGain();
+    this.wxLfo.gain.value = 0;
+    lfo.frequency.value = 0.13;
+    lfo.connect(this.wxLfo).connect(this.wxGain.gain);
+    src.connect(this.wxFilter).connect(this.wxGain).connect(this.master);
+    src.start(0, Math.random() * 1.5);
+    lfo.start();
+    setInterval(() => this.weatherEvent(), 400);
+    this.setWeather(this.weatherKind);
+  }
+
+  setWeather(kind) {
+    this.weatherKind = kind;
+    if (!this.ctx) return;
+    const w = WEATHER_SOUND[kind] ?? { f: 800, q: 0.5, g: 0 };
+    const t = this.now;
+    this.wxFilter.frequency.setTargetAtTime(w.f, t, 0.8);
+    this.wxFilter.Q.setTargetAtTime(w.q, t, 0.8);
+    this.wxGain.gain.setTargetAtTime(w.g, t, 0.8);
+    this.wxLfo.gain.setTargetAtTime(w.swell ?? 0, t, 0.8);
+  }
+
+  weatherEvent() {
+    if (!this.ctx || this.ctx.state !== 'running') return;
+    const r = Math.random();
+    const pan = Math.random() * 1.6 - 0.8;
+    switch (this.weatherKind) {
+      case 'rain':
+        if (r < 0.4) this.tone({ type: 'sine', f: 2200 + Math.random() * 2200, dur: 0.04, vol: 0.008, verb: 0.4, pan });
+        break;
+      case 'bubbles': {
+        if (r < 0.3) {
+          const f = 380 + Math.random() * 500;
+          this.tone({ f, f2: f * 1.8, dur: 0.14, vol: 0.02, verb: 0.6, pan });
+        }
+        break;
+      }
+      case 'embers':
+        if (r < 0.5) this.noiseBurst({ dur: 0.03, vol: 0.014, f: 2500 + Math.random() * 2500, q: 2, verb: 0.15 });
+        break;
+      case 'sprinkles':
+        if (r < 0.2) this.tone({ type: 'triangle', f: midi(96 + pentaStep(Math.floor(Math.random() * 5))), dur: 0.12, vol: 0.01, verb: 0.7, pan });
+        break;
+      case 'snow':
+        if (r < 0.04) this.tone({ type: 'sine', f: midi(100 + pentaStep(Math.floor(Math.random() * 5))), dur: 1.6, vol: 0.008, verb: 1, pan });
+        break;
+    }
+  }
+
+  // a low roll of thunder a beat after a flash of lightning
+  thunder() {
+    const t = this.now + 0.7 + Math.random() * 0.8;
+    this.noiseBurst({ t, dur: 2.4, vol: 0.07, f: 220, f2: 70, q: 0.7, type: 'lowpass', verb: 0.8 });
+    this.tone({ f: 58, f2: 40, t, dur: 2, vol: 0.05, attack: 0.15, verb: 0.5 });
   }
 
   playChord(notes) {

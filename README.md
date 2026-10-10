@@ -209,6 +209,7 @@ There are no models, textures or sound assets. Everything you see and hear is ge
 - Spring physics drive the squash, stretch and jiggle. The eyes, accessories and suspended bubbles live in a "roller" group that genuinely tumbles as the blob rolls, then rocks back upright when it stops.
 
 ### Space backdrop
+- Every galaxy has its own atmosphere: the colours of space, the light, and a signature weather (petals, rain, drifting clouds, dust, bubbles, sprinkles, fog, ash). A few biomes override it, so the snowy ones snow and the volcano throws embers. The weather is a single cheap particle draw call and has its own soft soundscape (rain hiss, bubbles, crackling embers, distant thunder in Gloomhollow).
 - A gradient sky, twinkling star field (custom point shader), drifting pastel nebula sprites and distant ringed planets.
 - Shooting stars streak across the open sky around the planet every few seconds, now and then as a little shower.
 
@@ -258,6 +259,7 @@ src/
   audio.js          Synthesised Web Audio sound effects and soundscapes
   look.js           Sky gradient, atmosphere glow, colour-grade shader
   skyfx.js          Stars, nebula, distant planets, shooting stars
+  atmosphere.js     Per-galaxy space colours, lighting and weather
   quality.js        Quality tiers, device detection, material helpers
   names.js          Planet name generator and time-based seeds
   noise.js          Seeded noise and PRNG

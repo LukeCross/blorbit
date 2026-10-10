@@ -5,6 +5,7 @@ import * as THREE from 'three';
 
 const rnd = (a, b) => a + Math.random() * (b - a);
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const WHITE = new THREE.Color('#ffffff');
 const PASTELS = ['#ffd1ea', '#d6c8ff', '#c4f2e2', '#ffe2c6', '#c9e6ff', '#fff1b8'];
 
 function softTexture() {
@@ -33,6 +34,36 @@ export class Backdrop {
     this.buildPlanets();
     this.shooting = [];
     this.nextStar = 2;
+    this.shootMul = 1;
+    this.bigPlanet = 1;
+  }
+
+  // Re-dress the space for a galaxy (see atmosphere.js). Stars snap to their new palette;
+  // nebulae and distant planets ease across in update() unless `snap` is set.
+  apply(p, snap = false) {
+    const col = this.starGeo.getAttribute('color');
+    const c = new THREE.Color();
+    for (let i = 0; i < col.count; i++) {
+      c.set(Math.random() < p.starWhite ? '#ffffff' : pick(p.starPalette));
+      col.setXYZ(i, c.r, c.g, c.b);
+    }
+    col.needsUpdate = true;
+    this.starGeo.setDrawRange(0, Math.round(col.count * p.starFrac));
+    this.starUniforms.uSizeMul.value = p.starSize;
+    for (const s of this.clouds) {
+      s.userData.target = new THREE.Color(pick(p.nebula));
+      s.userData.mul = p.nebulaMul;
+      if (snap) s.material.color.copy(s.userData.target);
+    }
+    this.planets.forEach((g, i) => {
+      g.userData.target = new THREE.Color(p.planets[i % p.planets.length]);
+      g.userData.scaleTo = i === 0 ? p.bigPlanet : 1;
+      if (snap) {
+        g.userData.body.material.color.copy(g.userData.target);
+        g.scale.setScalar(g.userData.scaleTo);
+      }
+    });
+    this.shootMul = p.shootMul;
   }
 
   // ---- twinkling stars ------------------------------------------------------
@@ -57,7 +88,8 @@ export class Backdrop {
     geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
     geo.setAttribute('seed', new THREE.BufferAttribute(seed, 1));
     geo.setAttribute('size', new THREE.BufferAttribute(size, 1));
-    this.starUniforms = { uTime: { value: 0 }, uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) } };
+    this.starGeo = geo;
+    this.starUniforms = { uTime: { value: 0 }, uSizeMul: { value: 1 }, uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) } };
     const stars = new THREE.Points(geo, new THREE.ShaderMaterial({
       uniforms: this.starUniforms,
       transparent: true,
@@ -67,13 +99,14 @@ export class Backdrop {
         attribute float seed;
         attribute float size;
         uniform float uTime;
+        uniform float uSizeMul;
         uniform float uPixelRatio;
         varying vec3 vCol;
         varying float vTw;
         void main() {
           vCol = color;
           vTw = 0.55 + 0.45 * sin(uTime * (0.8 + fract(seed) * 2.2) + seed);
-          gl_PointSize = size * uPixelRatio * (0.75 + 0.35 * vTw);
+          gl_PointSize = size * uSizeMul * uPixelRatio * (0.75 + 0.35 * vTw);
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }`,
       fragmentShader: /* glsl */ `
@@ -106,7 +139,7 @@ export class Backdrop {
       s.position.copy(dir).multiplyScalar(rnd(170, 210));
       const size = rnd(28, 60);
       s.scale.set(size * rnd(1, 1.8), size, 1);
-      s.userData = { dir, drift: new THREE.Vector3().randomDirection().multiplyScalar(0.01), spin: rnd(-0.02, 0.02), base: mat.opacity, phase: Math.random() * 6 };
+      s.userData = { dir, drift: new THREE.Vector3().randomDirection().multiplyScalar(0.01), spin: rnd(-0.02, 0.02), base: mat.opacity, mul: 1, phase: Math.random() * 6 };
       this.group.add(s);
       this.clouds.push(s);
     }
@@ -129,6 +162,7 @@ export class Backdrop {
         new THREE.MeshStandardMaterial({ color: spec.color, roughness: 1, emissive: new THREE.Color(spec.color).multiplyScalar(0.35) }),
       );
       g.add(body);
+      g.userData.body = body;
       if (spec.ring) {
         const ring = new THREE.Mesh(
           new THREE.RingGeometry(spec.r * 1.4, spec.r * 2.1, 96),
@@ -136,6 +170,7 @@ export class Backdrop {
         );
         ring.rotation.x = Math.PI / 2.4;
         g.add(ring);
+        g.userData.ring = ring;
       }
       g.position.copy(spots[idx]).normalize().multiplyScalar(rnd(150, 190));
       g.rotation.set(rnd(-0.5, 0.5), 0, rnd(-0.6, 0.6));
@@ -188,22 +223,32 @@ export class Backdrop {
   update(dt, camera) {
     this.time += dt;
     this.starUniforms.uTime.value = this.time;
+    const ease = Math.min(1, dt * 1.5);
 
     for (const s of this.clouds) {
       const u = s.userData;
       u.dir.add(u.drift.clone().multiplyScalar(dt)).normalize();
       s.position.copy(u.dir).multiplyScalar(s.position.length());
       s.material.rotation += u.spin * dt;
-      s.material.opacity = u.base * (0.8 + 0.2 * Math.sin(this.time * 0.3 + u.phase));
+      if (u.target) s.material.color.lerp(u.target, ease);
+      s.material.opacity = u.base * u.mul * (0.8 + 0.2 * Math.sin(this.time * 0.3 + u.phase));
     }
-    for (const p of this.planets) p.rotation.y += p.userData.spin * dt;
+    for (const p of this.planets) {
+      const u = p.userData;
+      p.rotation.y += u.spin * dt;
+      if (!u.target) continue;
+      u.body.material.color.lerp(u.target, ease);
+      u.body.material.emissive.copy(u.body.material.color).multiplyScalar(0.35);
+      u.ring?.material.color.copy(u.body.material.color).lerp(WHITE, 0.5);
+      p.scale.setScalar(p.scale.x + (u.scaleTo - p.scale.x) * ease);
+    }
 
     // a shooting star every few seconds, now and then a little shower of them
     this.nextStar -= dt;
     if (this.nextStar <= 0) {
       if (Math.random() < 0.15) for (let i = 0; i < 4; i++) this.spawnShootingStar(camera, i * rnd(0.15, 0.35));
       else this.spawnShootingStar(camera);
-      this.nextStar = rnd(3, 8);
+      this.nextStar = rnd(3, 8) * this.shootMul;
     }
 
     const toCam = new THREE.Vector3();

@@ -54,6 +54,7 @@ src/props.js   PROP_KINDS: procedural low-poly prop models (instanced)
 src/skins.js   SKINS (one per creature) and buildAccessories(): the creature's features
 src/creature.js  Sleeping/waking creature placed in each biome (uses skins)
 src/critters.js  Ambient wandering critters (KINDS)
+src/atmosphere.js  Per-galaxy look: ATMOSPHERES (space colours, light, signature weather), BIOME_WEATHER overrides, Weather (one cheap particle draw call)
 src/audio.js   Synthesised sound: per-biome ambient cases + rolling timbre
 src/shop.js    Card pack shop, galaxy tabs (galaxyTabs, renderKeepingTabs)
 src/collection.js  Finds, rarities, pack rates (totals are computed, not hard-coded)
@@ -173,6 +174,9 @@ Add to `KINDS` (`flying`, `speed`, `hover`, `turn`, `build()` returning `{ g, wi
 
 ### 6.6 `src/audio.js`
 Add a `case '<biomeId>':` per biome in the ambient switch (above `default:`), and an entry per biome in the `rollTimbre` object in `setBiome` (`[filter centre, Q, low thump]`). Helpers: `this.tone`, `this.noiseBurst`, `this.birdChirp`, `midi`, `pentaStep`.
+
+### 6.6b `src/atmosphere.js`
+Add an `ATMOSPHERES[<galaxy id>]` entry (spread `...base`, override star/nebula/planet colours, `sun`/`hemi*` light, `halo`, `weather`). Weather kinds live in `WEATHER`; per-biome overrides go in `BIOME_WEATHER`. A galaxy without an entry falls back to Wildbloom's look. Keep particle counts small (weather is scaled down on the Smooth tier).
 
 ### 6.7 `src/planet.js` (only for new terrain or shader effects)
 New terrain: a `case` in `terrain()`. New ground effect: follow the `aSea`/`aCloud` pattern (attribute, varying, fragment block, `style[n]` slot, buffer with `smooth()`, `setAttribute`).
