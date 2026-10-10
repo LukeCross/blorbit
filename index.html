@@ -544,6 +544,10 @@
       #profile-btn { overflow: hidden; }
       .profile-id { display: flex; align-items: center; gap: 14px; margin: 18px 0 4px; padding: 14px 16px; border-radius: var(--r); background: rgba(255,255,255,0.75); box-shadow: var(--shadow-sm); }
       .profile-id { flex-wrap: wrap; }
+      .share-box { margin-top: 14px; padding: 12px; border-radius: var(--r); background: rgba(255,255,255,0.75); box-shadow: var(--shadow-sm); }
+      .share-box textarea { width: 100%; box-sizing: border-box; resize: none; padding: 10px 12px; border: 2px solid rgba(61,53,96,0.12); border-radius: 14px; background: #fff; color: var(--ink); font: 700 14px / 1.45 var(--font); }
+      .share-box div { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+      .share-box small { flex: 1; color: var(--ink-soft); font-size: 12px; font-weight: 800; }
       .showcase { display: flex; gap: 8px; }
       .showcase .slot { width: 54px; padding: 0; cursor: pointer; font-family: inherit; }
       .showcase .slot:hover { transform: translateY(-1px); }
@@ -1177,7 +1181,12 @@
       <div class="panel profile-panel">
         <div class="panel-head">
           <h2>Profile</h2><span class="spacer"></span>
+          <button class="btn small" id="profile-share" title="Share your stats">Share</button>
           <button class="btn secondary small" id="profile-close">Close</button>
+        </div>
+        <div class="share-box hidden" id="share-box">
+          <textarea id="share-text" readonly rows="7" aria-label="Message to share"></textarea>
+          <div><small>Copy this and send it to a friend.</small><button class="btn small" id="share-copy">Copy</button></div>
         </div>
         <div class="profile-id">
           <span class="avatar big empty" id="profile-avatar"></span>

@@ -97,7 +97,7 @@ Pick a galaxy on the title screen to start, or press `Enter` to jump back into t
 ### Touch (phones and tablets)
 - **Tap sides** (default): your blob rolls forward by itself. **Hold the left or right half** of the screen to turn; the turn starts gentle and builds up the longer you hold. Quick taps give a small nudge, and both thumbs down goes straight.
 - **Joystick** (optional, in Settings → Touch controls): **drag anywhere** to use a virtual joystick. Push up to roll forward and left/right to steer.
-- Tap the icons in the top bar for the Collection, Shop, auto-roll, Profile, Settings and sound. Profile has your quirky name (re-roll it as often as you like), an avatar picked from your unlocked skins, three showcase slots for your favourite finds, and your stats overall and per galaxy.
+- Tap the icons in the top bar for the Collection, Shop, auto-roll, Profile, Settings and sound. Profile has your quirky name (re-roll it as often as you like), an avatar picked from your unlocked skins, three showcase slots for your favourite finds, and your stats overall and per galaxy. **Share** opens a ready-made "come and play" message with your name, progress, favourite finds and the game's link, with a Copy button.
 - Swipe the skin strip at the bottom to browse and equip skins.
 
 ### Settings

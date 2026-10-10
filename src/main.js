@@ -977,6 +977,7 @@ function openProfile() {
 }
 function closeProfile() {
   $('profile').classList.add('hidden');
+  $('share-box').classList.add('hidden');
   pickSlot = null;
 }
 function renderProfile() {
@@ -1100,6 +1101,26 @@ $('name-regen').addEventListener('click', () => {
   b.classList.remove('spin');
   void b.offsetWidth;
   b.classList.add('spin');
+});
+// "come and play" message with the player's stats, shown in a box they can copy from
+const shareText = () => {
+  const shown = save.showcase.filter(Boolean).map((k) => FIND_INDEX.get(k).emoji).join(' ');
+  return `${save.avatar ? SKINS[save.avatar].emoji + ' ' : ''}${save.name} is playing Blorbit, a cosy game about bringing tiny planets back to life!\n\n`
+    + `🃏 ${foundCount(save)}/${TOTAL_FINDS} cards · 🌸 ${unlockedGalaxies().length}/${GALAXY_IDS.length} galaxies · 🪐 ${save.restored} planets restored`
+    + `${shown ? `\n\nMy favourite finds: ${shown}` : ''}\n\nCome and play: https://blorbit.io`;
+};
+$('profile-share').addEventListener('click', () => {
+  const box = $('share-box');
+  box.classList.toggle('hidden');
+  if (box.classList.contains('hidden')) return;
+  $('share-text').value = shareText();
+  $('share-copy').textContent = 'Copy';
+});
+$('share-copy').addEventListener('click', async () => {
+  const ta = $('share-text');
+  try { await navigator.clipboard.writeText(ta.value); }
+  catch { ta.select(); document.execCommand('copy'); } // older browsers and plain-http pages
+  $('share-copy').textContent = 'Copied!';
 });
 $('avatar-picker').addEventListener('click', (e) => {
   const b = e.target.closest('button');

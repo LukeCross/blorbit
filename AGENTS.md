@@ -47,7 +47,7 @@ Deploys: pushing to `main` runs `.github/workflows/deploy.yml` (GitHub Pages, si
 index.html     All CSS (design tokens, HUD, panels, responsive rules), UI markup, SEO/share tags
 about.html     About & how-to-play page (static HTML, galaxy cards + counts are hand-written)
 privacy.html   Privacy policy
-src/main.js    Game loop, state, input, UI, saves, galaxy picker/travel, collection book, profile panel (name, avatar, find showcase, per-galaxy stats). Exposes window.blorbit for scripts
+src/main.js    Game loop, state, input, UI, saves, galaxy picker/travel, collection book, profile panel (name, avatar, find showcase, per-galaxy stats, and a Share box with a copyable "come and play" message). Exposes window.blorbit for scripts
 src/planet.js  Icosphere terrain (terrain() switch), biome layout, patches ("spots"), slime painting, GLSL ground shader, prop layers
 src/galaxies.js  GALAXIES definitions, unlock rules, startup sanity checks
 src/biomes.js  BIOMES: terrain, colours, props, critters, particles, patches, finds
