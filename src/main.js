@@ -19,7 +19,7 @@ import { BIOMES } from './biomes.js';
 import { GALAXIES, GALAXY_IDS, creaturesOf, wokenIn, isGalaxyUnlocked, unlockProgress, unlockHint, checkSkins, galaxyOfBiome } from './galaxies.js';
 import { Critters } from './critters.js';
 import { Stardust } from './stardust.js';
-import { RARITY, RATES, TIERS as RARITY_TIERS, TOTAL_FINDS, drawFind, foundCount, foundIn, totalFindsIn, rarityCounts, cardsCollected } from './collection.js';
+import { RARITY, RATES, TIERS as RARITY_TIERS, TOTAL_FINDS, drawFind, foundCount, foundIn, totalFindsIn, rarityCounts, cardsCollected, FIND_INDEX, cleanShowcase, rarestFinds } from './collection.js';
 import { Shop, galaxyTabs, renderKeepingTabs } from './shop.js';
 import { RewardedAds } from './ads.js';
 import { planetName, timeSeed, blobName } from './names.js';
@@ -42,6 +42,7 @@ save.seenGalaxies ??= ['wild'];
 // profile: a random silly name to start with, and no avatar until the player picks one of their skins
 save.name ??= blobName();
 if (!save.unlocked.includes(save.avatar)) save.avatar = null;
+save.showcase = cleanShowcase(save); // three favourite finds, as save keys (null = empty slot)
 if (!GALAXIES[save.galaxy] || !isGalaxyUnlocked(save, save.galaxy)) save.galaxy = 'wild';
 document.body.classList.toggle('cb', save.colorblind);
 quality.tier = save.quality === 'auto' ? detectTier() : save.quality;
@@ -347,6 +348,11 @@ window.addEventListener('keydown', (e) => {
   // on the title, Enter jumps back into the galaxy you were last in; everything else waits for a pick
   if (state === 'title') {
     if (e.code === 'Enter' && !(e.target instanceof HTMLButtonElement) && titleReady) enterGalaxy(save.galaxy);
+    // the shop and collection work from the title too
+    if (e.target instanceof HTMLInputElement) return;
+    if (e.code === 'KeyB') toggleBook();
+    if (e.code === 'KeyP') shop.toggle();
+    if (e.code === 'Escape') { shop.closeOffer(); shop.close(); $('book').classList.add('hidden'); closeSettings(); closeProfile(); }
     return;
   }
   if (e.target instanceof HTMLInputElement) return; // arrow keys belong to a focused slider, not the blob
@@ -477,7 +483,7 @@ function start() {
   sound.start();
   state = 'play';
   $('title').classList.add('hidden');
-  ['hud-top', 'skins', 'biome-label', 'autoroll', 'hud-left'].forEach((id) => $(id).classList.remove('hidden'));
+  ['hud-top', 'skins', 'biome-label', 'autoroll'].forEach((id) => $(id).classList.remove('hidden'));
   buildSkinBar();
   if (tapSteer()) flashSteerHint();
 }
@@ -653,7 +659,7 @@ function backToMenu() {
   closeSettings();
   closeProfile();
   ['book', 'galaxies', 'finale'].forEach((id) => $(id).classList.add('hidden'));
-  ['hud-top', 'skins', 'biome-label', 'autoroll', 'hud-left'].forEach((id) => $(id).classList.add('hidden'));
+  ['hud-top', 'skins', 'biome-label', 'autoroll'].forEach((id) => $(id).classList.add('hidden'));
   held.clear();
   Object.keys(keys).forEach((k) => (keys[k] = false));
   state = 'title';
@@ -971,10 +977,12 @@ function openProfile() {
 }
 function closeProfile() {
   $('profile').classList.add('hidden');
+  pickSlot = null;
 }
 function renderProfile() {
   $('profile-name').textContent = save.name;
   showAvatar($('profile-avatar'));
+  renderShowcase();
   // Classic Goo is always yours, so only creature skins count (across every galaxy)
   const mine = CREATURE_IDS.filter((id) => save.unlocked.includes(id));
   const picks = ['classic', ...mine];
@@ -1008,6 +1016,77 @@ function renderProfile() {
       + `<div class="g-rarity">${rarityPips(rarityCounts(save, def.biomes))}</div></div></div>`;
   }).join('');
 }
+// the three showcase slots on the profile card; tapping one opens a picker of the finds you've discovered
+let pickSlot = null; // which slot the picker is choosing for
+let pickTab = 'wild';
+const findTitle = (k) => {
+  const f = FIND_INDEX.get(k);
+  return `${f.name} (${RARITY[f.rarity]}) · ${BIOMES[f.biomeId].name}, ${GALAXIES[galaxyOfBiome(f.biomeId)].name}`;
+};
+function renderShowcase() {
+  $('showcase').innerHTML = save.showcase.map((k, i) => {
+    const sel = i === pickSlot ? ' picking' : '';
+    if (!k) return `<button class="slot empty${sel}" data-i="${i}" title="Choose a find to show off" aria-label="Empty showcase slot ${i + 1}">+</button>`;
+    const f = FIND_INDEX.get(k), n = save.finds[k];
+    return `<button class="slot ${f.rarity}${sel}" data-i="${i}" title="${findTitle(k)}" aria-label="${findTitle(k)}">${f.emoji}${n > 1 ? `<i>×${n}</i>` : ''}</button>`;
+  }).join('');
+  const any = foundCount(save) > 0;
+  const rarest = rarestFinds(save);
+  const same = rarest.length === save.showcase.filter(Boolean).length && rarest.every((k) => save.showcase.includes(k));
+  $('showcase-note').innerHTML = any
+    ? `Tap a slot to show off up to 3 of your favourite finds.${same ? '' : ' <button class="link" id="showcase-rarest">Pick my rarest</button>'}`
+    : 'Restore spots and open card packs to find something to show off.';
+  renderShowcasePicker();
+}
+function renderShowcasePicker() {
+  const el = $('showcase-picker');
+  el.classList.toggle('hidden', pickSlot === null);
+  if (pickSlot === null) return;
+  renderKeepingTabs(el, () => {
+    const cur = save.showcase[pickSlot];
+    const rows = GALAXIES[pickTab].biomes.map((b) => {
+      const items = BIOMES[b].finds.filter(([, name]) => save.finds[`${b}:${name}`]).map(([emoji, name, rarity]) => {
+        const k = `${b}:${name}`;
+        const n = save.finds[k];
+        return `<button class="slot ${rarity} ${k === cur ? 'chosen' : ''}" data-key="${k}" title="${findTitle(k)}" aria-label="${findTitle(k)}">${emoji}${n > 1 ? `<i>×${n}</i>` : ''}</button>`;
+      }).join('');
+      return items ? `<div class="book-row"><div class="book-head"><b>${BIOMES[b].name}</b></div><div class="slots">${items}</div></div>` : '';
+    }).join('');
+    el.innerHTML = `<div class="picker-head">Choose a find for slot ${pickSlot + 1}${cur ? '<button class="btn secondary small" data-action="clear">Remove</button>' : ''}</div>`
+      + galaxyTabs(save, pickTab, planet?.galaxy ?? save.galaxy) + (rows || '<p class="none">Nothing found in this galaxy yet.</p>');
+  });
+}
+$('showcase').addEventListener('click', (e) => {
+  const i = e.target.closest('.slot')?.dataset.i;
+  if (i === undefined) return;
+  pickSlot = pickSlot === Number(i) ? null : Number(i);
+  const cur = save.showcase[pickSlot];
+  pickTab = (cur && galaxyOfBiome(FIND_INDEX.get(cur).biomeId)) || (planet?.galaxy ?? save.galaxy);
+  renderShowcase();
+});
+$('showcase-note').addEventListener('click', (e) => {
+  if (!e.target.closest('#showcase-rarest')) return;
+  save.showcase = cleanShowcase({ finds: save.finds, showcase: rarestFinds(save) });
+  pickSlot = null;
+  persist();
+  renderShowcase();
+});
+$('showcase-picker').addEventListener('click', (e) => {
+  const tab = e.target.closest('[data-action="tab"]');
+  if (tab) { pickTab = tab.dataset.id; return renderShowcasePicker(); }
+  if (e.target.closest('[data-action="clear"]')) save.showcase[pickSlot] = null;
+  else {
+    const key = e.target.closest('[data-key]')?.dataset.key;
+    if (!key) return;
+    // a find can only fill one slot, so picking one that's already showcased swaps the two
+    const other = save.showcase.indexOf(key);
+    if (other >= 0) save.showcase[other] = save.showcase[pickSlot];
+    save.showcase[pickSlot] = key;
+  }
+  pickSlot = null;
+  persist();
+  renderShowcase();
+});
 $('profile-btn').addEventListener('click', openProfile);
 $('profile-close').addEventListener('click', closeProfile);
 $('name-regen').addEventListener('click', () => {

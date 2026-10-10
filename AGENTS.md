@@ -34,6 +34,7 @@ Deploys: pushing to `main` runs `.github/workflows/deploy.yml` (GitHub Pages, si
 - Each biome has exactly **8 finds: 3 common (`c`), 2 uncommon (`u`), 1 rare (`r`), 1 epic (`e`), 1 legendary (`l`)**. A startup check only enforces at least one of each, but docs and the shop assume 8 and this split.
 - Each galaxy has **5 biomes, 5 creatures, 40 finds** (Wildbloom is the exception: 10/10/80).
 - Commit style (see `git log`): short imperative title, e.g. `Add feastvale galaxy`, `Fix ipad resolution`. End commit messages with the attribution line the harness provides (currently `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`) and PR bodies with the harness's PR line. Only commit/push when asked.
+- **After any change, re-check `README.md`, `about.html` and this file (`AGENTS.md`)** for things to add or fix: new or changed features, controls, UI, save fields, files or counts, and anything now out of date. Update them in the same piece of work, even if the change seems small. (Section 6.8 lists the extra places a new galaxy touches.)
 - Use they/them for anyone whose pronouns aren't known.
 - On macOS use `sed -i ''` (BSD sed); prefer a small Python script or the Edit tool for multi-line edits.
 - Scripts that import `puppeteer-core` must live in `scripts/` (so Node resolves it). If you write a throwaway script, put it in `scripts/`, run it, and delete it.
@@ -46,7 +47,7 @@ Deploys: pushing to `main` runs `.github/workflows/deploy.yml` (GitHub Pages, si
 index.html     All CSS (design tokens, HUD, panels, responsive rules), UI markup, SEO/share tags
 about.html     About & how-to-play page (static HTML, galaxy cards + counts are hand-written)
 privacy.html   Privacy policy
-src/main.js    Game loop, state, input, UI, saves, galaxy picker/travel, collection book, profile panel (name, avatar, per-galaxy stats). Exposes window.blorbit for scripts
+src/main.js    Game loop, state, input, UI, saves, galaxy picker/travel, collection book, profile panel (name, avatar, find showcase, per-galaxy stats). Exposes window.blorbit for scripts
 src/planet.js  Icosphere terrain (terrain() switch), biome layout, patches ("spots"), slime painting, GLSL ground shader, prop layers
 src/galaxies.js  GALAXIES definitions, unlock rules, startup sanity checks
 src/biomes.js  BIOMES: terrain, colours, props, critters, particles, patches, finds
@@ -67,7 +68,7 @@ public/        Static files: og-image.png (share image, also the About hero), fa
 
 Key facts:
 - A **planet** picks **4 biomes** (`NUM_REGIONS = 4` in `planet.js`) from one galaxy. Planets are deterministic from `seed + galaxy`; each planet only shuffles its own galaxy's biome list, so **adding a galaxy never changes existing planets** (but adding/removing a biome inside an existing galaxy does).
-- Saves: main save `blorbit-save-v1` (stardust, skins, finds, settings, profile `name`/`avatar`, current galaxy, restored counts, `unlocked` creature ids, `seenGalaxies`, `adUnlocked`); one planet save per galaxy `blorbit-planet-v1:<galaxy>`.
+- Saves: main save `blorbit-save-v1` (stardust, skins, finds, settings, profile `name`/`avatar`/`showcase` (three find keys), current galaxy, restored counts, `unlocked` creature ids, `seenGalaxies`, `adUnlocked`); one planet save per galaxy `blorbit-planet-v1:<galaxy>`.
 - Galaxy unlock: `unlockedBy` (previous galaxy id) + `unlockAt` (0.8 = 80% of that galaxy's creatures woken). The chain today is a straight line. Players can also unlock one by watching a rewarded video (`save.adUnlocked`).
 - Unknown galaxy ids fall back to `'wild'` in `main.js` (`save.galaxy`, `bookTab`, planet-save migration). Don't change those.
 - `window.blorbit` (bottom of `main.js`) exposes `save, newPlanet, travelTo, enterGalaxy, planet(), completeRegion(i), completePatch(k), galaxyOf(biomeId), blob, sound, shop, ...` for scripts.
@@ -204,6 +205,7 @@ grep -rnE "[0-9]+ biomes|[0-9]+ galaxies|[0-9]+ cards|biome definitions" index.h
 - **Title galaxy picker** (`index.html`): `#title .galaxy-cards { width: min(1700px, 94vw) }` is sized so all cards fit one row on a wide desktop (title cards are `minmax(200px, 1fr)`; 8 cards need ~1700px). With more galaxies, raise that width and the `@media (min-width: 721px) and (max-width: 1810px) and (min-height: 501px)` upper bound (single swipeable row, `grid-auto-columns: 250px`, `width: 88vw`, scroll-snap) so the swipe row covers every width where they no longer fit. Phones (<=720px) use a stacked list. Verify at 1920, 1440, 1024 and 820 wide.
 - **Shop and collection galaxy tabs** (`.galaxy-tabs`): never wrap or truncate; they scroll sideways, and `renderKeepingTabs` (in `shop.js`, used by the shop and `renderBook`) preserves scroll position and reveals the active tab. Keep `position: relative` on `.galaxy-tabs` (the reveal math uses `offsetLeft`).
 - **Skin bar** (`#skins`): scrolls sideways; shows Classic, the current galaxy's creatures, then skins unlocked elsewhere. Number keys `1-9`, `0` map to the current galaxy's creatures.
+- **Corner buttons** (`#hud-left`: Menu, stardust, collection, shop; `#hud-right`: profile, settings, sound): the stardust/collection/shop buttons and the right-hand ones also show on the title screen (the Menu button hides there via `body.on-title`), so keep them tappable above the title layer.
 - **Top HUD** (`#hud-top`): between 721px and 1100px wide (tablets) the planet card is dropped below the corner buttons (`top: 72px`, with `#biome-label` and `#finds` pushed down). Phones and landscape phones have their own rules. Don't let HUD buttons overlap.
 
 ---

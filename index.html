@@ -322,8 +322,9 @@
 
       #hud-left { position: fixed; top: 14px; left: 14px; display: flex; gap: 8px; z-index: 2; }
       #hud-right { position: fixed; top: 14px; right: 14px; display: flex; gap: 8px; z-index: 2; }
-      /* on the title screen the settings / sound buttons sit above the title layer so they can be tapped */
-      body.on-title #hud-right { z-index: 6; }
+      /* on the title screen the corner buttons sit above the title layer so they can be tapped */
+      body.on-title #hud-left, body.on-title #hud-right { z-index: 6; }
+      body.on-title #menu-btn { display: none; }
       #dust .num, #book-btn .num { font-variant-numeric: tabular-nums; }
       #dust svg.i { color: #e8a91c; }
       #shop-btn { background: var(--accent-warm); }
@@ -542,7 +543,21 @@
       .avatar.big.empty { box-shadow: inset 0 0 0 3px rgba(61,53,96,0.22); }
       #profile-btn { overflow: hidden; }
       .profile-id { display: flex; align-items: center; gap: 14px; margin: 18px 0 4px; padding: 14px 16px; border-radius: var(--r); background: rgba(255,255,255,0.75); box-shadow: var(--shadow-sm); }
-      .profile-name { flex: 1; min-width: 0; }
+      .profile-id { flex-wrap: wrap; }
+      .showcase { display: flex; gap: 8px; }
+      .showcase .slot { width: 54px; padding: 0; cursor: pointer; font-family: inherit; }
+      .showcase .slot:hover { transform: translateY(-1px); }
+      .showcase .slot.picking { outline: 3px solid var(--lilac-deep); outline-offset: 2px; }
+      .showcase .slot.empty { background: rgba(61,53,96,0.05); border: 2px dashed rgba(61,53,96,0.25); box-shadow: none; color: var(--ink-faint); font: 800 22px var(--font); }
+      .showcase-picker { margin-top: 10px; padding: 14px 16px; border-radius: var(--r); background: rgba(255,255,255,0.75); box-shadow: var(--shadow-sm); }
+      .showcase-picker .galaxy-tabs { margin-bottom: 10px; }
+      .showcase-picker .picker-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font: 600 16px var(--font-display); }
+      .showcase-picker .picker-head .btn { margin-left: auto; }
+      .showcase-picker .book-row { margin-bottom: 12px; }
+      .showcase-picker .slot { cursor: pointer; padding: 0; font-family: inherit; }
+      .showcase-picker .slot.chosen { outline: 3px solid var(--lilac-deep); outline-offset: 1px; }
+      .showcase-picker .none { margin: 0; font-size: 13px; color: var(--ink-soft); }
+      .profile-name { flex: 1 1 140px; min-width: 0; }
       .profile-name small { display: block; color: var(--ink-soft); font-size: 12px; font-weight: 800; }
       .profile-name b { display: block; font: 600 24px var(--font-display); overflow-wrap: anywhere; }
       #name-regen svg.i { transition: transform 0.4s; }
@@ -553,6 +568,7 @@
       .avatar-picker button:hover { transform: translateY(-1px); }
       .avatar-picker button.active { border-color: var(--lilac-deep); background: #f0eaff; }
       .avatar-picker button.none { font: 800 12px var(--font); color: var(--ink-soft); }
+      .profile-note .link { background: none; border: 0; padding: 0; margin-left: 4px; color: var(--ink); font: 800 13px var(--font); text-decoration: underline; cursor: pointer; }
       .profile-note { display: block; margin-top: 8px; color: var(--ink-soft); font-size: 13px; }
       .profile-panel .stats { grid-template-columns: repeat(3, 1fr); margin: 0 0 10px; }
       .rarity-row { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; font-weight: 800; color: var(--ink-soft); }
@@ -766,6 +782,8 @@
         .stats { gap: 8px; margin: 14px 0; }
         .profile-panel .stats { grid-template-columns: repeat(2, 1fr); }
         .g-bars { grid-template-columns: 1fr; }
+        .showcase { order: 5; flex-basis: 100%; justify-content: center; }
+        .showcase .slot { width: 62px; }
         .stat { padding: 10px 12px; }
         .stat b { font-size: 20px; }
         .setting-row, .danger-zone { flex-direction: column; align-items: stretch; gap: 10px; }
@@ -944,8 +962,8 @@
     </div>
     <div id="biome-label" class="glass hidden"><span id="biome-name"></span><span id="biome-progress"></span></div>
 
-    <!-- top left: currency + collection + shop -->
-    <div id="hud-left" class="hidden">
+    <!-- top left: currency + collection + shop (also on the title; the menu button only while playing) -->
+    <div id="hud-left">
       <button id="menu-btn" class="pill-btn glass" title="Back to the main menu (switch galaxy)" aria-label="Back to the main menu">
         <svg class="i" viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5" /><path d="M6.5 9.8V19h11V9.8" /><path d="M10 19v-5h4v5" /></svg>
         <span class="label">Menu</span>
@@ -1167,10 +1185,13 @@
             <small>Your name</small>
             <b id="profile-name"></b>
           </div>
+          <div class="showcase" id="showcase" role="group" aria-label="Showcased finds"></div>
           <button class="pill-btn icon-btn" id="name-regen" title="New name" aria-label="Generate a new name">
             <svg class="i" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7" /><path d="M20 4v5h-5" /></svg>
           </button>
         </div>
+        <small class="profile-note" id="showcase-note"></small>
+        <div class="showcase-picker hidden" id="showcase-picker"></div>
         <h3 class="profile-h">Avatar</h3>
         <div class="avatar-picker" id="avatar-picker" role="radiogroup" aria-label="Choose your avatar"></div>
         <small class="profile-note" id="avatar-note"></small>

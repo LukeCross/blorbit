@@ -92,12 +92,12 @@ You start as the classic water blob. Each creature you wake becomes a skin with 
 | `1`–`9`, `0` | Equip this galaxy's creature skins, in order (if unlocked) |
 | `Esc` | Close any open panel |
 
-Pick a galaxy on the title screen to start, or press `Enter` to jump back into the galaxy you were last in.
+Pick a galaxy on the title screen to start, or press `Enter` to jump back into the galaxy you were last in. Your stardust, the Collection and the Shop (`B` / `P`) are also available from the title screen, so you can spend stardust before loading a planet.
 
 ### Touch (phones and tablets)
 - **Tap sides** (default): your blob rolls forward by itself. **Hold the left or right half** of the screen to turn; the turn starts gentle and builds up the longer you hold. Quick taps give a small nudge, and both thumbs down goes straight.
 - **Joystick** (optional, in Settings → Touch controls): **drag anywhere** to use a virtual joystick. Push up to roll forward and left/right to steer.
-- Tap the icons in the top bar for the Collection, Shop, auto-roll, Profile, Settings and sound. Profile has your quirky name (re-roll it as often as you like), an avatar picked from your unlocked skins, and your stats overall and per galaxy.
+- Tap the icons in the top bar for the Collection, Shop, auto-roll, Profile, Settings and sound. Profile has your quirky name (re-roll it as often as you like), an avatar picked from your unlocked skins, three showcase slots for your favourite finds, and your stats overall and per galaxy.
 - Swipe the skin strip at the bottom to browse and equip skins.
 
 ### Settings
@@ -105,7 +105,7 @@ Pick a galaxy on the title screen to start, or press `Enter` to jump back into t
 - **Touch controls** (touch devices only): *Tap sides* or *Joystick*.
 - **Turning sensitivity:** a slider from 40% to 160% that scales how fast the blob turns.
 - **Colorblind mode:** swaps meaningful colours to a blue/orange palette that stays distinct for protanopia, deuteranopia and tritanopia. It adds ✓ badges on finished biomes, a pulse on nearly-finished ones and ●/◆/▲/★ markers on uncommon/rare/epic/legendary finds, so nothing relies on colour alone. It also raises secondary text contrast above the WCAG AA guideline of 4.5:1.
-- **Reset all progress:** wipes skins, finds, stardust and the current planet (asks you to confirm).
+- **Reset all progress:** wipes skins, finds, stardust, your profile (name, avatar and showcase) and the current planet (asks you to confirm).
 
 ---
 
@@ -216,7 +216,7 @@ There are no models, textures or sound assets. Everything you see and hear is ge
 ### Determinism and saving
 - Every planet is generated from a single seed using a seeded PRNG (**mulberry32**) and seeded noise. Given the seed and its galaxy, the terrain, biomes, spots, props and stardust are identical every time. Each planet only shuffles its own galaxy's biome list, so adding a galaxy never changes existing planets.
 - That keeps saves tiny. The save stores the seed plus compact **bitsets** (base64) of painted vertices and collected stardust, the blob's position, and which spots and biomes are done. Progress is saved every few seconds, when the tab is hidden and after every completion.
-- **Saves and galaxies:** one main save (`blorbit-save-v1`) holds everything shared across galaxies: stardust, skins, finds, settings, profile (`name`, `avatar`), which galaxy you're in and planets restored per galaxy. Each galaxy has its own planet save (`blorbit-planet-v1:<galaxy>`). Finds are keyed `biomeId:name`, and biome ids are unique across galaxies, so they don't need a galaxy prefix. Saves from before galaxies existed migrate to Wildbloom automatically.
+- **Saves and galaxies:** one main save (`blorbit-save-v1`) holds everything shared across galaxies: stardust, skins, finds, settings, profile (`name`, `avatar`, `showcase`), which galaxy you're in and planets restored per galaxy. Each galaxy has its own planet save (`blorbit-planet-v1:<galaxy>`). Finds are keyed `biomeId:name`, and biome ids are unique across galaxies, so they don't need a galaxy prefix. Saves from before galaxies existed migrate to Wildbloom automatically.
 
 ### Performance
 The game is tuned to run on low-end laptops and phones:

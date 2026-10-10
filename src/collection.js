@@ -70,3 +70,21 @@ export function rarityCounts(save, biomeIds = BIOME_IDS) {
 }
 // every card ever drawn, duplicates included
 export const cardsCollected = (save) => Object.values(save.finds).reduce((n, c) => n + c, 0);
+
+// every find by its save key, for the profile showcase
+export const FIND_INDEX = new Map(BIOME_IDS.flatMap((b) => BIOMES[b].finds.map(([emoji, name, rarity]) => [`${b}:${name}`, { biomeId: b, emoji, name, rarity }])));
+export const SHOWCASE_SLOTS = 3;
+// a showcase can only hold finds that exist and have been discovered, each at most once
+export function cleanShowcase(save) {
+  const seen = new Set();
+  const keep = (save.showcase || []).slice(0, SHOWCASE_SLOTS).map((k) => (FIND_INDEX.has(k) && save.finds[k] && !seen.has(k) && seen.add(k) ? k : null));
+  while (keep.length < SHOWCASE_SLOTS) keep.push(null);
+  return keep;
+}
+// the player's rarest discovered finds, rarest first
+export function rarestFinds(save, n = SHOWCASE_SLOTS) {
+  return [...FIND_INDEX.keys()]
+    .filter((k) => save.finds[k])
+    .sort((a, b) => rank(FIND_INDEX.get(b).rarity) - rank(FIND_INDEX.get(a).rarity))
+    .slice(0, n);
+}
