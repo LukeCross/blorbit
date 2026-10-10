@@ -221,7 +221,7 @@
       .galaxy-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; width: 100%; }
       #title .galaxy-cards { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); width: min(1700px, 94vw); margin-bottom: 4px; }
       .galaxy-card {
-        position: relative; display: flex; flex-direction: column; align-items: stretch; text-align: left; gap: 6px; padding: 0 0 14px; overflow: hidden;
+        position: relative; display: flex; flex-direction: column; align-items: stretch; text-align: left; gap: 4px; padding: 0 0 12px; overflow: hidden;
         border: 2px solid rgba(255,255,255,0.9); border-radius: 24px; background: rgba(255,255,255,0.8); box-shadow: var(--shadow-sm);
         cursor: pointer; font: inherit; color: inherit; transition: transform 0.18s cubic-bezier(.3,1.5,.5,1), box-shadow 0.2s;
       }
@@ -229,12 +229,29 @@
       .galaxy-card:focus-visible { outline: 3px solid var(--lilac-deep); outline-offset: 3px; }
       .galaxy-card .art { height: 92px; display: grid; place-items: center; font-size: 46px; background: linear-gradient(135deg, var(--a), var(--b)); }
       .galaxy-card .art span { filter: drop-shadow(0 6px 10px rgba(61,53,96,0.25)); animation: bob 3.2s ease-in-out infinite; }
-      .galaxy-card b { font: 600 20px var(--font-display); padding: 2px 16px 0; }
+      .galaxy-card .head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 14px 0 16px; }
+      .galaxy-card b { font: 600 20px var(--font-display); }
+      .galaxy-card .restored { flex: none; padding: 3px 9px; border-radius: 99px; font-size: 12px; font-weight: 800; color: var(--ink-soft); background: rgba(61,53,96,0.07); }
       /* the blurb takes up any spare height, so every card's stats and buttons line up along the bottom */
       .galaxy-card p { flex: 1 0 auto; margin: 0; padding: 0 16px; font-size: 13px; line-height: 1.45; color: var(--ink-soft); }
       .galaxy-card .meta { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 16px 0; font-size: 12px; font-weight: 800; color: var(--ink-soft); }
       .galaxy-card .meta span { padding: 3px 9px; border-radius: 99px; background: rgba(61,53,96,0.07); }
-      .galaxy-card .go { margin: 6px 16px 0; padding: 9px 0; border-radius: 99px; text-align: center; font: 600 16px var(--font-display); background: var(--accent); box-shadow: var(--shadow-sm), var(--highlight); }
+      /* progress rings: conic fill with a hole punched by the inner disc; gold and a star once finished */
+      .galaxy-card .rings { display: flex; justify-content: space-around; gap: 8px; padding: 4px 12px 0; }
+      .galaxy-card .ring { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+      .galaxy-card .ring .disc {
+        --c: var(--mint-deep); position: relative; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center;
+        background: conic-gradient(var(--c) calc(var(--p) * 1%), rgba(61,53,96,0.12) 0);
+      }
+      .galaxy-card .ring:nth-child(2) .disc { --c: var(--lilac-deep); }
+      .galaxy-card .ring .disc::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: #fff; }
+      .galaxy-card .ring .disc span { position: relative; font: 600 15px var(--font-display); }
+      .galaxy-card .ring.done .disc { --c: #ffc83d; box-shadow: 0 0 12px rgba(255,200,61,0.6); }
+      .galaxy-card .ring.done .disc span { color: #e0a000; font-size: 24px; }
+      .galaxy-card .ring small { font-size: 11px; font-weight: 800; color: var(--ink-soft); white-space: nowrap; }
+      .galaxy-card.complete { border-color: #ffd66b; }
+      .galaxy-card .badge.done { background: #ffc83d; color: #5a4300; }
+      .galaxy-card .go { margin: 4px 16px 0; padding: 8px 0; border-radius: 99px; text-align: center; font: 600 16px var(--font-display); background: var(--accent); box-shadow: var(--shadow-sm), var(--highlight); }
       .galaxy-card.here .go { background: rgba(61,53,96,0.08); box-shadow: none; }
       /* locked: pressed into the panel (inset shadow, flatter darker fill, dashed edge), art shaded with a padlock */
       .galaxy-card.locked {
@@ -256,6 +273,8 @@
       }
       .galaxy-card .unlock-video:hover { transform: translateY(-2px); }
       .galaxy-card .unlock-video:focus-visible { outline: 3px solid var(--lilac-deep); outline-offset: 3px; }
+      /* open cards: the badge sits top-left of the art so it never covers the emoji or the restored pill */
+      .galaxy-card:not(.locked) .badge { top: 8px; left: 10px; right: auto; padding: 2px 7px; font-size: 9px; }
       .galaxy-card .badge.locked { z-index: 1; background: rgba(61,53,96,0.55); }
       .galaxy-card .lock { margin: 6px 16px 0; font-size: 13px; font-weight: 800; color: var(--ink-soft); }
       .galaxy-card .lock .bar { height: 7px; margin-top: 6px; border-radius: 99px; background: rgba(61,53,96,0.1); overflow: hidden; }
@@ -729,15 +748,21 @@
         .galaxy-card { display: grid; grid-template-columns: 76px 1fr; column-gap: 12px; row-gap: 3px; padding: 10px 12px 12px 10px; border-radius: 20px; }
         .galaxy-card .art { grid-row: 1 / span 5; height: auto; min-height: 76px; border-radius: 14px; font-size: 34px; }
         .galaxy-card b, .galaxy-card p, .galaxy-card .meta, .galaxy-card .go, .galaxy-card .lock, .galaxy-card .unlock-video { margin: 0; }
+        .galaxy-card .head { padding: 0; }
         .galaxy-card b, .galaxy-card p, .galaxy-card .meta, .galaxy-card .go, .galaxy-card .lock { padding: 0; }
         .galaxy-card .unlock-video { margin-top: 6px; padding: 8px 10px; font-size: 14px; }
         .galaxy-card .art { grid-row: 1 / span 6; }
         .galaxy-card b { font-size: 18px; }
         .galaxy-card p { font-size: 12px; }
+        .galaxy-card .rings { padding: 2px 0 0; justify-content: flex-start; gap: 14px; }
+        .galaxy-card .ring .disc { width: 54px; height: 54px; }
+        .galaxy-card .ring .disc::before { inset: 7px; }
+        .galaxy-card .ring .disc span { font-size: 14px; }
         .galaxy-card .meta { font-size: 11px; gap: 4px; }
         .galaxy-card .meta span { padding: 2px 7px; }
         .galaxy-card .go { margin-top: 4px; padding: 7px 0; font-size: 15px; }
         .galaxy-card .badge { top: 6px; right: 8px; }
+        .galaxy-card:not(.locked) .badge { left: 14px; }
         .galaxy-card.locked .padlock { left: 48px; top: 50%; width: 42px; height: 42px; font-size: 21px; }
         /* galaxy tabs on a phone: "(here)" becomes a dot */
         .galaxy-tabs { gap: 3px; }

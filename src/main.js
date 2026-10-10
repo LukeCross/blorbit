@@ -655,6 +655,13 @@ function backToMenu() {
 $('menu-btn').addEventListener('click', backToMenu);
 $('finale-menu').addEventListener('click', backToMenu);
 
+// a progress ring: floors the percentage so only a truly finished set reads 100%
+function ring(icon, label, n, total) {
+  const pct = total ? (n >= total ? 100 : Math.floor((n / total) * 100)) : 0;
+  return `<div class="ring ${pct === 100 ? 'done' : ''}" style="--p:${pct}" title="${n}/${total} ${label}">
+    <div class="disc"><span>${pct === 100 ? '★' : `${pct}%`}</span></div><small>${icon} ${n}/${total} ${label}</small></div>`;
+}
+
 function galaxyCards(mode) {
   const here = planet.galaxy;
   return GALAXY_IDS.map((g) => {
@@ -663,17 +670,20 @@ function galaxyCards(mode) {
     const [woke, total] = wokenIn(save, g);
     const isNew = open && !save.seenGalaxies.includes(g);
     const isHere = mode === 'travel' && g === here;
+    const complete = open && woke >= total && foundIn(save, g) >= totalFindsIn(g);
     let foot;
     if (!open) {
       const [d, need] = unlockProgress(save, g);
       foot = `<div class="lock">${unlockHint(save, g)} · ${d}/${need}<div class="bar"><i style="width:${Math.min(1, d / need) * 100}%"></i></div></div>`;
     } else {
       const label = isHere ? 'You are here' : mode === 'title' && hasSavedPlanet(g) ? 'Continue' : mode === 'title' ? 'Play' : 'Travel here';
-      foot = `<div class="meta"><span>🐾 ${woke}/${total} friends</span><span>📖 ${foundIn(save, g)}/${totalFindsIn(g)} finds</span><span>🪐 ${save.restoredIn[g] || 0} restored</span></div><div class="go">${label}</div>`;
+      const found = foundIn(save, g), finds = totalFindsIn(g);
+      foot = `<div class="rings">${ring('🐾', 'friends', woke, total)}${ring('📖', 'finds', found, finds)}</div><div class="go">${label}</div>`;
     }
-    const inner = `<div class="art"><span>${def.emoji}</span></div><b>${def.name}</b><p>${def.blurb}</p>${foot}`;
+    const restored = open ? `<span class="restored" title="Planets restored" aria-label="${save.restoredIn[g] || 0} planets restored">🪐 ${save.restoredIn[g] || 0}</span>` : '';
+    const inner = `<div class="art"><span>${def.emoji}</span></div><div class="head"><b>${def.name}</b>${restored}</div><p>${def.blurb}</p>${foot}`;
     const style = `style="--a:${def.art[0]};--b:${def.art[1]}"`;
-    if (open) return `<button class="galaxy-card ${isHere ? 'here' : ''}" data-g="${g}" ${style}>${isNew ? '<span class="badge">NEW</span>' : ''}${inner}</button>`;
+    if (open) return `<button class="galaxy-card ${isHere ? 'here' : ''} ${complete ? 'complete' : ''}" data-g="${g}" ${style}>${isNew ? '<span class="badge">NEW</span>' : complete ? '<span class="badge done">COMPLETE</span>' : ''}${inner}</button>`;
     // locked: a plain card (it can't be a button, since it holds one) with an optional video unlock
     const video = ads.enabled && ads.supported ? `<button class="unlock-video" data-unlock="${g}">🎬 Watch a video to unlock</button>` : '';
     return `<div class="galaxy-card locked" data-g="${g}" role="group" aria-label="${def.name} (locked)" ${style}>
