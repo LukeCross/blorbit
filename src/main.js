@@ -477,6 +477,9 @@ $('autoroll').classList.toggle('on', save.autoRoll);
 $('mute').addEventListener('click', toggleMute);
 $('autoroll').addEventListener('click', toggleAutoRoll);
 
+// browsers only allow audio after a gesture, so the first tap or key anywhere (title, shop...) starts it
+['pointerdown', 'keydown'].forEach((ev) => window.addEventListener(ev, () => sound.start(), { once: true, capture: true }));
+
 function start() {
   if (state !== 'title') return;
   document.body.classList.remove('on-title');
