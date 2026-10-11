@@ -60,6 +60,7 @@ src/audio.js   Synthesised sound: per-biome ambient cases + rolling timbre
 src/shop.js    Card pack shop, galaxy tabs (galaxyTabs, renderKeepingTabs)
 src/collection.js  Finds, rarities, pack rates (totals are computed, not hard-coded)
 src/ads.js     Rewarded video ads (Google Ad Manager)
+src/analytics.js  track(name): anonymous GoatCounter events (see section 9); no-op without VITE_GOATCOUNTER_URL
 src/{blob,look,skyfx,particles,stardust,names,noise,quality,shadow}.js  Blob, sky, ambient particles, stardust, naming (planet names, the profile's quirky player names), PRNG, quality tiers
 src/emoji.css  GENERATED @font-face rules for the self-hosted emoji font (see section 5); public/fonts/emoji/ holds its woff2 files
 scripts/       Puppeteer helpers (screenshots, regression checks); scripts/og/ builds the share image and icons
@@ -229,3 +230,11 @@ grep -rnE "[0-9]+ biomes|[0-9]+ galaxies|[0-9]+ cards|biome definitions" index.h
 - `NUM_REGIONS` is 4 and the player's progress counts 4 biomes per planet; the "N of the M friends" unlock text is generated from data.
 - The README and about page are hand-maintained marketing/docs: counts there do not update themselves.
 - Don't commit generated screenshots from `/tmp`; the only committed generated asset is `public/og-image.png` (and `scripts/og/planet.png`).
+
+---
+
+## 9. Analytics (GoatCounter)
+
+- `src/analytics.js` exports `track(name)`. GoatCounter has no event properties, so detail lives in the name (counted in its dashboard as paths). The `goatcounter` plugin in `vite.config.js` injects its script into every page (page views) only in builds with `VITE_GOATCOUNTER_URL` set (repo variable `GOATCOUNTER_URL`); dev and puppeteer runs send nothing.
+- Events: `find/<biome>/<name>` (every draw, in `drawFind`), `first-play`, `skin/<id>`, `galaxy-unlocked/<id>/<creatures|video>`, `planet-restored/<galaxy>`, `planet-new/<galaxy>`, `galaxy-entered/<id>`, `biome-restored/<biome>`, `creature-woken/<creature>`, `pack/<type>` and `pack/free-video`, `ad-offer/<pack|galaxy>`, `ad-watched/<pack|galaxy>`, `setting/<quality|colorblind|touch|autoroll>/<value>`, `coffee-click`.
+- No cookies, no ids. If you add events or change what's sent, update `privacy.html` and README's Analytics section. Renaming a find or id splits its counts.

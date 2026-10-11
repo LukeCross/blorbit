@@ -2,6 +2,7 @@ import { BIOMES } from './biomes.js';
 import { GALAXIES, GALAXY_IDS, isGalaxyUnlocked, unlockProgress } from './galaxies.js';
 import { SKINS } from './skins.js';
 import { RARITY, RATES, TIERS, drawPack } from './collection.js';
+import { track } from './analytics.js';
 
 // Stardust shop: three card packs for every biome, each with better odds than the last.
 // Opens on the current galaxy's biomes, with tabs for the other galaxies.
@@ -149,14 +150,16 @@ export class Shop {
         <p class="offer-odds">Odds per card: ${odds}</p>`,
       starting: 'Your free pack opens as soon as it finishes.',
       missed: 'there is no free pack this time',
+      kind: 'pack',
       onReward: () => this.grantFree(biomeId),
     });
   }
 
   // Shared rewarded-video prompt (free packs, galaxy unlocks). `body` explains exactly what the video
   // earns; the video only plays if the player taps Watch, and `onReward` only runs if they finish it.
-  async offerVideo({ title, body, starting, missed, onReward }) {
+  async offerVideo({ title, body, starting, missed, onReward, kind }) {
     this.offerOpen = true;
+    track(`ad-offer/${kind}`);
     $('ad-offer').classList.remove('hidden');
     $('ad-offer-body').innerHTML = `<div class="offer-emoji">🎬</div><h2 id="ad-offer-title">${title}</h2>${body}`;
     const watch = $('ad-watch');
@@ -171,14 +174,15 @@ export class Shop {
     }
     watch.disabled = false;
     watch.textContent = '▶ Watch video';
-    watch.onclick = () => this.watchFor({ starting, missed, onReward });
+    watch.onclick = () => this.watchFor({ starting, missed, onReward, kind });
   }
 
-  watchFor({ starting, missed, onReward }) {
+  watchFor({ starting, missed, onReward, kind }) {
     $('ad-offer-body').innerHTML = `<div class="offer-emoji">🎬</div><h2 id="ad-offer-title">Here comes your video</h2><p>${starting}</p>`;
     $('ad-watch').classList.add('hidden');
     const started = this.ads.show({
       onReward: () => {
+        track(`ad-watched/${kind}`);
         this.closeOffer();
         onReward();
       },
@@ -200,6 +204,7 @@ export class Shop {
 
   grantFree(biomeId) {
     const cards = drawPack(this.save, biomeId, 'standard');
+    track('pack/free-video');
     this.persist();
     this.onCollection();
     this.sound.purchase();
@@ -220,6 +225,7 @@ export class Shop {
   buyPack(biomeId, type) {
     if (!this.spend(PACKS[type].cost)) return;
     const cards = drawPack(this.save, biomeId, type);
+    track(`pack/${type}`);
     this.persist();
     this.onCollection();
     this.showPack(biomeId, type, cards);

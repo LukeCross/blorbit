@@ -22,11 +22,13 @@ import { Stardust } from './stardust.js';
 import { RARITY, RATES, TIERS as RARITY_TIERS, TOTAL_FINDS, drawFind, foundCount, foundIn, totalFindsIn, rarityCounts, cardsCollected, FIND_INDEX, cleanShowcase, rarestFinds } from './collection.js';
 import { Shop, galaxyTabs, renderKeepingTabs } from './shop.js';
 import { RewardedAds } from './ads.js';
+import { track } from './analytics.js';
 import { planetName, timeSeed, blobName } from './names.js';
 
 // ---------------------------------------------------------------- save data
 
 const SAVE_KEY = 'blorbit-save-v1';
+if (!localStorage.getItem(SAVE_KEY)) track('first-play'); // a new player's first visit, for a new-players-per-day chart
 const save = Object.assign(
   { unlocked: ['classic'], equipped: 'classic', restored: 0, autoRoll: false, stardust: 0, finds: {}, v: 3 },
   JSON.parse(localStorage.getItem(SAVE_KEY) || '{}'),
@@ -244,6 +246,7 @@ function equip(id) {
   if (!id || !save.unlocked.includes(id) || id === blob.skinId) return;
   blob.setSkin(id);
   save.equipped = id;
+  track(`skin/${id}`);
   planet.setSlimeColor(SKINS[id].slime);
   persist();
   sound.skinSwap();
@@ -470,6 +473,7 @@ function toggleMute() {
 }
 function toggleAutoRoll() {
   save.autoRoll = !save.autoRoll;
+  track(`setting/autoroll/${save.autoRoll ? 'on' : 'off'}`);
   persist();
   $('autoroll').classList.toggle('on', save.autoRoll);
 }
@@ -587,6 +591,7 @@ function loadGalaxyPlanet(g) {
       console.warn('Could not resume planet, starting fresh', err);
     }
   }
+  track(`planet-new/${g}`);
   newPlanet(timeSeed(), g);
 }
 const hasSavedPlanet = (g) => {
@@ -606,6 +611,7 @@ function warpToNewPlanet() {
   sound.warp();
   $('warp').classList.add('on');
   setTimeout(() => {
+    track(`planet-new/${save.galaxy}`);
     newPlanet();
     savePlanet();
     state = 'play';
@@ -629,6 +635,7 @@ function travelTo(g, then, fresh = false) {
   setTimeout(() => {
     savePlanet();
     save.galaxy = g;
+    track(`galaxy-entered/${g}`);
     if (!save.seenGalaxies.includes(g)) save.seenGalaxies.push(g);
     persist();
     loadGalaxyPlanet(g);
@@ -650,7 +657,7 @@ function travelTo(g, then, fresh = false) {
 function enterGalaxy(g) {
   if (state !== 'title' || !isGalaxyUnlocked(save, g)) return;
   if (!save.seenGalaxies.includes(g)) { save.seenGalaxies.push(g); persist(); }
-  if (g === planet.galaxy && completed < NUM_REGIONS) { save.galaxy = g; persist(); return start(); }
+  if (g === planet.galaxy && completed < NUM_REGIONS) { save.galaxy = g; track(`galaxy-entered/${g}`); persist(); return start(); }
   travelTo(g, start, true);
 }
 
@@ -746,12 +753,14 @@ function offerGalaxyUnlock(g) {
       <p class="offer-odds">Or keep playing: it unlocks for free once you've woken ${need} of the ${total} ${GALAXIES[def.unlockedBy].name} friends (${d}/${need} so far).</p>`,
     starting: `${def.name} unlocks as soon as it finishes.`,
     missed: `${def.name} is still locked`,
+    kind: 'galaxy',
     onReward: () => unlockGalaxyByVideo(g),
   });
 }
 function unlockGalaxyByVideo(g) {
   if (isGalaxyUnlocked(save, g)) return;
   (save.adUnlocked ??= []).push(g);
+  track(`galaxy-unlocked/${g}/video`);
   persist();
   announceGalaxy(g);
   // refresh whichever galaxy list is on screen
@@ -912,6 +921,7 @@ $('touch-picker').addEventListener('click', (e) => {
   const c = e.target.closest('button')?.dataset.c;
   if (!c || c === save.touchControls) return;
   save.touchControls = c;
+  track(`setting/touch/${c}`);
   persist();
   syncTouch();
   held.clear();
@@ -926,6 +936,7 @@ $('sensitivity').addEventListener('input', (e) => {
 $('sensitivity').addEventListener('change', persist);
 $('colorblind').addEventListener('click', () => {
   save.colorblind = !save.colorblind;
+  track(`setting/colorblind/${save.colorblind ? 'on' : 'off'}`);
   document.body.classList.toggle('cb', save.colorblind);
   $('colorblind').classList.toggle('on', save.colorblind);
   $('colorblind').setAttribute('aria-checked', save.colorblind);
@@ -936,6 +947,7 @@ $('quality-picker').addEventListener('click', (e) => {
   const q = e.target.closest('button')?.dataset.q;
   if (!q || q === save.quality) return;
   save.quality = q;
+  track(`setting/quality/${q}`);
   persist();
   savePlanet();
   $('warp').classList.add('on');
@@ -1214,6 +1226,8 @@ function completeRegion(i) {
   const r = regions[i];
   r.done = true;
   completed++;
+  track(`biome-restored/${planet.biomes[i]}`);
+  track(`creature-woken/${r.id}`);
   planet.completeRegion(i);
   planet.patches.forEach((p, k) => { if (p.region === i && p.done < 0) completePatch(k, true); });
   sound.ping(completed - 1);
@@ -1241,7 +1255,10 @@ function completeRegion(i) {
       const before = unlockedGalaxies();
       save.unlocked.push(r.id);
       const opened = unlockedGalaxies().filter((g) => !before.includes(g));
-      if (opened.length) setTimeout(() => announceGalaxy(opened[0]), 3200);
+      if (opened.length) {
+        track(`galaxy-unlocked/${opened[0]}/creatures`);
+        setTimeout(() => announceGalaxy(opened[0]), 3200);
+      }
       persist();
       sound.unlock();
       buildSkinBar();
@@ -1276,6 +1293,7 @@ $('finale-galaxy').addEventListener('click', () => {
 function finale() {
   state = 'finale';
   save.restored++;
+  track(`planet-restored/${planet.galaxy}`);
   save.restoredIn[planet.galaxy] = (save.restoredIn[planet.galaxy] || 0) + 1;
   persist();
   sound.fanfare();
@@ -1531,6 +1549,8 @@ async function reveal() {
     document.body.classList.remove('revealing');
   }, 700);
 }
+
+document.addEventListener('click', (e) => e.target.closest?.('a[href*="buymeacoffee"]') && track('coffee-click'));
 
 // handy for debugging from the console
 refreshDust();

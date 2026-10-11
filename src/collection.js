@@ -1,5 +1,6 @@
 import { BIOMES, BIOME_IDS } from './biomes.js';
 import { GALAXIES } from './galaxies.js';
+import { track } from './analytics.js';
 
 // Shared logic for rolling collectibles, whether from a restored patch or a card pack.
 
@@ -38,6 +39,7 @@ export function drawFind(save, biomeId, rates, min = 'c') {
   const key = `${biomeId}:${name}`;
   const isNew = !save.finds[key];
   save.finds[key] = (save.finds[key] || 0) + 1;
+  track(`find/${key.replace(':', '/')}`);
   return { biomeId, emoji, name, rarity, isNew, count: save.finds[key] };
 }
 

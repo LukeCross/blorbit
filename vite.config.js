@@ -40,6 +40,17 @@ export default defineConfig(({ mode }) => {
         },
       },
       {
+        // GoatCounter's script on every page, for page views (and it's what track() sends events through).
+        // Set VITE_GOATCOUNTER_URL to your counter's address; without it, and in dev, nothing is added.
+        name: 'goatcounter',
+        transformIndexHtml(html, ctx) {
+          const url = env.VITE_GOATCOUNTER_URL;
+          if (!url || ctx.server) return html;
+          const tag = `<script data-goatcounter="${url.replace(/\/$/, '')}/count" async src="https://gc.zgo.at/count.js"></script>`;
+          return html.replace('</head>', `    ${tag}\n  </head>`);
+        },
+      },
+      {
         // don't let the privacy policy ship with its contact placeholders unnoticed
         name: 'privacy-placeholders',
         buildStart() {

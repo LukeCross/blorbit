@@ -151,6 +151,12 @@ The site lives at **https://blorbit.io**, and the build is set up for search eng
 2. **Bing Webmaster Tools** ([bing.com/webmasters](https://www.bing.com/webmasters)): you can import the site straight from Search Console.
 3. **Check the link preview:** paste `https://blorbit.io` into a Discord or Slack message, or into [opengraph.xyz](https://www.opengraph.xyz).
 
+## Analytics (GoatCounter)
+
+Anonymous, cookie-free usage counts through [GoatCounter](https://www.goatcounter.com), with no server of your own. Create a free site there, then set the repository variable `GOATCOUNTER_URL` (Settings → Secrets and variables → Actions → Variables) to its address, e.g. `https://blorbit.goatcounter.com`. Without it, builds contain no analytics, and the dev server never sends any.
+
+Page views come from GoatCounter's script; game events go through `track()` in `src/analytics.js` and show up in the dashboard's paths list (filter by prefix, sort by count): `find/<biome>/<name>`, `first-play`, `skin/<id>`, `galaxy-unlocked/<id>/<creatures|video>`, `planet-restored/<galaxy>`, `planet-new/<galaxy>`, `galaxy-entered/<id>`, `biome-restored/<biome>`, `creature-woken/<creature>`, `pack/<type>`, `pack/free-video`, `ad-offer/<pack|galaxy>`, `ad-watched/<pack|galaxy>`, `setting/<quality|colorblind|touch|autoroll>/<value>` and `coffee-click`. Test locally with `VITE_GOATCOUNTER_URL=https://x.goatcounter.com npm run build`.
+
 ## Rewarded video ads (Google Ad Manager)
 
 The free-pack videos use **Google Ad Manager rewarded ads** through the Google Publisher Tag (GPT), in `src/ads.js`.
@@ -253,6 +259,7 @@ src/
   creature.js       Sleeping/waking creatures on each biome
   critters.js       Wandering ambient critters
   particles.js      Ambient particle systems
+  analytics.js      Anonymous GoatCounter event counts
   ads.js            Rewarded video ads (Google Ad Manager / GPT) for free Card packs, and re-opening consent choices
   stardust.js       Collectible stardust trails
   collection.js     Finds, rarities, pack draw rates and the profile's find stats

@@ -39,6 +39,8 @@ jobs:
           # Settings -> Secrets and variables -> Actions -> Variables. Without them, the build has no ads.
           VITE_GAM_REWARDED_UNIT: ${{ vars.GAM_REWARDED_UNIT }}
           ADS_TXT: ${{ vars.ADS_TXT }}
+          # Anonymous usage counts (GoatCounter), e.g. https://blorbit.goatcounter.com. Repository variable GOATCOUNTER_URL; without it, no analytics.
+          VITE_GOATCOUNTER_URL: ${{ vars.GOATCOUNTER_URL }}
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
