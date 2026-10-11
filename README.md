@@ -105,6 +105,7 @@ Pick a galaxy on the title screen to start, or press `Enter` to jump back into t
 - **Touch controls** (touch devices only): *Tap sides* or *Joystick*.
 - **Turning sensitivity:** a slider from 40% to 160% that scales how fast the blob turns.
 - **Colorblind mode:** swaps meaningful colours to a blue/orange palette that stays distinct for protanopia, deuteranopia and tritanopia. It adds ✓ badges on finished biomes, a pulse on nearly-finished ones and ●/◆/▲/★ markers on uncommon/rare/epic/legendary finds, so nothing relies on colour alone. It also raises secondary text contrast above the WCAG AA guideline of 4.5:1.
+- **Buy me a coffee:** a short note and a big button linking to the Buy Me a Coffee page (also linked at the bottom of the title screen). Set the URL in `index.html` (search for `buymeacoffee.com`).
 - **Reset all progress:** wipes skins, finds, stardust, your profile (name, avatar and showcase) and the current planet (asks you to confirm).
 
 ---
