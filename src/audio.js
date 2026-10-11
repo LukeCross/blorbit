@@ -553,7 +553,7 @@ export class Sound {
         else if (Math.random() < 0.5) this.noiseBurst({ t, dur: 0.12, vol: 0.02, f: 2200, q: 2, verb: 0.9 }); // a dripping echo
         else this.tone({ type: 'sine', f: midi(48 + pentaStep(Math.floor(Math.random() * 5))), t, dur: 2.2, vol: 0.012, attack: 0.4, verb: 0.95, pan }); // low hum
         break;
-      // ---- Stompvale (big gentle footfalls, distant calls and bubbling tar)
+      // ---- Stompridge (big gentle footfalls, distant calls and bubbling tar)
       case 'fernwood':
         if (Math.random() < 0.4) for (let i = 0; i < 3; i++) this.tone({ type: 'sine', f: 520 + i * 60, f2: 700 + i * 40, t: t + i * 0.12, dur: 0.1, vol: 0.016, verb: 0.5, pan, glide: 0.06 }); // frog-ish trills
         else if (Math.random() < 0.5) this.tone({ type: 'sine', f: midi(55), f2: midi(60), t, dur: 1.8, vol: 0.014, attack: 0.4, verb: 0.9, pan }); // far-off longneck call

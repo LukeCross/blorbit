@@ -1602,7 +1602,7 @@ export const PROP_KINDS = {
     ],
   },
 
-  // Stompvale
+  // Stompridge
   cycad: {
     scale: [0.8, 1.4],
     parts: () => [

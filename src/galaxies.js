@@ -74,7 +74,7 @@ export const GALAXIES = {
     unlockAt: 0.8,
   },
   stomp: {
-    name: 'Stompvale',
+    name: 'Stompridge',
     emoji: '👣',
     blurb: 'Fern jungles, fossil canyons, ice-age tundra and tar pits. Wake the gentle giants.',
     art: ['#c8e8a0', '#ffc890'],

@@ -87,7 +87,7 @@ Key facts:
 | `sea` | Seaglow | 🐋 | kelp (otter), reef (pufferfish), galleon (shark), jellyglow (jellyfish), vents (squid) | `safari` 80% |
 | `feast` | Feastvale | 🥘 | bakery (rooster), orchard (monkey), market (rat), veggie (pig), bazaar (camel) | `sea` 80% |
 | `gloom` | Gloomhollow | 🏚️ | graveyard (ghost), mansion (bat), cauldron (witch), pumpkins (zombie), crypt (spider) | `feast` 80% |
-| `stomp` | Stompvale | 👣 | fernwood (longneck), fossils (trex), iceage (mammoth), dodoisle (dodo), tarpits (sloth) | `gloom` 80% |
+| `stomp` | Stompridge | 👣 | fernwood (longneck), fossils (trex), iceage (mammoth), dodoisle (dodo), tarpits (sloth) | `gloom` 80% |
 
 **Current totals: 8 galaxies, 45 biomes, 360 cards (80 + 7 × 40).** Update this table and these totals whenever you add a galaxy.
 

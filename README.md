@@ -23,7 +23,7 @@ When you boot the game you **choose your galaxy**. Each galaxy is its own set of
 - **🐋 Seaglow:** 5 sea-floor biomes (kelp, coral, a wreck, glowing jellies and deep vents), 5 creatures and 40 finds. The water starts murky and dim, then comes alive with caustic light and glow as you restore it. It **unlocks once you've woken 4 of the 5 Sunroam creatures** (80%).
 - **🥘 Feastvale:** 5 food biomes (bakery, orchard, noodle night market, veggie farm and spice bazaar), 5 creatures and 40 finds. Cold, dull ground warms to gold and starts to steam as you restore it. It **unlocks once you've woken 4 of the 5 Seaglow creatures** (80%).
 - **🏚️ Gloomhollow:** 5 spooky-but-cosy biomes (misty graveyard, haunted mansion, cauldron swamp, pumpkin lane and cobweb crypt), 5 creatures and 40 finds. Grey, bare ground turns moonlit purple and mossy green, with candlelit windows and friendly wisps. It **unlocks once you've woken 4 of the 5 Feastvale creatures** (80%).
-- **👣 Stompvale:** 5 prehistoric biomes (fern jungle, fossil canyon, ice age tundra, dodo lagoon and bubbling tar pits), 5 creatures and 40 finds. Dull, bare ground greens up and warms to sunset colours, with hatchlings and pterosaurs moving in. It **unlocks once you've woken 4 of the 5 Gloomhollow creatures** (80%).
+- **👣 Stompridge:** 5 prehistoric biomes (fern jungle, fossil canyon, ice age tundra, dodo lagoon and bubbling tar pits), 5 creatures and 40 finds. Dull, bare ground greens up and warms to sunset colours, with hatchlings and pterosaurs moving in. It **unlocks once you've woken 4 of the 5 Gloomhollow creatures** (80%).
 
 Can't wait? Every locked galaxy card also has **🎬 Watch a video to unlock**. Watch one short rewarded video to the end and that galaxy unlocks for good. Skipping leaves it locked, and you can try again any time.
 
@@ -32,7 +32,7 @@ Travel between unlocked galaxies is **free**. Tap the galaxy icon next to the pl
 ### Biomes and spots
 Every planet is split into **4 biomes**, picked at random from its galaxy:
 
-| Wildbloom biome | Creature | | Citylight biome | Creature | | Skyhaven biome | Creature | | Sunroam biome | Creature | | Seaglow biome | Creature | | Feastvale biome | Creature | | Gloomhollow biome | Creature | | Stompvale biome | Creature |
+| Wildbloom biome | Creature | | Citylight biome | Creature | | Skyhaven biome | Creature | | Sunroam biome | Creature | | Seaglow biome | Creature | | Feastvale biome | Creature | | Gloomhollow biome | Creature | | Stompridge biome | Creature |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Bunny Meadow | 🐰 Bunny | | Plaza Park | 🐿️ Squirrel | | Cloud Pastures | 🐑 Sheep | | Golden Savanna | 🦁 Lion | | Kelp Forest | 🦦 Otter | | Bakery Village | 🐓 Rooster | | Misty Graveyard | 👻 Ghost | | Fern Jungle | 🦕 Longneck |
 | Sleepy Pond | 🐸 Frog | | Neon Downtown | 🐱 Cat | | Windmill Cliffs | 🐐 Goat | | Parrot Canopy | 🦜 Parrot | | Coral Reef | 🐡 Pufferfish | | Orchard Lane | 🐒 Monkey | | Haunted Mansion | 🦇 Bat | | Fossil Canyon | 🦖 T-Rex |
@@ -56,7 +56,7 @@ Each planet gets a randomly generated name and layout, seeded from the date and 
 
 ### Stardust, finds and the shop
 - **Stardust** ✨ is scattered in little trails across every planet. Roll over it to collect it.
-- **Finds** are collectibles: 8 per biome (80 in Wildbloom, 40 each in Citylight, Skyhaven, Sunroam, Seaglow, Feastvale, Gloomhollow and Stompvale). Each biome has 3 *common*, 2 *uncommon*, 1 *rare*, 1 *epic* and 1 *legendary* find. You roll one every time you clear a spot, and they all live in your **Collection** book, which has a tab per galaxy.
+- **Finds** are collectibles: 8 per biome (80 in Wildbloom, 40 each in Citylight, Skyhaven, Sunroam, Seaglow, Feastvale, Gloomhollow and Stompridge). Each biome has 3 *common*, 2 *uncommon*, 1 *rare*, 1 *epic* and 1 *legendary* find. You roll one every time you clear a spot, and they all live in your **Collection** book, which has a tab per galaxy.
 - The **Shop** sells three card packs for each biome. It opens on your current galaxy, with a tab for every galaxy: unlocked ones let you buy their packs without travelling, and locked ones show greyed out with their unlock progress. Every pack holds 3 cards from that biome's collection, and promises at least one card of a certain rarity:
 
 | | Common | Uncommon | Rare | Epic | Legendary | Guarantee |

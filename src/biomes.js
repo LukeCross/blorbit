@@ -781,7 +781,7 @@ Object.assign(BIOMES, {
   },
 });
 
-// ---- Stompvale
+// ---- Stompridge
 Object.assign(BIOMES, {
   fernwood: {
     name: 'Fern Jungle', creature: 'longneck', weight: 0.06, terrain: 'hillocks',

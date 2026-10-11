@@ -121,7 +121,7 @@ const KINDS = {
     for (const s of [-1, 1]) g.add(new THREE.Mesh(new THREE.SphereGeometry(0.015, 8, 6).translate(s * 0.035, 0.1, 0.075), lambert(0x222233)));
     return { g, glow: true };
   } },
-  // Stompvale: gliding pterosaurs and tiny waddling hatchlings
+  // Stompridge: gliding pterosaurs and tiny waddling hatchlings
   pterosaur: { flying: true, speed: 1.2, hover: [1.0, 2.0], turn: 1.8, build: () => {
     const g = new THREE.Group();
     const skin = rnd([0xe8a05a, 0xd88a6a, 0xc8a078]);
