@@ -178,7 +178,7 @@ You can also build locally with them set, e.g. `VITE_GAM_REWARDED_UNIT=/1234567/
      - everyone else, or anyone whose ad blocker stops Google's tool, doesn't see the button, because there's nothing for them to change.
 
      To test on your live site, add `?fc=alwaysshow&fctype=gdpr` (or `&fctype=ccpa`) to the address. To test the button logic locally, run `node scripts/consentcheck.mjs`.
-- **Privacy policy:** `privacy.html` is published at `/privacy.html` and linked from the title screen and Settings. Before going live, **replace `[YOUR NAME]` and `[YOUR EMAIL]`** in it; every build warns until you do. It's a plain-language starting point covering the save data, hosting, Google Fonts and Google's ads, not legal advice, so have it checked if you're unsure.
+- **Privacy policy:** `privacy.html` is published at `/privacy.html` and linked from the title screen and Settings. The contact name and email are filled in; the build warns if a `[YOUR …]` placeholder ever reappears. It's a plain-language starting point covering the save data, hosting, Google Fonts and Google's ads, not legal advice, so have it checked if you're unsure.
 - **Supported pages:** Google only serves rewarded ads on supported, mobile-friendly pages. If a page or device isn't supported, or no video is available, the prompt says so and the player can try again later.
 
 ## How it was built
