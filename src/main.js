@@ -24,6 +24,7 @@ import { Shop, galaxyTabs, renderKeepingTabs } from './shop.js';
 import { RewardedAds } from './ads.js';
 import { track } from './analytics.js';
 import { planetName, timeSeed, blobName } from './names.js';
+import { initDebug } from './debug.js';
 
 // ---------------------------------------------------------------- save data
 
@@ -79,6 +80,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.NeutralToneMapping;
 renderer.toneMappingExposure = 1.0;
 document.body.prepend(renderer.domElement);
+initDebug(renderer);
 
 const scene = new THREE.Scene();
 const sky = new Sky();

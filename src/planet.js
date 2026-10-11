@@ -15,6 +15,11 @@ const LIFE_RATE = 1.8;
 const PATH_HALF_WIDTH = 0.075;
 const GRID_CELL = 0.2; // larger than the brush's reach, so the 27 surrounding cells always cover it
 
+// shared with the ?debug panel (src/debug.js): 0 = normal ground, 1+ = show a single shader input.
+// Keep the uDebug branch and the s1..s9 snapshots in the fragment shader: the same maths without
+// them rendered a black planet on an iPad (compiler quirk, cause never pinned down).
+export const groundDebug = { value: 0 };
+
 const vert = /* glsl */ `
   attribute vec3 aDead;
   attribute vec3 aAlive;
@@ -45,6 +50,7 @@ const frag = /* glsl */ `
   uniform float uTime;
   uniform vec3 uSlimeCol;
   uniform vec3 uSunDir;
+  uniform float uDebug;
   varying vec3 vN, vP, vWorld, vDead, vAlive, vWaterCol;
   varying vec4 vDyn, vStyle;
   varying float vWater, vPave, vCloud, vSea;
@@ -58,13 +64,14 @@ const frag = /* glsl */ `
   }
 
   void main() {
+    vec3 s1, s2, s3, s4, s5, s6, s7, s8, s9; // debug snapshots of col at each stage
     float slime = vDyn.x, life = vDyn.y, flash = vDyn.z, glow = vDyn.w;
     float sand = vStyle.x, snow = vStyle.y, moon = vStyle.z, glowing = vStyle.w;
     float nz = vnoise(vP * 1.4) * 0.6 + vnoise(vP * 5.0) * 0.4;
     float fine = vnoise(vP * 22.0);
 
     vec3 dead = vDead * (0.8 + 0.4 * nz);
-    float crack = smoothstep(0.03, 0.0, abs(vnoise(vP * 3.0) - 0.5));
+    float crack = 1.0 - smoothstep(0.0, 0.03, abs(vnoise(vP * 3.0) - 0.5)); // edges in order: reversed ones are undefined on some mobile GPUs
     dead *= 1.0 - crack * 0.1;
 
     vec3 alive = vAlive * (0.78 + 0.45 * nz);
@@ -86,6 +93,7 @@ const frag = /* glsl */ `
     }
 
     vec3 col = mix(dead, alive, life);
+    s1 = dead; s2 = alive; s3 = col;
 
     // snow glitter
     vec3 cell = floor(vP * 38.0);
@@ -96,6 +104,7 @@ const frag = /* glsl */ `
     // moonlit glow
     col += vAlive * moon * life * (0.18 + 0.08 * sin(uTime * 1.5 + vP.x * 2.0));
 
+    s4 = col;
     // cloud sea (Skyhaven): slowly drifting billows; grey storm cloud until restored, then sunlit white
     float cloudLit = 0.0;
     if (vCloud > 0.001) {
@@ -119,6 +128,7 @@ const frag = /* glsl */ `
       seaLit = vSea * (0.25 + 0.3 * life);
     }
 
+    s5 = col;
     // water / ice
     vec3 N = normalize(vN);
     if (vWater > 0.001) {
@@ -141,21 +151,58 @@ const frag = /* glsl */ `
     float diff = max(dot(N, L), 0.0);
     col *= mix(0.52 + diff * 0.58, 1.0, max(cloudLit, seaLit)); // clouds glow softly instead of shading like ground
 
+    s6 = col;
     vec3 H = normalize(L + V);
     float wspec = pow(max(dot(N, H), 0.0), 90.0) * vWater * 1.2;
     float spec = pow(max(dot(N, H), 0.0), 70.0);
     col = mix(col, uSlimeCol * (0.55 + diff * 0.6), slime * 0.55);
     col += uSlimeCol * slime * 0.06 + vec3(spec * slime * 0.8) + vec3(wspec);
 
-    float fres = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+    s7 = col;
+    // clamped: dot(N, V) can round to just over 1.0, and pow() of a negative base is undefined
+    float fres = pow(clamp(1.0 - dot(N, V), 0.0, 1.0), 3.0);
     col += vec3(1.0, 0.86, 0.96) * fres * 0.14;
     col += (vAlive * 1.2 + 0.45) * flash;
+    s8 = col;
 
     // lava and other glowing ground ignores lighting
     float pulse = 0.85 + 0.25 * sin(uTime * 2.0 + nz * 8.0);
     col += vAlive * glowing * life * 0.6 * pulse;
     col += vWaterCol * glowing * vWater * 1.1 * pulse;
+    s9 = col;
 
+    // ?debug panel: show one input on its own to find which one is bad on a device
+    if (uDebug > 0.5) {
+      if (uDebug < 1.5) col = vec3(1.0, 0.0, 1.0);
+      else if (uDebug < 2.5) col = vDead;
+      else if (uDebug < 3.5) col = vAlive;
+      else if (uDebug < 4.5) col = N * 0.5 + 0.5;
+      else if (uDebug < 5.5) col = vec3(nz);
+      else if (uDebug < 6.5) col = vDyn.xyz;
+      else if (uDebug < 7.5) col = vStyle.xyz;
+      else if (uDebug < 8.5) col = vec3(fres);
+      else if (uDebug < 9.5) col = vec3(diff);
+      else if (uDebug < 10.5) col = vP * 0.1 + 0.5;
+      else if (uDebug < 11.5) col = vec3(spec);
+      else if (uDebug < 12.5) col = vec3(wspec);
+      else if (uDebug < 13.5) col = vec3(0.5 + 0.5 * sin(uTime));
+      else if (uDebug < 14.5) col = vec3(fract(uTime * 0.1));
+      else if (uDebug < 15.5) col = (col.r != col.r || col.g != col.g || col.b != col.b) ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0);
+      else if (uDebug < 16.5) col = vec3(clamp(col.r, 0.0, 1.0), 0.0, 0.0);
+      else if (uDebug < 17.5) col = s1;
+      else if (uDebug < 18.5) col = s2;
+      else if (uDebug < 19.5) col = s3;
+      else if (uDebug < 20.5) col = s4;
+      else if (uDebug < 21.5) col = s5;
+      else if (uDebug < 22.5) col = s6;
+      else if (uDebug < 23.5) col = s7;
+      else if (uDebug < 24.5) col = s8;
+      else if (uDebug < 25.5) col = vec3(slime);
+      else if (uDebug < 26.5) col = vec3(max(dot(N, normalize(L + V)), 0.0));
+      else if (uDebug < 27.5) col = vec3(clamp(glowing, 0.0, 1.0));
+      else if (uDebug < 28.5) col = vec3(clamp(pulse, 0.0, 1.0));
+      else col = s9;
+    }
     gl_FragColor = vec4(col, 1.0);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -743,6 +790,7 @@ export class Planet {
       uTime: { value: 0 },
       uSlimeCol: { value: new THREE.Color(0x8dffd6) },
       uSunDir: { value: new THREE.Vector3(1, 1, 1).normalize() },
+      uDebug: groundDebug,
     };
     this.mesh = new THREE.Mesh(geo, new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: frag, uniforms: this.uniforms }));
     this.group.add(this.mesh);

@@ -229,6 +229,9 @@ grep -rnE "[0-9]+ biomes|[0-9]+ galaxies|[0-9]+ cards|biome definitions" index.h
 - `emissive` patches glow when restored; `pave` makes slab-patterned ground; both are per-patch knobs.
 - `NUM_REGIONS` is 4 and the player's progress counts 4 biomes per planet; the "N of the M friends" unlock text is generated from data.
 - The README and about page are hand-maintained marketing/docs: counts there do not update themselves.
+- Shader hygiene for iOS/iPad GPUs (a black ground was reported there): keep `smoothstep` edges in ascending order and never pass `pow` a possibly negative base (clamp it).
+- The ground fragment shader (`planet.js`) deliberately keeps its `uDebug` branch and `s1..s9` snapshots: with them removed the planet rendered black on an iPad, with identical maths. Don't strip them without testing on an iPad.
+- Debugging on a device with no console: open the game with `?debug` (e.g. `http://<lan-ip>:5173/?debug`) for an on-screen panel (`src/debug.js`) showing the GPU, its limits, any console/shader errors, and a button that cycles the ground shader through single inputs. Run the dev server with `npx vite --host` to reach it from another device.
 - Don't commit generated screenshots from `/tmp`; the only committed generated asset is `public/og-image.png` (and `scripts/og/planet.png`).
 
 ---
