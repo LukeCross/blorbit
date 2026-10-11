@@ -30,6 +30,7 @@ export class Sound {
   constructor() {
     this.ctx = null;
     this.muted = false;
+    this.volume = 1; // the player's master volume slider (0-1)
     this.life = 0;
     this.lastTinkle = 0;
     this.biome = 'meadow';
@@ -43,7 +44,7 @@ export class Sound {
     }
     const ctx = (this.ctx = new (window.AudioContext || window.webkitAudioContext)());
     this.master = ctx.createGain();
-    this.master.gain.value = this.muted ? 0 : 0.9;
+    this.master.gain.value = this.muted ? 0 : this.level;
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -16;
     comp.ratio.value = 4;
@@ -75,13 +76,22 @@ export class Sound {
 
   setMuted(m) {
     this.muted = m;
-    if (this.ctx && !this.adPause) this.master.gain.setTargetAtTime(m ? 0 : 0.9, this.now, 0.1);
+    if (this.ctx && !this.adPause) this.master.gain.setTargetAtTime(m ? 0 : this.level, this.now, 0.1);
+  }
+
+  get level() {
+    return 0.9 * this.volume;
+  }
+
+  setVolume(v) {
+    this.volume = v;
+    if (this.ctx && !this.adPause && !this.muted) this.master.gain.setTargetAtTime(this.level, this.now, 0.03);
   }
 
   // silence the game while a video ad plays, without touching the player's own mute setting
   pauseForAd(on) {
     this.adPause = on;
-    if (this.ctx) this.master.gain.setTargetAtTime(on || this.muted ? 0 : 0.9, this.now, 0.05);
+    if (this.ctx) this.master.gain.setTargetAtTime(on || this.muted ? 0 : this.level, this.now, 0.05);
   }
 
   impulse(dur, decay) {

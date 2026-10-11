@@ -37,6 +37,7 @@ if ((save.v || 0) < 3) Object.assign(save, { autoRoll: false, v: 3 }); // auto-r
 save.quality ??= 'auto';
 save.sensitivity ??= 1; // multiplies the blob's turn speed
 save.colorblind ??= false;
+save.volume ??= 1; // master volume, 0-1
 save.touchControls ??= 'tap'; // touch devices: 'tap' = rolls by itself, hold a side to turn; 'stick' = drag joystick
 // galaxies: which one you're in, planets restored in each, and which ones you've seen (for the NEW badge)
 save.restoredIn ??= { wild: save.restored || 0 };
@@ -138,6 +139,7 @@ coarse.addEventListener?.('change', syncTouch);
 const smallScreen = () => window.innerWidth <= 720 || window.innerHeight <= 500;
 
 const sound = new Sound();
+sound.volume = save.volume;
 const backdrop = new Backdrop(scene, sound);
 const particles = new Particles(scene);
 const atmosphere = new Atmosphere({ scene, hemi, sun, halo, backdrop, sound });
@@ -892,6 +894,7 @@ function openSettings() {
   syncConsentButton();
   $('privacy-note').classList.add('hidden');
   showSensitivity();
+  showVolume();
   $('colorblind').classList.toggle('on', save.colorblind);
   $('colorblind').setAttribute('aria-checked', save.colorblind);
   $('settings').classList.remove('hidden');
@@ -901,6 +904,12 @@ function showSensitivity() {
   el.value = save.sensitivity;
   el.style.setProperty('--fill', `${((save.sensitivity - el.min) / (el.max - el.min)) * 100}%`);
   $('sensitivity-value').textContent = `${Math.round(save.sensitivity * 100)}%`;
+}
+function showVolume() {
+  const el = $('volume');
+  el.value = save.volume;
+  el.style.setProperty('--fill', `${save.volume * 100}%`);
+  $('volume-value').textContent = `${Math.round(save.volume * 100)}%`;
 }
 // review Google's consent choices: only offered to visitors covered by European or US state privacy
 // rules (Google's consent tool tells us which), and kept in step if that becomes known later
@@ -934,6 +943,16 @@ $('sensitivity').addEventListener('input', (e) => {
   showSensitivity();
 });
 $('sensitivity').addEventListener('change', persist);
+$('volume').addEventListener('input', (e) => {
+  save.volume = Number(e.target.value);
+  sound.setVolume(save.volume);
+  showVolume();
+});
+$('volume').addEventListener('change', () => {
+  persist();
+  sound.start();
+  sound.blorp(3); // a sample at the new level
+});
 $('colorblind').addEventListener('click', () => {
   save.colorblind = !save.colorblind;
   track(`setting/colorblind/${save.colorblind ? 'on' : 'off'}`);
