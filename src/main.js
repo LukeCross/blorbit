@@ -1280,6 +1280,7 @@ function announceGalaxy(g) {
   galaxyToVisit = g;
   sound.fanfare();
   refreshGalaxyBadge();
+  if (state === 'finale') refreshFinaleGalaxy();
   const how = state === 'title' ? 'Pick it below to play' : `Tap ${GALAXIES[planet.galaxy].emoji} next to the planet name to travel there`;
   toast(`${GALAXIES[g].emoji} New galaxy unlocked: ${GALAXIES[g].name}!<small>${how}</small>`);
 }
@@ -1306,10 +1307,17 @@ function finale() {
   }
   $('finale-creatures').textContent = regions.map((r) => SKINS[r.id].emoji).join('');
   $('finale-dust').textContent = save.stardust;
+  setTimeout(() => {
+    refreshFinaleGalaxy();
+    $('finale').classList.remove('hidden');
+  }, 1800);
+}
+
+// the unlock is announced a little after the last biome wakes, which can be after the finale starts
+function refreshFinaleGalaxy() {
   const g = galaxyToVisit && galaxyToVisit !== planet.galaxy ? galaxyToVisit : null;
   $('finale-galaxy').classList.toggle('hidden', !g);
   if (g) $('finale-galaxy').textContent = `${GALAXIES[g].emoji} Visit ${GALAXIES[g].name}`;
-  setTimeout(() => $('finale').classList.remove('hidden'), 1800);
 }
 
 // ---------------------------------------------------------------- per-frame play logic
