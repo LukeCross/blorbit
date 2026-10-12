@@ -1042,8 +1042,8 @@
           <a href="./about.html" target="_blank" rel="noopener">About &amp; how to play</a>
           <span aria-hidden="true">·</span>
           <a href="./privacy.html" target="_blank" rel="noopener">Privacy policy</a>
-          <!-- monetized --><span aria-hidden="true">·</span>
-          <a href="https://buymeacoffee.com/lukecross" target="_blank" rel="noopener">☕ Buy me a coffee</a><!-- /monetized -->
+          <span data-monetized aria-hidden="true">·</span>
+          <a data-monetized href="https://buymeacoffee.com/lukecross" target="_blank" rel="noopener">☕ Buy me a coffee</a>
         </div>
       </div>
     </div>
@@ -1157,21 +1157,21 @@
         <div class="setting-row stacked">
           <div>
             <b>Privacy</b>
-            <small>Read how the game handles your information<!-- monetized --><span id="consent-text">, or review your ad and cookie choices</span><!-- /monetized -->.</small>
+            <small>Read how the game handles your information<span data-monetized id="consent-text">, or review your ad and cookie choices</span>.</small>
             <small class="privacy-note hidden" id="privacy-note" role="status"></small>
           </div>
           <div class="privacy-actions">
-            <!-- monetized --><button class="btn secondary small" id="consent-btn">Privacy &amp; cookie settings</button><!-- /monetized -->
+            <button data-monetized class="btn secondary small" id="consent-btn">Privacy &amp; cookie settings</button>
             <a class="btn secondary small" href="./privacy.html" target="_blank" rel="noopener">Privacy policy</a>
           </div>
         </div>
-        <!-- monetized --><div class="setting-row stacked support-row">
+        <div data-monetized class="setting-row stacked support-row">
           <div>
             <b>Enjoying Blorbit?</b>
             <small>Blorbit is free, with no timers and no pressure. It's made by one person in their spare time. If it's made you smile, a coffee helps cover hosting and fuels new galaxies, creatures and finds. Thank you for playing!</small>
           </div>
           <a class="btn small support-btn" href="https://buymeacoffee.com/lukecross" target="_blank" rel="noopener">☕ Buy me a coffee</a>
-        </div><!-- /monetized -->
+        </div>
         <div class="danger-zone" id="reset-start">
           <div>
             <b>Reset all progress</b>
@@ -1234,8 +1234,8 @@
       </div>
     </div>
 
-    <!-- monetized --><!-- free pack for a rewarded video: the player always opts in here first -->
-    <div id="ad-offer" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="ad-offer-title">
+    <!-- free pack for a rewarded video: the player always opts in here first -->
+    <div data-monetized id="ad-offer" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="ad-offer-title">
       <div class="offer-card glass">
         <div id="ad-offer-body"></div>
         <div class="offer-actions">
@@ -1243,7 +1243,7 @@
           <button class="btn secondary" id="ad-no">No thanks</button>
         </div>
       </div>
-    </div><!-- /monetized -->
+    </div>
 
     <script type="module" src="/src/main.js"></script>
   </body>

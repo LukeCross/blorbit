@@ -160,7 +160,7 @@ Page views come from GoatCounter's script; game events go through `track()` in `
 
 ## Monetization switch
 
-`site.config.js` has one flag, `MONETIZED`, on by default. On GitHub, add a repository variable `MONETIZED` with the value `false` (Settings → Secrets and variables → Actions → Variables) and re-run the deploy; locally use `MONETIZED=false npm run dev` or `npm run build`. Turned off, the build has no Buy Me a Coffee links, no ads (even if `GAM_REWARDED_UNIT` / `ADS_TXT` are set; no `ads.txt` is published and the ad code never runs), no Privacy & cookie settings button, and the privacy policy loses its advertising sections. In the HTML pages, anything wrapped in `<!-- monetized -->…<!-- /monetized -->` is stripped by a build step in `vite.config.js` (`<!-- unmonetized -->` blocks are kept only when it's off). Wrap any new coffee link or ad text the same way.
+`site.config.js` has one flag, `MONETIZED`, on by default. On GitHub, add a repository variable `MONETIZED` with the value `false` (Settings → Secrets and variables → Actions → Variables) and re-run the deploy; locally use `MONETIZED=false npm run dev` or `npm run build`. Turned off, the build has no Buy Me a Coffee links, no ads (even if `GAM_REWARDED_UNIT` / `ADS_TXT` are set; no `ads.txt` is published and the ad code never runs), no Privacy & cookie settings button, and the privacy policy loses its advertising sections. In the HTML pages, any element with a `data-monetized` attribute is removed by a build step in `vite.config.js` (the attribute is just dropped when the flag is on). Mark any new coffee link or ad text the same way; for a phrase inside a sentence, wrap it in `<span data-monetized>`.
 
 ## Rewarded video ads (Google Ad Manager)
 

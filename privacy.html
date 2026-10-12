@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#cbbcff" />
     <title>Privacy policy · Blorbit</title>
-    <meta name="description" content="How Blorbit handles your information: game progress saved in your browser, hosting<!-- monetized -->, fonts, and optional Google video ads with your consent choices<!-- /monetized --><!-- unmonetized --> and fonts<!-- /unmonetized -->." />
+    <meta name="description" content="How Blorbit handles your information: game progress saved in your browser, hosting and fonts." />
     <link rel="canonical" href="https://blorbit.io/privacy.html" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
@@ -21,7 +21,9 @@
       main { max-width: 760px; margin: 0 auto; padding: 32px 20px 64px; }
       .card { background: rgba(255, 255, 255, 0.82); border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 28px; padding: 28px clamp(18px, 5vw, 40px); box-shadow: 0 18px 50px rgba(120, 100, 220, 0.18); }
       h1 { font-size: clamp(30px, 6vw, 40px); line-height: 1.15; margin: 0 0 6px; }
-      h2 { font-size: 21px; margin: 30px 0 6px; }
+      main { counter-reset: section; }
+      h2 { font-size: 21px; margin: 30px 0 6px; counter-increment: section; }
+      h2::before { content: counter(section) ". "; }
       h3 { font-size: 17px; margin: 18px 0 4px; }
       p, li { color: var(--ink-soft); }
       ul { padding-left: 22px; }
@@ -55,19 +57,19 @@
           <ul>
             <li>There are no accounts. We don't ask for your name, email or anything else about you.</li>
             <li>Your game progress is saved <b>only in your own browser</b>. We never receive it.</li>
-            <!-- monetized --><li>The game can show optional video ads from <b>Google</b>, which you can choose to watch for a free card pack or to unlock a galaxy early. Google and its partners may use cookies and similar technology for those ads.</li>
-            <li>Where the law requires it (for example in the EEA, UK and Switzerland), we ask for your consent first, and you can change your choice at any time.</li><!-- /monetized -->
+            <li data-monetized>The game can show optional video ads from <b>Google</b>, which you can choose to watch for a free card pack or to unlock a galaxy early. Google and its partners may use cookies and similar technology for those ads.</li>
+            <li data-monetized>Where the law requires it (for example in the EEA, UK and Switzerland), we ask for your consent first, and you can change your choice at any time.</li>
           </ul>
         </div>
 
-        <h2>1. What the game stores on your device</h2>
+        <h2>What the game stores on your device</h2>
         <p>
           To remember your progress, the game uses your browser's local storage. This stays on your device and is not sent to us
           or anyone else.
         </p>
         <table>
           <tr><th>What</th><th>Why</th></tr>
-          <tr><td>Game progress <code>blorbit-save-v1</code></td><td>Your stardust, unlocked skins, collection, settings (graphics, sound, controls, colorblind mode), which galaxy you're in, and any galaxies you've unlocked<!-- monetized --> by watching a video<!-- /monetized -->.</td></tr>
+          <tr><td>Game progress <code>blorbit-save-v1</code></td><td>Your stardust, unlocked skins, collection, settings (graphics, sound, controls, colorblind mode), which galaxy you're in, and any galaxies you've unlocked<span data-monetized> by watching a video</span>.</td></tr>
           <tr><td>Saved planets <code>blorbit-planet-v1:…</code></td><td>The half-finished planet in each galaxy, so you can carry on where you left off.</td></tr>
         </table>
         <p>
@@ -75,7 +77,8 @@
           in your browser.
         </p>
 
-<!-- monetized -->        <h2>2. Advertising (Google Ad Manager)</h2>
+        <section data-monetized>
+        <h2>Advertising (Google Ad Manager)</h2>
         <p>
           Blorbit offers optional <b>rewarded video ads</b>. You can choose to watch a short video in return for a reward:
         </p>
@@ -128,8 +131,9 @@
           opt out, and you can revisit it through <b>Settings → Privacy &amp; cookie settings</b>. We don't sell personal information for money.
         </p>
 
-<!-- /monetized -->
-        <h2>3. Other services the site uses</h2>
+        </section>
+
+        <h2>Other services the site uses</h2>
         <ul>
           <li>
             <b>Hosting (GitHub Pages).</b> The game is hosted by GitHub. Like any web server, GitHub may log technical information such as
@@ -152,27 +156,27 @@
         </ul>
         <p>Apart from this counter, we don't use any analytics or tracking tools of our own.</p>
 
-        <h2>4. Children</h2>
+        <h2>Children</h2>
         <p>
           Blorbit is made for a general audience and is not directed at children under 13. We don't knowingly collect personal
           information from children. If you believe a child has provided personal information through this site, contact us and we'll
           help remove it.
         </p>
 
-        <h2>5. Your rights</h2>
+        <h2>Your rights</h2>
         <p>
           Depending on where you live, you may have rights over your personal information, such as to access it, correct it, delete it,
           object to or restrict its use, or withdraw consent. Because we don't collect personal information ourselves, most requests are
-          best handled by the services above <!-- monetized -->(for ads, through Google)<!-- /monetized --> You can always contact us and we'll help where we can. You
+          best handled by the services above<span data-monetized> (for ads, through Google)</span>. You can always contact us and we'll help where we can. You
           also have the right to complain to your local data protection authority.
         </p>
 
-        <h2>6. Changes to this policy</h2>
+        <h2>Changes to this policy</h2>
         <p>
           If we change how the game handles information, we'll update this page and the "Last updated" date at the top.
         </p>
 
-        <h2>7. Contact</h2>
+        <h2>Contact</h2>
         <p>Blorbit.io · <a href="mailto:blorbit.io@gmail.com">blorbit.io@gmail.com</a></p>
       </div>
     </main>

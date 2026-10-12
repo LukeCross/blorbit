@@ -5,6 +5,7 @@ const SITE = 'https://blorbit.io';
 const PAGES = ['/', '/about.html', '/privacy.html'];
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { parse as parseHtml } from 'node-html-parser';
 import { MONETIZED } from './site.config.js';
 
 export default defineConfig(({ mode }) => {
@@ -33,16 +34,16 @@ export default defineConfig(({ mode }) => {
         },
       },
       {
-        // MONETIZED (site.config.js): when off, drop everything wrapped in <!-- monetized -->…<!-- /monetized -->
-        // (Buy Me a Coffee links, ad prompts, the privacy policy's advertising text), keep <!-- unmonetized --> blocks,
-        // and renumber the privacy policy's headings so the gap closes
+        // MONETIZED (site.config.js): when off, remove every element marked data-monetized (Buy Me a Coffee
+        // links, ad prompts, the privacy policy's advertising text); when on, just drop the marker
         name: 'monetized-markup',
         transformIndexHtml: { order: 'pre', handler(html) {
-          const tags = (name) => new RegExp(`<!-- ${name} -->([\\s\\S]*?)<!-- /${name} -->`, 'g'), keepOr = (keep) => (_, inner) => (keep ? inner : '');
-          html = html.replace(tags('monetized'), keepOr(MONETIZED)).replace(tags('unmonetized'), keepOr(!MONETIZED));
-          if (MONETIZED) return html;
-          let n = 0;
-          return html.replace(/<h2>\d+\. /g, () => `<h2>${++n}. `);
+          const root = parseHtml(html, { comment: true });
+          for (const el of root.querySelectorAll('[data-monetized]')) {
+            if (MONETIZED) el.removeAttribute('data-monetized');
+            else el.remove();
+          }
+          return root.toString();
         } },
       },
       {

@@ -26,7 +26,7 @@ Deploys: pushing to `main` runs `.github/workflows/deploy.yml` (GitHub Pages, si
 
 ## 2. Conventions and house rules
 
-- **Monetization flag**: `site.config.js` exports `MONETIZED` (from the `MONETIZED` env var, set in CI by the repo variable of the same name; on unless it is `false`). When false, no Buy Me a Coffee links and no ads anywhere, and `privacy.html` has no ad text. Any new coffee link, ad UI or ad-related policy text must be wrapped in `<!-- monetized -->…<!-- /monetized -->` (stripped by the `monetized-markup` plugin in `vite.config.js`), and JS must go through `ads.enabled` (which includes the flag). Check both settings with `npm run build`.
+- **Monetization flag**: `site.config.js` exports `MONETIZED` (from the `MONETIZED` env var, set in CI by the repo variable of the same name; on unless it is `false`). When false, no Buy Me a Coffee links and no ads anywhere, and `privacy.html` has no ad text. Any new coffee link, ad UI or ad-related policy text must carry a `data-monetized` attribute (elements with it are removed by the `monetized-markup` plugin in `vite.config.js`, which uses `node-html-parser`), and JS must go through `ads.enabled` (which includes the flag). Check both settings with `npm run build`.
 
 - **Match the surrounding code**: same comment density, naming and idioms. Comments explain *why*, are sparse, and are written in plain British-ish English.
 - **Galaxy names are ONE word**, a compound, like `Wildbloom`, `Citylight`, `Skyhaven`, `Sunroam`, `Seaglow`, `Feastvale`. Never two words.
