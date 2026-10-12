@@ -723,7 +723,10 @@ let titleReady = false;
 function showTitleGalaxies() {
   $('title-choose').classList.remove('hidden');
   $('title-galaxies').classList.remove('hidden');
-  $('title-galaxies').innerHTML = galaxyCards('title');
+  const row = $('title-galaxies');
+  const scroll = row.scrollLeft; // refreshing mid-visit (after shop packs) shouldn't jump the swipe row
+  row.innerHTML = galaxyCards('title');
+  row.scrollLeft = scroll;
 }
 $('title-galaxies').addEventListener('click', (e) => {
   const unlock = e.target.closest('[data-unlock]')?.dataset.unlock;
@@ -877,6 +880,7 @@ function findCard(emoji, name, rarity, isNew, count) {
 function updateBookCount() {
   const g = planet?.galaxy ?? save.galaxy;
   $('book-count').textContent = `${foundIn(save, g)}/${totalFindsIn(g)}`;
+  if (state === 'title' && planet) showTitleGalaxies(); // keep the picker's find rings current
 }
 
 function refreshDust() {
