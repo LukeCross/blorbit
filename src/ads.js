@@ -31,7 +31,7 @@ function tidyAddressBar() {
 
 export class RewardedAds {
   constructor({ onPause, onResume } = {}) {
-    this.enabled = !!UNIT;
+    this.enabled = __MONETIZED__ && !!UNIT;
     this.demo = UNIT === DEMO_UNIT;
     this.supported = true; // GPT says no (null slot) on pages/devices without rewarded support
     this.onPause = onPause;

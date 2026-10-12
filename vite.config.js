@@ -5,6 +5,7 @@ const SITE = 'https://blorbit.io';
 const PAGES = ['/', '/about.html', '/privacy.html'];
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { MONETIZED } from './site.config.js';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
@@ -12,6 +13,8 @@ export default defineConfig(({ mode }) => {
     // Relative asset paths so the build works from any sub-path,
     // e.g. GitHub Pages project sites served at https://<user>.github.io/<repo>/, or a custom domain
     base: './',
+    // src/ads.js reads this, so a build with MONETIZED off never loads any ad code
+    define: { __MONETIZED__: JSON.stringify(MONETIZED) },
     build: {
       // the game, plus the privacy policy as its own page
       rollupOptions: {
@@ -24,10 +27,23 @@ export default defineConfig(({ mode }) => {
         // Set ADS_TXT to the line(s) Ad Manager gives you; each line separated by a newline or ';'.
         name: 'ads-txt',
         generateBundle() {
-          if (!env.ADS_TXT) return;
+          if (!MONETIZED || !env.ADS_TXT) return;
           const source = env.ADS_TXT.split(/\n|;/).map((l) => l.trim()).filter(Boolean).join('\n') + '\n';
           this.emitFile({ type: 'asset', fileName: 'ads.txt', source });
         },
+      },
+      {
+        // MONETIZED (site.config.js): when off, drop everything wrapped in <!-- monetized -->…<!-- /monetized -->
+        // (Buy Me a Coffee links, ad prompts, the privacy policy's advertising text), keep <!-- unmonetized --> blocks,
+        // and renumber the privacy policy's headings so the gap closes
+        name: 'monetized-markup',
+        transformIndexHtml: { order: 'pre', handler(html) {
+          const tags = (name) => new RegExp(`<!-- ${name} -->([\\s\\S]*?)<!-- /${name} -->`, 'g'), keepOr = (keep) => (_, inner) => (keep ? inner : '');
+          html = html.replace(tags('monetized'), keepOr(MONETIZED)).replace(tags('unmonetized'), keepOr(!MONETIZED));
+          if (MONETIZED) return html;
+          let n = 0;
+          return html.replace(/<h2>\d+\. /g, () => `<h2>${++n}. `);
+        } },
       },
       {
         // robots.txt + sitemap.xml so search engines find every page (lastmod = the day it was built)

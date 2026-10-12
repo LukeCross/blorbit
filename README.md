@@ -158,6 +158,10 @@ Anonymous, cookie-free usage counts through [GoatCounter](https://www.goatcounte
 
 Page views come from GoatCounter's script; game events go through `track()` in `src/analytics.js` and show up in the dashboard's paths list (filter by prefix, sort by count): `find/<biome>/<name>`, `first-play`, `skin/<id>`, `galaxy-unlocked/<id>/<creatures|video>`, `planet-restored/<galaxy>`, `planet-new/<galaxy>`, `galaxy-entered/<id>`, `biome-restored/<biome>`, `creature-woken/<creature>`, `pack/<type>`, `pack/free-video`, `ad-offer/<pack|galaxy>`, `ad-watched/<pack|galaxy>`, `setting/<quality|colorblind|touch|autoroll>/<value>` and `coffee-click`. Test locally with `VITE_GOATCOUNTER_URL=https://x.goatcounter.com npm run build`.
 
+## Monetization switch
+
+`site.config.js` has one flag, `MONETIZED`, on by default. On GitHub, add a repository variable `MONETIZED` with the value `false` (Settings → Secrets and variables → Actions → Variables) and re-run the deploy; locally use `MONETIZED=false npm run dev` or `npm run build`. Turned off, the build has no Buy Me a Coffee links, no ads (even if `GAM_REWARDED_UNIT` / `ADS_TXT` are set; no `ads.txt` is published and the ad code never runs), no Privacy & cookie settings button, and the privacy policy loses its advertising sections. In the HTML pages, anything wrapped in `<!-- monetized -->…<!-- /monetized -->` is stripped by a build step in `vite.config.js` (`<!-- unmonetized -->` blocks are kept only when it's off). Wrap any new coffee link or ad text the same way.
+
 ## Rewarded video ads (Google Ad Manager)
 
 The free-pack videos use **Google Ad Manager rewarded ads** through the Google Publisher Tag (GPT), in `src/ads.js`.

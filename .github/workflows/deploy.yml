@@ -35,7 +35,10 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # Rewarded video ads (Google Ad Manager). Set these as repository variables under
+          # Master switch for coffee links and ads. Repository variable MONETIZED: set to "false" to remove them all;
+          # unset or anything else leaves them on. Read by site.config.js.
+          MONETIZED: ${{ vars.MONETIZED }}
+          # Rewarded video ads (Google Ad Manager); ignored when MONETIZED is false. Set these as repository variables under
           # Settings -> Secrets and variables -> Actions -> Variables. Without them, the build has no ads.
           VITE_GAM_REWARDED_UNIT: ${{ vars.GAM_REWARDED_UNIT }}
           ADS_TXT: ${{ vars.ADS_TXT }}

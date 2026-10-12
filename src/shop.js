@@ -66,7 +66,7 @@ export class Shop {
     Object.assign(this, { save, persist, sound, onCollection, onDust, onClose, onOpenBook, currentGalaxy, ads });
     // keep the free-pack buttons in step with whether a video is ready
     ads?.onChange(() => this.refreshFreeButtons());
-    $('ad-no').addEventListener('click', () => this.closeOffer());
+    $('ad-no')?.addEventListener('click', () => this.closeOffer());
     this.tab = currentGalaxy();
     $('shop-close').addEventListener('click', () => this.close());
     $('shop-body').addEventListener('click', (e) => {

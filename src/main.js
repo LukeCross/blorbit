@@ -916,10 +916,10 @@ function showVolume() {
 // review Google's consent choices: only offered to visitors covered by European or US state privacy
 // rules (Google's consent tool tells us which), and kept in step if that becomes known later
 const syncConsentButton = () => {
-  $('consent-btn').classList.toggle('hidden', !ads.consentApplies);
-  $('consent-text').classList.toggle('hidden', !ads.consentApplies);
+  $('consent-btn')?.classList.toggle('hidden', !ads.consentApplies);
+  $('consent-text')?.classList.toggle('hidden', !ads.consentApplies);
 };
-$('consent-btn').addEventListener('click', async () => {
+$('consent-btn')?.addEventListener('click', async () => {
   const note = $('privacy-note');
   note.classList.add('hidden');
   const ok = await ads.openConsentSettings();
