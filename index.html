@@ -426,7 +426,7 @@
       .find.out { opacity: 0; transform: translateX(-30px); }
       .find .find-emoji { font-size: 28px; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 14px; background: #fff; box-shadow: var(--shadow-sm); }
       .find b { display: block; font: 600 16px var(--font-display); }
-      /* rank progress bar: same coloured segments as the ring, set inline */
+      /* rank progress bar: coloured segments set inline (also used under each find in the collection) */
       .rank-bar { display: block; height: 6px; }
       .rank-line { display: block; margin-top: 3px; font-size: 11px; font-weight: 800; color: var(--ink-soft); white-space: nowrap; }
       .rank-line .rank-bar { margin-bottom: 3px; }
@@ -541,11 +541,8 @@
       .slot.e { border-color: var(--c-epic); background: linear-gradient(160deg, #fff, #efe6ff); }
       .slot.l { border-color: var(--c-legend); background: linear-gradient(160deg, #fffaf0, #fff0c4); }
       .slot.locked { font-size: 15px; background: rgba(255,255,255,0.35); box-shadow: none; color: var(--ink-faint); }
-      /* ring around the find: one coloured segment per rank (bronze, silver, gold, rose, prismatic), filling as copies come in */
-      .slot .ring {
-        position: absolute; inset: 7%; border-radius: 50%; pointer-events: none;
-        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3.5px)); mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3.5px));
-      }
+      /* rank bar along the bottom of the find: one coloured segment per rank (bronze, silver, gold, rose, prismatic), filling as copies come in */
+      .slot .rank-bar { position: absolute; left: 12%; right: 12%; bottom: 7px; height: 5px; pointer-events: none; }
       /* mastered finds keep their rarity colours and gain a pulsing glow with a shine sweeping across */
       .slot.mastered { overflow: hidden; animation: mastered-glow 2.6s ease-in-out infinite; }
       .slot.mastered::after {
@@ -555,7 +552,6 @@
       @keyframes mastered-glow { 0%, 100% { box-shadow: 0 0 8px rgba(168,124,245,0.55), 0 0 14px rgba(255,160,215,0.35); } 50% { box-shadow: 0 0 14px rgba(168,124,245,0.95), 0 0 26px rgba(255,160,215,0.7); } }
       @media (prefers-reduced-motion: reduce) { .slot.mastered, .slot.mastered::after { animation: none; } .slot.mastered { box-shadow: 0 0 14px rgba(168,124,245,0.9), 0 0 22px rgba(255,160,215,0.6); } .slot.mastered::after { display: none; } }
       @keyframes mastered-shine { 0% { transform: translateX(-70%); } 55%, 100% { transform: translateX(70%); } }
-      .slot i { position: absolute; right: 5px; bottom: 3px; font-size: 10px; font-style: normal; font-weight: 900; color: var(--ink-soft); }
 
       /* shop */
       .shop-note { font-size: 13px; color: var(--ink-soft); margin: 14px 0 10px; line-height: 1.6; }

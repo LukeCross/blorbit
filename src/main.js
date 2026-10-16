@@ -1280,7 +1280,7 @@ function renderBookBody() {
       const n = save.finds[`${b}:${name}`];
       const r = rankInfo(rarity, n);
       const title = n ? `${name} (${RARITY[rarity]}): ${r.name}, ${r.text}` : `??? (${RARITY[rarity]})`;
-      return `<div class="slot ${rarity} ${n ? '' : 'locked'}${r.rank === RANKS.length ? ' mastered' : ''}" data-key="${b}:${name}" title="${title}">${n ? `<span class="ring" style="background:conic-gradient(${rankStops(rarity, n, 360, 9, 'deg')})"></span>${emoji}` : '❔'}${n > 1 ? `<i>×${n}</i>` : ''}</div>`;
+      return `<div class="slot ${rarity} ${n ? '' : 'locked'}${r.rank === RANKS.length ? ' mastered' : ''}" data-key="${b}:${name}" title="${title}">${n ? `${emoji}<i class="rank-bar" style="background:linear-gradient(90deg, ${rankStops(rarity, n, 100, 6, '%')})"></i>` : '❔'}</div>`;
     }).join('');
     const found = def.finds.filter(([, name]) => save.finds[`${b}:${name}`]).length;
     return `<div class="book-row"><div class="book-head"><span class="${woke ? '' : 'dim'}">${woke ? SKINS[def.creature].emoji : '❔'}</span><b>${def.name}</b><em>${found}/${def.finds.length}</em></div><div class="slots">${items}</div></div>`;
@@ -1289,7 +1289,7 @@ function renderBookBody() {
   const restored = save.restoredIn[g] || 0;
   $('book-total').textContent = `${foundIn(save, g)} of ${totalFindsIn(g)} ${GALAXIES[g].name} finds · ${masteredIn(save, GALAXIES[g].biomes)} mastered · ✨ ${save.stardust} stardust · ${restored} planet${restored === 1 ? '' : 's'} restored here`;
 }
-$('book-legend').innerHTML = `Collect duplicates to rank up your finds: ${RANKS.map((r, i) => `<b><i class="dot${i === RANKS.length - 1 ? ' top' : ''}" style="background:${RANK_DOTS[i]}"></i>${r}</b>`).join(' → ')}. The ring around each find fills with these colours as you collect copies; a full ring means Mastered, which shimmers and earns big XP.`;
+$('book-legend').innerHTML = `Collect duplicates to rank up your finds: ${RANKS.map((r, i) => `<b><i class="dot${i === RANKS.length - 1 ? ' top' : ''}" style="background:${RANK_DOTS[i]}"></i>${r}</b>`).join(' → ')}. The bar under each find fills with these colours as you collect copies; a full bar means Mastered, which shimmers and earns big XP.`;
 $('book-grid').addEventListener('click', (e) => {
   const slot = e.target.closest('.slot[data-key]');
   if (slot && !slot.classList.contains('locked')) {
