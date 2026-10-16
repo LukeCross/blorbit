@@ -248,6 +248,18 @@
       .galaxy-card .ring .disc span { position: relative; font: 600 15px var(--font-display); }
       .galaxy-card .ring.done .disc { --c: #ffc83d; box-shadow: 0 0 12px rgba(255,200,61,0.6); }
       .galaxy-card .ring.done .disc span { color: #e0a000; font-size: 24px; }
+      /* mastery: a thin rainbow ring around the finds disc, compressed to the mastered share */
+      .galaxy-card .ring .disc { margin: 0; }
+      .galaxy-card .ring:not(.has-outer) .disc { width: 68px; height: 68px; }
+      .galaxy-card .ring.has-outer .disc { margin: 5px; }
+      .galaxy-card .ring { justify-content: flex-start; }
+      .galaxy-card .ring .mastered-note { display: flex; align-items: center; gap: 4px; margin-top: -2px; }
+      .galaxy-card .ring .mastered-note i { width: 9px; height: 9px; border-radius: 50%; background: conic-gradient(#ff7eb6, #b57cf5, #5fd0ff, #ff7eb6); }
+      .galaxy-card .ring.has-outer .disc::after {
+        content: ''; position: absolute; inset: -5px; border-radius: 50%; pointer-events: none;
+        background: conic-gradient(#ff7eb6, #b57cf5 calc(var(--m) * 0.5%), #5fd0ff calc(var(--m) * 1%), rgba(61,53,96,0.08) 0);
+        -webkit-mask: radial-gradient(circle, transparent 0 calc(50% - 3px), #000 calc(50% - 2.5px)); mask: radial-gradient(circle, transparent 0 calc(50% - 3px), #000 calc(50% - 2.5px));
+      }
       .galaxy-card .ring small { font-size: 11px; font-weight: 800; color: var(--ink-soft); white-space: nowrap; }
       .galaxy-card.complete { border-color: #ffd66b; }
       .galaxy-card .badge.done { background: #ffc83d; color: #5a4300; }
@@ -919,8 +931,9 @@
         .galaxy-card .art { grid-row: 1 / span 6; }
         .galaxy-card b { font-size: 18px; }
         .galaxy-card p { font-size: 12px; }
-        .galaxy-card .rings { padding: 2px 0 0; justify-content: flex-start; gap: 14px; }
+        .galaxy-card .rings { padding: 2px 0 0; justify-content: center; gap: 14px; }
         .galaxy-card .ring .disc { width: 54px; height: 54px; }
+        .galaxy-card .ring:not(.has-outer) .disc { width: 64px; height: 64px; }
         .galaxy-card .ring .disc::before { inset: 7px; }
         .galaxy-card .ring .disc span { font-size: 14px; }
         .galaxy-card .meta { font-size: 11px; gap: 4px; }

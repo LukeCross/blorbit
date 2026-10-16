@@ -727,10 +727,13 @@ $('menu-btn').addEventListener('click', backToMenu);
 $('finale-menu').addEventListener('click', backToMenu);
 
 // a progress ring: floors the percentage so only a truly finished set reads 100%
-function ring(icon, label, n, total) {
-  const pct = total ? (n >= total ? 100 : Math.floor((n / total) * 100)) : 0;
-  return `<div class="ring ${pct === 100 ? 'done' : ''}" style="--p:${pct}" title="${n}/${total} ${label}">
-    <div class="disc"><span>${pct === 100 ? '★' : `${pct}%`}</span></div><small>${icon} ${n}/${total} ${label}</small></div>`;
+function ring(icon, label, n, total, mastered) {
+  const floor = (a) => (total ? (a >= total ? 100 : Math.floor((a / total) * 100)) : 0);
+  const pct = floor(n);
+  const m = mastered === undefined ? '' : `;--m:${floor(mastered)}`;
+  const tip = mastered === undefined ? '' : ` · ${mastered} mastered`;
+  return `<div class="ring ${pct === 100 ? 'done' : ''}${m ? ' has-outer' : ''}" style="--p:${pct}${m}" title="${n}/${total} ${label}${tip}">
+    <div class="disc"><span>${pct === 100 ? '★' : `${pct}%`}</span></div><small>${icon} ${n}/${total} ${label}</small>${mastered === undefined ? '' : `<small class="mastered-note"><i></i>${mastered} mastered</small>`}</div>`;
 }
 
 function galaxyCards(mode) {
@@ -749,7 +752,7 @@ function galaxyCards(mode) {
     } else {
       const label = isHere ? 'You are here' : mode === 'title' && hasSavedPlanet(g) ? 'Continue' : mode === 'title' ? 'Play' : 'Travel here';
       const found = foundIn(save, g), finds = totalFindsIn(g);
-      foot = `<div class="rings">${ring('🐾', 'friends', woke, total)}${ring('📖', 'finds', found, finds)}</div><div class="go">${label}</div>`;
+      foot = `<div class="rings">${ring('🐾', 'friends', woke, total)}${ring('📖', 'finds', found, finds, masteredIn(save, def.biomes))}</div><div class="go">${label}</div>`;
     }
     const restored = open ? `<span class="restored" title="Planets restored" aria-label="${save.restoredIn[g] || 0} planets restored">🪐 ${save.restoredIn[g] || 0}</span>` : '';
     const inner = `<div class="art"><span>${def.emoji}</span></div><div class="head"><b>${def.name}</b>${restored}</div><p>${def.blurb}</p>${foot}`;
