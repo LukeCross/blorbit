@@ -327,6 +327,39 @@
       body.on-title #menu-btn { display: none; }
       #shop-btn .num, #book-btn .num { font-variant-numeric: tabular-nums; }
       #shop-btn { background: var(--accent-warm); }
+
+      /* the profile button doubles as the level display: avatar, level badge and XP bar */
+      .lv-badge {
+        flex: none; min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box; border-radius: 99px; display: grid; place-items: center;
+        font: 600 13px var(--font-display); color: var(--ink); background: var(--accent-warm); box-shadow: var(--shadow-sm);
+      }
+      .lv-bar { display: block; width: 84px; height: 8px; border-radius: 99px; background: rgba(61,53,96,0.12); overflow: hidden; }
+      .lv-bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--lilac-deep), var(--pink-deep)); transition: width 0.5s ease-out; }
+      #profile-btn { position: relative; }
+      #profile-btn .lv-badge { min-width: 22px; height: 22px; padding: 0 5px; font-size: 12px; }
+      #profile-btn .lv-bar { width: 72px; }
+      #lv-text { display: none; }
+      /* narrower screens: just the avatar, with the level as a small tag and the XP as a thin bar along the bottom */
+      @media (max-width: 1299px), (max-height: 500px) {
+        #profile-btn .lv-bar { position: absolute; left: 0; right: 0; bottom: 0; width: auto; height: 4px; border-radius: 0; }
+        #profile-btn .lv-bar i { border-radius: 0; }
+        #profile-btn .lv-badge { position: absolute; right: 2px; bottom: 5px; min-width: 15px; height: 15px; padding: 0 3px; font-size: 10px; box-shadow: 0 0 0 1.5px #fff; }
+      }
+      @media (min-width: 1300px) and (min-height: 501px) {
+        #profile-btn { width: auto; padding: 0 14px 0 8px; gap: 8px; }
+        #profile-btn .avatar { flex: none; }
+      }
+      @media (min-width: 1500px) and (min-height: 501px) { #lv-text { display: inline; font: 800 11px var(--font); color: var(--ink-soft); font-variant-numeric: tabular-nums; } }
+      #profile-btn.up { animation: lvpop 0.6s ease-in-out 3; }
+      @keyframes lvpop { 50% { transform: scale(1.12); box-shadow: 0 0 18px rgba(168,124,245,0.9); } }
+      /* "+N XP" floats just under the profile button */
+      .xp-gain {
+        position: fixed; right: 14px; top: 64px; z-index: 2; padding: 8px 16px; border-radius: var(--r); white-space: nowrap; opacity: 0; pointer-events: none;
+        font: 600 16px var(--font-display); font-style: normal; color: var(--ink); font-variant-numeric: tabular-nums;
+        background: var(--glass-strong); -webkit-backdrop-filter: blur(18px) saturate(1.5); backdrop-filter: blur(18px) saturate(1.5); border: 1px solid var(--glass-border); box-shadow: var(--shadow), var(--highlight);
+      }
+      .xp-gain.go { animation: xpgain 1.8s ease-out; }
+      @keyframes xpgain { 0% { opacity: 0; transform: translateY(-8px) scale(0.8); } 12% { opacity: 1; transform: translateY(0) scale(1.12); } 22% { transform: scale(1); } 75% { opacity: 1; } 100% { opacity: 0; transform: translateY(6px); } }
       #shop-btn.bump, #book-btn.bump { animation: pop 0.35s cubic-bezier(.3,1.8,.5,1); }
       #book-btn.bump { animation: pop 0.6s cubic-bezier(.3,1.8,.5,1), glow 1.2s ease-in-out 2; }
 
@@ -393,6 +426,11 @@
       .find.out { opacity: 0; transform: translateX(-30px); }
       .find .find-emoji { font-size: 28px; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 14px; background: #fff; box-shadow: var(--shadow-sm); }
       .find b { display: block; font: 600 16px var(--font-display); }
+      /* rank progress bar: same coloured segments as the ring, set inline */
+      .rank-bar { display: block; height: 6px; }
+      .rank-line { display: block; margin-top: 3px; font-size: 11px; font-weight: 800; color: var(--ink-soft); white-space: nowrap; }
+      .rank-line .rank-bar { margin-bottom: 3px; }
+      .find.mastered .find-emoji { box-shadow: 0 0 18px rgba(168,124,245,0.9), 0 0 26px rgba(255,160,215,0.6); }
       .find small { font-size: 12px; color: var(--ink-soft); text-transform: capitalize; font-weight: 800; }
       .find.new .find-emoji { background: var(--accent); }
       .find.new.u .find-emoji { background: linear-gradient(135deg, #e0fff4, #a8f0d8); box-shadow: 0 0 14px rgba(95,211,176,0.6); }
@@ -481,7 +519,13 @@
       .big-emoji { font-size: 46px; letter-spacing: 10px; margin: 14px 0 20px; }
 
       /* collection book */
-      #book-total { color: var(--ink-soft); margin: 6px 0 18px; font-size: 14px; }
+      #book-total { color: var(--ink-soft); margin: 6px 0 6px; font-size: 14px; }
+      #book-legend { color: var(--ink-soft); font-size: 13px; line-height: 1.5; margin-bottom: 16px; }
+      #book-legend b { color: var(--ink); }
+      #book-legend .dot { display: inline-block; width: 9px; height: 9px; margin-right: 4px; border-radius: 50%; }
+      #book-legend .dot.top { background: conic-gradient(#ff7eb6, #b57cf5, #5fd0ff, #ff7eb6) !important; }
+      #book-detail:empty { display: none; }
+      #book-detail { margin: -6px 0 16px; padding: 5px 12px; border-radius: 12px; background: rgba(255,255,255,0.6); font-size: 13px; font-weight: 800; color: var(--ink); }
       .book-row { margin-bottom: 16px; }
       .book-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
       .book-head span { font-size: 20px; }
@@ -497,6 +541,20 @@
       .slot.e { border-color: var(--c-epic); background: linear-gradient(160deg, #fff, #efe6ff); }
       .slot.l { border-color: var(--c-legend); background: linear-gradient(160deg, #fffaf0, #fff0c4); }
       .slot.locked { font-size: 15px; background: rgba(255,255,255,0.35); box-shadow: none; color: var(--ink-faint); }
+      /* ring around the find: one coloured segment per rank (bronze, silver, gold, rose, prismatic), filling as copies come in */
+      .slot .ring {
+        position: absolute; inset: 7%; border-radius: 50%; pointer-events: none;
+        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3.5px)); mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3.5px));
+      }
+      /* mastered finds keep their rarity colours and gain a pulsing glow with a shine sweeping across */
+      .slot.mastered { overflow: hidden; animation: mastered-glow 2.6s ease-in-out infinite; }
+      .slot.mastered::after {
+        content: ''; position: absolute; inset: -40% -60%; pointer-events: none;
+        background: linear-gradient(110deg, transparent 42%, rgba(255,255,255,1) 50%, transparent 58%); animation: mastered-shine 3.2s ease-in-out infinite;
+      }
+      @keyframes mastered-glow { 0%, 100% { box-shadow: 0 0 8px rgba(168,124,245,0.55), 0 0 14px rgba(255,160,215,0.35); } 50% { box-shadow: 0 0 14px rgba(168,124,245,0.95), 0 0 26px rgba(255,160,215,0.7); } }
+      @media (prefers-reduced-motion: reduce) { .slot.mastered, .slot.mastered::after { animation: none; } .slot.mastered { box-shadow: 0 0 14px rgba(168,124,245,0.9), 0 0 22px rgba(255,160,215,0.6); } .slot.mastered::after { display: none; } }
+      @keyframes mastered-shine { 0% { transform: translateX(-70%); } 55%, 100% { transform: translateX(70%); } }
       .slot i { position: absolute; right: 5px; bottom: 3px; font-size: 10px; font-style: normal; font-weight: 900; color: var(--ink-soft); }
 
       /* shop */
@@ -689,6 +747,17 @@
       .card.l .card-front { background: linear-gradient(170deg, #fffdf2, #ffe08a); box-shadow: 0 0 56px rgba(245,201,74,0.95), var(--shadow-lg); }
       .card.l.flipped .card-front::after { content: ''; position: absolute; inset: -50%; background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.85) 50%, transparent 60%); animation: sweep 1.6s ease-in-out infinite; }
       .card.flipped.l { animation: legend 0.8s 0.3s ease-out; }
+      .rank-box { display: flex; flex-direction: column; align-items: stretch; gap: 4px; width: 78%; margin-top: 4px; text-align: center; }
+      .rank-head { font: 900 12px var(--font); font-style: normal; color: var(--ink); text-transform: uppercase; letter-spacing: 0.05em; }
+      .rank-head.up { color: var(--lilac-deep); }
+      .rank-box.gold .rank-head { color: #d79a00; }
+      .rank-box small { font-size: 11px; font-weight: 800; color: var(--ink-soft); text-transform: none; }
+      .profile-level { display: flex; align-items: center; gap: 12px; margin: 18px 0 4px; padding: 12px 16px; border-radius: var(--r); background: rgba(255,255,255,0.75); box-shadow: var(--shadow-sm); }
+      .profile-level .lv-badge { min-width: 40px; height: 40px; font-size: 20px; }
+      .profile-level > div { flex: 1; min-width: 0; }
+      .profile-level b { display: block; font: 600 17px var(--font-display); }
+      .profile-level .lv-bar { width: 100%; margin: 5px 0 3px; }
+      .profile-level small { color: var(--ink-soft); font-size: 12px; font-weight: 800; }
       .card-emoji { font-size: 72px; filter: drop-shadow(0 6px 8px rgba(90,70,160,0.2)); }
       .card-front b { font: 600 19px var(--font-display); }
       .card-front small { font-weight: 900; text-transform: uppercase; letter-spacing: 0.14em; font-size: 10px; color: var(--ink-soft); }
@@ -740,6 +809,7 @@
         .pill-btn { height: 38px; padding: 0 12px; font-size: 13px; gap: 6px; }
         .icon-btn { width: 38px; padding: 0; }
         #hud-left .label, #autoroll .label { display: none; }
+        .xp-gain { right: calc(env(safe-area-inset-right) + 10px); top: calc(env(safe-area-inset-top) + 54px); }
         #book-btn .num { display: none; }
         #book-btn { width: 38px; padding: 0; justify-content: center; }
         #autoroll .switch { width: 26px; height: 16px; }
@@ -994,6 +1064,9 @@
       <button id="autoroll" class="pill-btn glass hidden" title="Toggle auto-roll (R)"><svg class="i compact-only" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7" /><path d="M20 4v5h-5" /></svg><span class="label">Auto-roll</span><span class="switch"></span></button>
       <button id="profile-btn" class="pill-btn icon-btn glass" title="Profile">
         <span class="avatar empty" id="profile-btn-avatar"></span>
+        <span class="lv-badge" id="lv-badge">1</span>
+        <span class="lv-bar"><i id="lv-fill"></i></span>
+        <span id="lv-text"></span>
       </button>
       <button id="settings-btn" class="pill-btn icon-btn glass" title="Settings">
         <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></svg>
@@ -1004,6 +1077,7 @@
       </button>
     </div>
 
+    <em class="xp-gain" id="xp-gain"></em>
     <div id="world-rings"></div>
     <div id="popups"></div>
     <div id="finds"></div>
@@ -1085,6 +1159,8 @@
           <button class="btn secondary small" id="book-close">Close</button>
         </div>
         <div id="book-total"></div>
+        <div id="book-legend"></div>
+        <div id="book-detail" aria-live="polite"></div>
         <div id="book-grid"></div>
       </div>
     </div>
@@ -1210,6 +1286,7 @@
           <textarea id="share-text" readonly rows="7" aria-label="Message to share"></textarea>
           <div><small>Copy this and send it to a friend.</small><button class="btn small" id="share-copy">Copy</button></div>
         </div>
+        <div class="profile-level" id="profile-level"></div>
         <div class="profile-id">
           <span class="avatar big empty" id="profile-avatar"></span>
           <div class="profile-name">

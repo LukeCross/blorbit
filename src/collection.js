@@ -1,6 +1,7 @@
 import { BIOMES, BIOME_IDS } from './biomes.js';
 import { GALAXIES } from './galaxies.js';
 import { track } from './analytics.js';
+import { XP, dupeXp, addXp } from './xp.js';
 
 // Shared logic for rolling collectibles, whether from a restored patch or a card pack.
 
@@ -31,16 +32,63 @@ function rollTier(rates, min = 'c') {
   return allowed[allowed.length - 1];
 }
 
-// Rolls one find, records it in the save, and returns what was drawn.
+// Every find ranks up as you collect copies. These are the copies needed for each rank (the first is
+// the discovery itself). Rarer finds turn up less often, so they ask for fewer copies.
+export const RANKS = ['Found', 'Familiar', 'Cherished', 'Treasured', 'Mastered'];
+export const MAX_RANK = RANKS.length;
+const RANK_AT = { c: [1, 3, 6, 10, 15], u: [1, 3, 5, 8, 12], r: [1, 2, 4, 7, 10], e: [1, 2, 4, 6, 8], l: [1, 2, 3, 5, 7] };
+// 0 = undiscovered, 1 (Found) .. 5 (Mastered)
+export const rankFor = (rarity, count = 0) => RANK_AT[rarity].filter((n) => count >= n).length;
+// One colour per rank, bronze up to a prismatic top (shown as a rainbow once it's full).
+const RANK_COLORS = ['#cf8a4e', '#b4bfcc', '#f2b823', '#ff7eb6', '#b57cf5'];
+const RANK_TRACK = 'rgba(61,53,96,0.12)';
+// Colour stops for a progress ring or bar split into one segment per rank: finished ranks are full
+// in their own colour, the next one is part-filled, the rest are empty. Pass it to conic-gradient
+// (total 360, unit 'deg') or linear-gradient (total 100, unit '%'). Reads as "how far from Mastered".
+export function rankStops(rarity, count, total, gap, unit) {
+  const { rank, frac } = rankInfo(rarity, count);
+  const seg = total / MAX_RANK, u = (n) => `${n.toFixed(2)}${unit}`, out = [];
+  for (let i = 0; i < MAX_RANK; i++) {
+    const a = i * seg + gap / 2, b = (i + 1) * seg - gap / 2;
+    const fill = i < rank ? 1 : i === rank ? frac : 0;
+    const mid = a + (b - a) * fill;
+    out.push(`transparent ${u(i * seg)} ${u(a)}`);
+    if (fill === 1 && i === MAX_RANK - 1) out.push(`#ff7eb6 ${u(a)}`, `#b57cf5 ${u((a + b) / 2)}`, `#5fd0ff ${u(b)}`);
+    else {
+      if (fill > 0) out.push(`${RANK_COLORS[i]} ${u(a)} ${u(mid)}`);
+      if (fill < 1) out.push(`${RANK_TRACK} ${u(mid)} ${u(b)}`);
+    }
+    out.push(`transparent ${u(b)} ${u((i + 1) * seg)}`);
+  }
+  return out.join(', ');
+}
+export const RANK_DOTS = RANK_COLORS;
+// everything the UI needs to describe a find's rank: its name, progress to the next one, and a sentence
+export function rankInfo(rarity, count = 0) {
+  const rank = rankFor(rarity, count);
+  if (!rank) return { rank, name: '', frac: 0, left: 0, text: '' };
+  const name = RANKS[rank - 1];
+  if (rank === MAX_RANK) return { rank, name, frac: 1, left: 0, text: 'No more copies needed' };
+  const at = RANK_AT[rarity], left = at[rank] - count;
+  return { rank, name, frac: (count - at[rank - 1]) / (at[rank] - at[rank - 1]), left, text: `${left} more cop${left === 1 ? 'y' : 'ies'} to ${RANKS[rank]}` };
+}
+
+// Rolls one find, records it in the save, pays the XP for it, and returns what was drawn.
 export function drawFind(save, biomeId, rates, min = 'c') {
   const rarity = rollTier(rates, min);
   const pool = BIOMES[biomeId].finds.filter((f) => f[2] === rarity);
   const [emoji, name] = pool[Math.floor(Math.random() * pool.length)];
   const key = `${biomeId}:${name}`;
   const isNew = !save.finds[key];
+  const before = rankFor(rarity, save.finds[key]);
   save.finds[key] = (save.finds[key] || 0) + 1;
+  const rank = rankFor(rarity, save.finds[key]);
+  const rankUp = !isNew && rank > before;
+  const mastered = rankUp && rank === MAX_RANK;
   track(`find/${key.replace(':', '/')}`);
-  return { biomeId, emoji, name, rarity, isNew, count: save.finds[key] };
+  if (mastered) track(`find-mastered/${key.replace(':', '/')}`);
+  addXp(save, (isNew ? XP.newFind[rarity] : dupeXp(rarity)) + (rankUp ? XP.rankUp : 0) + (mastered ? XP.mastered : 0));
+  return { biomeId, emoji, name, rarity, isNew, count: save.finds[key], rank, rankUp, mastered };
 }
 
 // Three cards. If none of the first two reach the pack's floor tier, the third one is lifted to it,
@@ -51,6 +99,7 @@ export function drawPack(save, biomeId, type) {
   const floor = rates.floor ?? 'c';
   const met = cards.some((c) => rank(c.rarity) >= rank(floor));
   cards.push(drawFind(save, biomeId, rates, met ? 'c' : floor));
+  addXp(save, XP.pack[type]);
   return cards;
 }
 
@@ -69,6 +118,19 @@ export function rarityCounts(save, biomeIds = BIOME_IDS) {
     }
   }
   return out;
+}
+// finds taken to the top rank
+export const masteredCount = (save) => [...FIND_INDEX].filter(([k, f]) => rankFor(f.rarity, save.finds[k]) === MAX_RANK).length;
+export const masteredIn = (save, biomeIds) => biomeIds.reduce((n, b) => n + BIOMES[b].finds.filter(([, name, t]) => rankFor(t, save.finds[`${b}:${name}`]) === MAX_RANK).length, 0);
+
+// A rough XP total for saves from before levels existed, so long-time players start with a level.
+export function estimateXp(save) {
+  let xp = (save.restored || 0) * XP.planet + Math.max(0, (save.unlocked?.length || 1) - 1) * XP.biome;
+  for (const [k, f] of FIND_INDEX) {
+    const n = save.finds[k];
+    if (n) xp += XP.newFind[f.rarity] + (n - 1) * dupeXp(f.rarity);
+  }
+  return xp;
 }
 // every card ever drawn, duplicates included
 export const cardsCollected = (save) => Object.values(save.finds).reduce((n, c) => n + c, 0);

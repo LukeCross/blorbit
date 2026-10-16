@@ -784,6 +784,12 @@ export class Sound {
     this.bell(midi(96), t + 0.4, 0.1);
   }
 
+  levelUp() {
+    const t = this.now;
+    [72, 76, 79, 84].forEach((n, i) => this.tone({ type: 'triangle', f: midi(n), t: t + i * 0.08, dur: 0.7, vol: 0.08, verb: 0.6 }));
+    this.bell(midi(91), t + 0.35, 0.12);
+  }
+
   skinSwap() {
     const t = this.now;
     this.tone({ f: 300, f2: 900, t, dur: 0.18, vol: 0.12, glide: 0.1 });

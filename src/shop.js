@@ -1,7 +1,7 @@
 import { BIOMES } from './biomes.js';
 import { GALAXIES, GALAXY_IDS, isGalaxyUnlocked, unlockProgress } from './galaxies.js';
 import { SKINS } from './skins.js';
-import { RARITY, RATES, TIERS, drawPack } from './collection.js';
+import { RARITY, RATES, TIERS, RANKS, rankInfo, rankStops, drawPack } from './collection.js';
 import { track } from './analytics.js';
 
 // Stardust shop: three card packs for every biome, each with better odds than the last.
@@ -273,6 +273,7 @@ export class Shop {
             <span class="card-emoji">${c.emoji}</span>
             <b>${c.name}</b>
             <small>${RARITY[c.rarity]}</small>
+            ${this.rankHtml(c)}
           </div>
         </div>
       </div>`).join('')}</div>
@@ -286,6 +287,15 @@ export class Shop {
       setTimeout(() => this.sound.discovery(c.rarity, c.isNew), 180);
       if (++flipped === cards.length) this.packDone(biomeId, type, opts);
     }));
+  }
+
+  // rank name, a progress bar and what's left to the next rank; a rank-up or mastery gets a headline
+  rankHtml(c) {
+    const r = rankInfo(c.rarity, c.count);
+    const head = c.mastered ? 'Mastered!' : c.rankUp ? `Rank up: ${r.name}!` : r.name;
+    return `<div class="rank-box${c.mastered ? ' gold' : ''}"><em class="rank-head${c.rankUp ? ' up' : ''}">${head}</em>`
+      + `<i class="rank-bar" style="background:linear-gradient(90deg, ${rankStops(c.rarity, c.count, 100, 3, '%')})"></i>`
+      + `<small>${r.text}</small></div>`;
   }
 
   packDone(biomeId, type, opts = {}) {

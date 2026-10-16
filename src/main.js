@@ -19,7 +19,8 @@ import { BIOMES } from './biomes.js';
 import { GALAXIES, GALAXY_IDS, creaturesOf, wokenIn, isGalaxyUnlocked, unlockProgress, unlockHint, checkSkins, galaxyOfBiome } from './galaxies.js';
 import { Critters } from './critters.js';
 import { Stardust } from './stardust.js';
-import { RARITY, RATES, TIERS as RARITY_TIERS, TOTAL_FINDS, drawFind, foundCount, foundIn, totalFindsIn, rarityCounts, cardsCollected, FIND_INDEX, cleanShowcase, rarestFinds } from './collection.js';
+import { RARITY, RATES, TIERS as RARITY_TIERS, TOTAL_FINDS, drawFind, foundCount, foundIn, totalFindsIn, rarityCounts, cardsCollected, FIND_INDEX, cleanShowcase, rarestFinds, RANKS, RANK_DOTS, rankInfo, rankStops, masteredCount, masteredIn, estimateXp } from './collection.js';
+import { XP, addXp, onXp, levelInfo, levelTitle } from './xp.js';
 import { Shop, galaxyTabs, renderKeepingTabs } from './shop.js';
 import { RewardedAds } from './ads.js';
 import { track } from './analytics.js';
@@ -46,6 +47,7 @@ save.seenGalaxies ??= ['wild'];
 // profile: a random silly name to start with, and no avatar until the player picks one of their skins
 save.name ??= blobName();
 if (!save.unlocked.includes(save.avatar)) save.avatar = null;
+save.xp ??= estimateXp(save); // saves from before levels get a head start from what they've already done
 save.showcase = cleanShowcase(save); // three favourite finds, as save keys (null = empty slot)
 if (!GALAXIES[save.galaxy] || !isGalaxyUnlocked(save, save.galaxy)) save.galaxy = 'wild';
 document.body.classList.toggle('cb', save.colorblind);
@@ -819,6 +821,7 @@ function completePatch(k, silent = false) {
   const patch = planet.patches[k];
   planet.completePatch(k);
   if (silent) return;
+  addXp(save, XP.patch);
   const r = regions[patch.region];
   sound.patchPing(r.patchesDone++);
   blob.jiggle(0.8);
@@ -844,10 +847,10 @@ function spawnCritters(list, center, radius, delay = 0) {
 // ---------------------------------------------------------------- collection
 
 function rollFind(biomeId, dir) {
-  const { emoji, name, rarity, isNew, count } = drawFind(save, biomeId, RATES.patch);
+  const { emoji, name, rarity, isNew, count, rankUp, mastered } = drawFind(save, biomeId, RATES.patch);
   persist();
   sound.discovery(rarity, isNew);
-  findCard(emoji, name, rarity, isNew, count);
+  findCard(emoji, name, rarity, isNew, count, rankUp, mastered);
   if (isNew) {
     const colors = {
       c: [WHITE],
@@ -867,10 +870,13 @@ function rollFind(biomeId, dir) {
   updateBookCount();
 }
 
-function findCard(emoji, name, rarity, isNew, count) {
+function findCard(emoji, name, rarity, isNew, count, rankUp, mastered) {
   const el = document.createElement('div');
-  el.className = `find ${rarity}${isNew ? ' new' : ''}`;
-  el.innerHTML = `<span class="find-emoji">${emoji}</span><div><b>${isNew ? 'NEW! ' : ''}${name}</b><small>${RARITY[rarity]}${isNew ? '' : ` · ×${count}`}</small></div>`;
+  el.className = `find ${rarity}${isNew ? ' new' : ''}${mastered ? ' mastered' : ''}`;
+  const r = rankInfo(rarity, count);
+  const note = mastered ? 'Mastered!' : rankUp ? `Rank up: ${r.name}!` : isNew ? RARITY[rarity] : `${RARITY[rarity]} · ×${count}`;
+  el.innerHTML = `<span class="find-emoji">${emoji}</span><div><b>${isNew ? 'NEW! ' : ''}${name}</b><small>${note}</small>`
+    + `<span class="rank-line"><i class="rank-bar" style="background:linear-gradient(90deg, ${rankStops(rarity, count, 100, 3, '%')})"></i>${r.rank === 5 ? 'Mastered' : `${r.name} · ${r.left} to ${RANKS[r.rank]}`}</span></div>`;
   $('finds').prepend(el);
   setTimeout(() => el.classList.add('out'), 3200);
   setTimeout(() => el.remove(), 3700);
@@ -886,6 +892,44 @@ function updateBookCount() {
 function refreshDust() {
   $('dust-count').textContent = save.stardust;
 }
+
+// level badge + XP bar in the HUD
+function refreshLevel() {
+  const { level, into, need, frac } = levelInfo(save.xp);
+  $('lv-badge').textContent = level;
+  $('lv-fill').style.width = `${(frac * 100).toFixed(1)}%`;
+  $('lv-text').textContent = `${into} / ${need} XP`;
+  $('profile-btn').title = `${save.name} · Level ${level}, ${levelTitle(level)}`;
+}
+// a level-up waits for any open panel to close, so it isn't hidden behind it
+let pendingLevel = null;
+function showLevelUp() {
+  if (!pendingLevel || document.querySelector('.overlay:not(.hidden)')) return;
+  const { level, dust } = pendingLevel;
+  pendingLevel = null;
+  sound.levelUp();
+  toast(`Level ${level}! ${levelTitle(level)}<small>+✨${dust} stardust</small>`);
+  const b = $('profile-btn');
+  b.classList.remove('up');
+  void b.offsetWidth;
+  b.classList.add('up');
+}
+setInterval(showLevelUp, 500);
+let xpShown = 0, xpShownAt = -Infinity;
+onXp(({ amount, level, levels, dust }) => {
+  refreshLevel();
+  refreshDust();
+  const g = $('xp-gain');
+  // gains that land close together (a pack's cards, a patch and its find) add up in one pop-up
+  xpShown = performance.now() - xpShownAt < 1500 ? xpShown + amount : amount;
+  xpShownAt = performance.now();
+  g.textContent = `+${xpShown} XP`;
+  g.classList.remove('go');
+  void g.offsetWidth;
+  g.classList.add('go');
+  if (levels) pendingLevel = { level, dust: dust + (pendingLevel?.dust || 0) };
+  if (!$('profile').classList.contains('hidden')) renderProfile();
+});
 
 // ---------------------------------------------------------------- settings + reset
 
@@ -1009,7 +1053,7 @@ function showAvatar(el) {
 }
 function refreshProfileBadge() {
   showAvatar($('profile-btn-avatar'));
-  $('profile-btn').title = `Profile: ${save.name}`;
+  refreshLevel();
 }
 function openProfile() {
   renderProfile();
@@ -1022,6 +1066,9 @@ function closeProfile() {
 }
 function renderProfile() {
   $('profile-name').textContent = save.name;
+  const { level, into, need, frac } = levelInfo(save.xp);
+  $('profile-level').innerHTML = `<span class="lv-badge">${level}</span><div><b>Level ${level} · ${levelTitle(level)}</b>`
+    + `<span class="lv-bar"><i style="width:${(frac * 100).toFixed(1)}%"></i></span><small>${into} / ${need} XP to level ${level + 1} · ${save.xp} XP in total</small></div>`;
   showAvatar($('profile-avatar'));
   renderShowcase();
   // Classic Goo is always yours, so only creature skins count (across every galaxy)
@@ -1038,6 +1085,7 @@ function renderProfile() {
     ['Skins unlocked', `${mine.length}/${CREATURE_IDS.length}`],
     ['Collection', `${foundCount(save)}/${TOTAL_FINDS}`],
     ['Cards collected', cardsCollected(save)],
+    ['Mastered finds', `${masteredCount(save)}/${TOTAL_FINDS}`],
     ['Stardust', save.stardust],
     ['Planets restored', save.restored],
     ['Galaxies unlocked', `${open}/${GALAXY_IDS.length}`],
@@ -1146,7 +1194,7 @@ $('name-regen').addEventListener('click', () => {
 const shareText = () => {
   const shown = save.showcase.filter(Boolean).map((k) => FIND_INDEX.get(k).emoji).join(' ');
   return `${save.avatar ? SKINS[save.avatar].emoji + ' ' : ''}${save.name} is playing Blorbit, a cosy game about bringing tiny planets back to life!\n\n`
-    + `🃏 ${foundCount(save)}/${TOTAL_FINDS} cards · 🌸 ${unlockedGalaxies().length}/${GALAXY_IDS.length} galaxies · 🪐 ${save.restored} planets restored`
+    + `Level ${levelInfo(save.xp).level} ${levelTitle(levelInfo(save.xp).level)} · 🃏 ${foundCount(save)}/${TOTAL_FINDS} cards · 🌸 ${unlockedGalaxies().length}/${GALAXY_IDS.length} galaxies · 🪐 ${save.restored} planets restored`
     + `${shown ? `\n\nMy favourite finds: ${shown}` : ''}\n\nCome and play: https://blorbit.io`;
 };
 $('profile-share').addEventListener('click', () => {
@@ -1230,15 +1278,24 @@ function renderBookBody() {
     const woke = save.unlocked.includes(def.creature);
     const items = def.finds.map(([emoji, name, rarity]) => {
       const n = save.finds[`${b}:${name}`];
-      return `<div class="slot ${rarity} ${n ? '' : 'locked'}" title="${n ? `${name} (${RARITY[rarity]})` : `??? (${RARITY[rarity]})`}">${n ? emoji : '❔'}${n > 1 ? `<i>×${n}</i>` : ''}</div>`;
+      const r = rankInfo(rarity, n);
+      const title = n ? `${name} (${RARITY[rarity]}): ${r.name}, ${r.text}` : `??? (${RARITY[rarity]})`;
+      return `<div class="slot ${rarity} ${n ? '' : 'locked'}${r.rank === RANKS.length ? ' mastered' : ''}" data-key="${b}:${name}" title="${title}">${n ? `<span class="ring" style="background:conic-gradient(${rankStops(rarity, n, 360, 9, 'deg')})"></span>${emoji}` : '❔'}${n > 1 ? `<i>×${n}</i>` : ''}</div>`;
     }).join('');
     const found = def.finds.filter(([, name]) => save.finds[`${b}:${name}`]).length;
     return `<div class="book-row"><div class="book-head"><span class="${woke ? '' : 'dim'}">${woke ? SKINS[def.creature].emoji : '❔'}</span><b>${def.name}</b><em>${found}/${def.finds.length}</em></div><div class="slots">${items}</div></div>`;
   }).join('');
+  $('book-detail').textContent = '';
   const restored = save.restoredIn[g] || 0;
-  $('book-total').textContent = `${foundIn(save, g)} of ${totalFindsIn(g)} ${GALAXIES[g].name} finds · ✨ ${save.stardust} stardust · ${restored} planet${restored === 1 ? '' : 's'} restored here`;
+  $('book-total').textContent = `${foundIn(save, g)} of ${totalFindsIn(g)} ${GALAXIES[g].name} finds · ${masteredIn(save, GALAXIES[g].biomes)} mastered · ✨ ${save.stardust} stardust · ${restored} planet${restored === 1 ? '' : 's'} restored here`;
 }
+$('book-legend').innerHTML = `Collect duplicates to rank up your finds: ${RANKS.map((r, i) => `<b><i class="dot${i === RANKS.length - 1 ? ' top' : ''}" style="background:${RANK_DOTS[i]}"></i>${r}</b>`).join(' → ')}. The ring around each find fills with these colours as you collect copies; a full ring means Mastered, which shimmers and earns big XP.`;
 $('book-grid').addEventListener('click', (e) => {
+  const slot = e.target.closest('.slot[data-key]');
+  if (slot && !slot.classList.contains('locked')) {
+    const f = FIND_INDEX.get(slot.dataset.key), n = save.finds[slot.dataset.key], r = rankInfo(f.rarity, n);
+    $('book-detail').textContent = `${f.emoji} ${f.name} · ${RARITY[f.rarity]} · ${r.name} (×${n}) · ${r.text}`;
+  }
   const tab = e.target.closest('[data-action="tab"]');
   if (tab) { bookTab = tab.dataset.id; renderBook(); }
 });
@@ -1253,6 +1310,7 @@ function completeRegion(i) {
   completed++;
   track(`biome-restored/${planet.biomes[i]}`);
   track(`creature-woken/${r.id}`);
+  addXp(save, XP.biome);
   planet.completeRegion(i);
   planet.patches.forEach((p, k) => { if (p.region === i && p.done < 0) completePatch(k, true); });
   sound.ping(completed - 1);
@@ -1321,6 +1379,7 @@ function finale() {
   save.restored++;
   track(`planet-restored/${planet.galaxy}`);
   save.restoredIn[planet.galaxy] = (save.restoredIn[planet.galaxy] || 0) + 1;
+  addXp(save, XP.planet);
   persist();
   sound.fanfare();
   const colors = [...planet.aliveCols, WHITE, GOLD];
@@ -1587,4 +1646,5 @@ document.addEventListener('click', (e) => e.target.closest?.('a[href*="buymeacof
 
 // handy for debugging from the console
 refreshDust();
-window.blorbit = { atmosphere, shop, ads, save, newPlanet, travelTo, enterGalaxy, planetKey, galaxyOf: galaxyOfBiome, CAM, camera, backdrop, planet: () => planet, rollFind, toggleBook, completeRegion, completePatch, blob, sound, keys };
+refreshLevel();
+window.blorbit = { atmosphere, shop, ads, save, newPlanet, travelTo, enterGalaxy, planetKey, galaxyOf: galaxyOfBiome, CAM, camera, backdrop, planet: () => planet, rollFind, addXp, toggleBook, completeRegion, completePatch, blob, sound, keys };

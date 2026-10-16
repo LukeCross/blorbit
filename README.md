@@ -55,7 +55,7 @@ Restore all 4 biomes to finish the planet. Then warp to a brand new one or keep 
 Each planet gets a randomly generated name and layout, seeded from the date and time it was created, so no two planets are alike. Use **New planet** at the top of the screen (with a confirm tap) to warp somewhere fresh at any time. Refreshing the page picks up exactly where you left off on a half-finished planet.
 
 ### Stardust, finds and the shop
-- **Stardust** ✨ is scattered in little trails across every planet. Roll over it to collect it.
+- **Stardust** ✨ is scattered in little trails across every planet. Roll over it to collect it. Levelling up pays out stardust too (see [Levels and mastery](#levels-and-mastery)).
 - **Finds** are collectibles: 8 per biome (80 in Wildbloom, 40 each in Citylight, Skyhaven, Sunroam, Seaglow, Feastvale, Gloomhollow and Stompridge). Each biome has 3 *common*, 2 *uncommon*, 1 *rare*, 1 *epic* and 1 *legendary* find. You roll one every time you clear a spot, and they all live in your **Collection** book, which has a tab per galaxy.
 - The **Shop** sells three card packs for each biome. It opens on your current galaxy, with a tab for every galaxy: unlocked ones let you buy their packs without travelling, and locked ones show greyed out with their unlock progress. Every pack holds 3 cards from that biome's collection, and promises at least one card of a certain rarity:
 
@@ -67,6 +67,24 @@ Each planet gets a randomly generated name and layout, seeded from the date and 
 | 🔮 Prism pack (✨150) | – | 14% | 38% | 32% | 16% | 1 epic or better |
 
   Percentages are the chance per card. Bigger packs are slightly better value: a legendary costs roughly ✨390 in Card packs, ✨365 in Shiny packs and ✨330 in Prism packs (one planet gives about ✨210). The shop's **Pack odds** panel shows the same table.
+
+### Levels and mastery
+There's no cap: you keep levelling up for as long as you play. Everything you do earns **XP**, shown on the Profile button in the top right: your avatar, level badge and XP bar (on narrow screens a small level tag and a thin bar along the avatar). Tap it for your Profile:
+
+| Action | XP |
+| --- | --- |
+| Clear a spot | 5 |
+| Restore a biome | 40 |
+| Restore a planet | 150 |
+| Open a pack | 10 (Card), 20 (Shiny) or 35 (Prism) |
+| New find | 10 / 15 / 25 / 40 / 80 (common to legendary) |
+| Duplicate find | a third of that |
+| Duplicate that ranks a find up | +20 |
+| Mastering a find (top rank) | +150 |
+
+Each level costs a little more than the last (level *n* to *n+1* takes `100 + 25n` XP) and pays out stardust (`10 + 2 × level`, at most ✨50). Your level has a title that changes as you climb, from *Puddle Blob* up to *Eternal Blorb*.
+
+Duplicates count too: every find climbs five ranks as you collect copies: *Found → Familiar → Cherished → Treasured → Mastered* (a common find needs 1, 3, 6, 10 and 15 copies, rarer finds need fewer). In the Collection book each find has a ring split into five coloured segments, one per rank (bronze, silver, gold, rose and a prismatic top). Finished ranks are full, the next one fills as copies arrive, so you can see both the next rank and how far Mastered is; the header lists the ranks and colours in order. Tap a find to see its rank and how many copies the next one needs; pack cards and find pop-ups show the same colours as a segmented bar. A **Mastered** find has a full ring and a shimmering glow (it keeps its rarity colours). Saves from before levels existed start with XP worked out from their existing finds and restored planets.
 
 ### Free packs (and galaxies) from videos
 Each biome row in the shop has a **🎬 Free** button. Tapping it asks *"Free Card pack?"*, shows what you'll get and the odds, and plays a short rewarded video only if you choose **Watch video**. If you watch to the end, you get a free Card pack for that biome. If you skip, nothing happens and you can try again. There's no limit on how many you can watch. Videos come from Google Ad Manager (see [Rewarded video ads](#rewarded-video-ads-google-ad-manager) below).
@@ -97,7 +115,7 @@ Pick a galaxy on the title screen to start, or press `Enter` to jump back into t
 ### Touch (phones and tablets)
 - **Tap sides** (default): your blob rolls forward by itself. **Hold the left or right half** of the screen to turn; the turn starts gentle and builds up the longer you hold. Quick taps give a small nudge, and both thumbs down goes straight.
 - **Joystick** (optional, in Settings → Touch controls): **drag anywhere** to use a virtual joystick. Push up to roll forward and left/right to steer.
-- Tap the icons in the top bar for the Collection, Shop, auto-roll, Profile, Settings and sound. Profile has your quirky name (re-roll it as often as you like), an avatar picked from your unlocked skins, three showcase slots for your favourite finds, and your stats overall and per galaxy. **Share** opens a ready-made "come and play" message with your name, progress, favourite finds and the game's link, with a Copy button.
+- Tap the icons in the top bar for the Collection, Shop, auto-roll, Profile, Settings and sound. Profile has your level and XP, your quirky name (re-roll it as often as you like), an avatar picked from your unlocked skins, three showcase slots for your favourite finds, and your stats overall and per galaxy. **Share** opens a ready-made "come and play" message with your name, progress, favourite finds and the game's link, with a Copy button.
 - Swipe the skin strip at the bottom to browse and equip skins.
 
 ### Settings
@@ -107,7 +125,7 @@ Pick a galaxy on the title screen to start, or press `Enter` to jump back into t
 - **Master volume:** a slider from 0% to 100% for all sound (the speaker button, or M, still mutes). Saved as `volume`.
 - **Colorblind mode:** swaps meaningful colours to a blue/orange palette that stays distinct for protanopia, deuteranopia and tritanopia. It adds ✓ badges on finished biomes, a pulse on nearly-finished ones and ●/◆/▲/★ markers on uncommon/rare/epic/legendary finds, so nothing relies on colour alone. It also raises secondary text contrast above the WCAG AA guideline of 4.5:1.
 - **Buy me a coffee:** a short note and a big button linking to the Buy Me a Coffee page (also linked at the bottom of the title screen). Set the URL in `index.html` (search for `buymeacoffee.com`).
-- **Reset all progress:** wipes skins, finds, stardust, your profile (name, avatar and showcase) and the current planet (asks you to confirm).
+- **Reset all progress:** wipes skins, finds (and their ranks), stardust, your XP and level, your profile (name, avatar and showcase) and the current planet (asks you to confirm).
 
 ---
 
@@ -156,7 +174,7 @@ The site lives at **https://blorbit.io**, and the build is set up for search eng
 
 Anonymous, cookie-free usage counts through [GoatCounter](https://www.goatcounter.com), with no server of your own. Create a free site there, then set the repository variable `GOATCOUNTER_URL` (Settings → Secrets and variables → Actions → Variables) to its address, e.g. `https://blorbit.goatcounter.com`. Without it, builds contain no analytics, and the dev server never sends any.
 
-Page views come from GoatCounter's script; game events go through `track()` in `src/analytics.js` and show up in the dashboard's paths list (filter by prefix, sort by count): `find/<biome>/<name>`, `first-play`, `skin/<id>`, `galaxy-unlocked/<id>/<creatures|video>`, `planet-restored/<galaxy>`, `planet-new/<galaxy>`, `galaxy-entered/<id>`, `biome-restored/<biome>`, `creature-woken/<creature>`, `pack/<type>`, `pack/free-video`, `ad-offer/<pack|galaxy>`, `ad-watched/<pack|galaxy>`, `setting/<quality|colorblind|touch|autoroll>/<value>` and `coffee-click`. Test locally with `VITE_GOATCOUNTER_URL=https://x.goatcounter.com npm run build`.
+Page views come from GoatCounter's script; game events go through `track()` in `src/analytics.js` and show up in the dashboard's paths list (filter by prefix, sort by count): `find/<biome>/<name>`, `first-play`, `skin/<id>`, `galaxy-unlocked/<id>/<creatures|video>`, `planet-restored/<galaxy>`, `planet-new/<galaxy>`, `galaxy-entered/<id>`, `level-up/<n>`, `find-mastered/<biome>/<name>`, `biome-restored/<biome>`, `creature-woken/<creature>`, `pack/<type>`, `pack/free-video`, `ad-offer/<pack|galaxy>`, `ad-watched/<pack|galaxy>`, `setting/<quality|colorblind|touch|autoroll>/<value>` and `coffee-click`. Test locally with `VITE_GOATCOUNTER_URL=https://x.goatcounter.com npm run build`.
 
 ## Monetization switch
 
@@ -228,7 +246,7 @@ There are no models, textures or sound assets. Everything you see and hear is ge
 ### Determinism and saving
 - Every planet is generated from a single seed using a seeded PRNG (**mulberry32**) and seeded noise. Given the seed and its galaxy, the terrain, biomes, spots, props and stardust are identical every time. Each planet only shuffles its own galaxy's biome list, so adding a galaxy never changes existing planets.
 - That keeps saves tiny. The save stores the seed plus compact **bitsets** (base64) of painted vertices and collected stardust, the blob's position, and which spots and biomes are done. Progress is saved every few seconds, when the tab is hidden and after every completion.
-- **Saves and galaxies:** one main save (`blorbit-save-v1`) holds everything shared across galaxies: stardust, skins, finds, settings, profile (`name`, `avatar`, `showcase`), which galaxy you're in and planets restored per galaxy. Each galaxy has its own planet save (`blorbit-planet-v1:<galaxy>`). Finds are keyed `biomeId:name`, and biome ids are unique across galaxies, so they don't need a galaxy prefix. Saves from before galaxies existed migrate to Wildbloom automatically.
+- **Saves and galaxies:** one main save (`blorbit-save-v1`) holds everything shared across galaxies: stardust, skins, finds, settings, profile (`name`, `avatar`, `showcase`), `xp` (the level is derived from it; find ranks are derived from the find counts), which galaxy you're in and planets restored per galaxy. Each galaxy has its own planet save (`blorbit-planet-v1:<galaxy>`). Finds are keyed `biomeId:name`, and biome ids are unique across galaxies, so they don't need a galaxy prefix. Saves from before galaxies existed migrate to Wildbloom automatically.
 
 ### Performance
 The game is tuned to run on low-end laptops and phones:
@@ -267,7 +285,8 @@ src/
   analytics.js      Anonymous GoatCounter event counts
   ads.js            Rewarded video ads (Google Ad Manager / GPT) for free Card packs, and re-opening consent choices
   stardust.js       Collectible stardust trails
-  collection.js     Finds, rarities, pack draw rates and the profile's find stats
+  collection.js     Finds, rarities, pack draw rates, duplicate ranks and the profile's find stats
+  xp.js             XP values, the endless level curve, level titles and level-up stardust
   shop.js           Card pack shop and pack-opening animation
   audio.js          Synthesised Web Audio sound effects and soundscapes
   look.js           Sky gradient, atmosphere glow, colour-grade shader

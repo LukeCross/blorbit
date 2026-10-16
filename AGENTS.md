@@ -49,7 +49,7 @@ Deploys: pushing to `main` runs `.github/workflows/deploy.yml` (GitHub Pages, si
 index.html     All CSS (design tokens, HUD, panels, responsive rules), UI markup, SEO/share tags
 about.html     About & how-to-play page (static HTML, galaxy cards + counts are hand-written)
 privacy.html   Privacy policy
-src/main.js    Game loop, state, input, UI, saves, galaxy picker/travel, collection book, profile panel (name, avatar, find showcase, per-galaxy stats, and a Share box with a copyable "come and play" message). Exposes window.blorbit for scripts
+src/main.js    Game loop, state, input, UI, saves, galaxy picker/travel, collection book (rank rings, legend), level HUD and level-up toast, profile panel (level card, name, avatar, find showcase, per-galaxy stats, and a Share box with a copyable "come and play" message). Exposes window.blorbit for scripts
 src/planet.js  Icosphere terrain (terrain() switch), biome layout, patches ("spots"), slime painting, GLSL ground shader, prop layers
 src/galaxies.js  GALAXIES definitions, unlock rules, startup sanity checks
 src/biomes.js  BIOMES: terrain, colours, props, critters, particles, patches, finds
@@ -60,7 +60,8 @@ src/critters.js  Ambient wandering critters (KINDS)
 src/atmosphere.js  Per-galaxy look: ATMOSPHERES (space colours, light, signature weather), BIOME_WEATHER overrides, Weather (one cheap particle draw call)
 src/audio.js   Synthesised sound: per-biome ambient cases + rolling timbre
 src/shop.js    Card pack shop, galaxy tabs (galaxyTabs, renderKeepingTabs)
-src/collection.js  Finds, rarities, pack rates (totals are computed, not hard-coded)
+src/collection.js  Finds, rarities, pack rates (totals are computed, not hard-coded), duplicate ranks (`RANKS`, `rankFor`, `rankInfo`, `rankStops` for the segmented ring/bar colours; the fifth rank, Mastered, is the top), `estimateXp` for old saves. `drawFind`/`drawPack` pay out XP themselves
+src/xp.js      XP values (`XP`), the endless level curve (`levelInfo`), titles, level-up stardust, `addXp(save, n)` + `onXp` listener (main.js drives the HUD badge/bar and the level-up toast from it)
 src/ads.js     Rewarded video ads (Google Ad Manager)
 src/analytics.js  track(name): anonymous GoatCounter events (see section 9); no-op without VITE_GOATCOUNTER_URL
 src/{blob,look,skyfx,particles,stardust,names,noise,quality,shadow}.js  Blob, sky, ambient particles, stardust, naming (planet names, the profile's quirky player names), PRNG, quality tiers
@@ -71,10 +72,10 @@ public/        Static files: og-image.png (share image, also the About hero), fa
 
 Key facts:
 - A **planet** picks **4 biomes** (`NUM_REGIONS = 4` in `planet.js`) from one galaxy. Planets are deterministic from `seed + galaxy`; each planet only shuffles its own galaxy's biome list, so **adding a galaxy never changes existing planets** (but adding/removing a biome inside an existing galaxy does).
-- Saves: main save `blorbit-save-v1` (stardust, skins, finds, settings, profile `name`/`avatar`/`showcase` (three find keys), current galaxy, restored counts, `unlocked` creature ids, `seenGalaxies`, `adUnlocked`); one planet save per galaxy `blorbit-planet-v1:<galaxy>`.
+- Saves: main save `blorbit-save-v1` (stardust, skins, finds, settings, profile `name`/`avatar`/`showcase` (three find keys), `xp` (total; level and find ranks are derived, never stored), current galaxy, restored counts, `unlocked` creature ids, `seenGalaxies`, `adUnlocked`); one planet save per galaxy `blorbit-planet-v1:<galaxy>`.
 - Galaxy unlock: `unlockedBy` (previous galaxy id) + `unlockAt` (0.8 = 80% of that galaxy's creatures woken). The chain today is a straight line. Players can also unlock one by watching a rewarded video (`save.adUnlocked`).
 - Unknown galaxy ids fall back to `'wild'` in `main.js` (`save.galaxy`, `bookTab`, planet-save migration). Don't change those.
-- `window.blorbit` (bottom of `main.js`) exposes `save, newPlanet, travelTo, enterGalaxy, planet(), completeRegion(i), completePatch(k), galaxyOf(biomeId), blob, sound, shop, ...` for scripts.
+- `window.blorbit` (bottom of `main.js`) exposes `save, newPlanet, travelTo, enterGalaxy, planet(), completeRegion(i), completePatch(k), rollFind(biome, dir), addXp(save, n), galaxyOf(biomeId), blob, sound, shop, ...` for scripts.
 
 ---
 
@@ -208,6 +209,7 @@ grep -rnE "[0-9]+ biomes|[0-9]+ galaxies|[0-9]+ cards|biome definitions" index.h
 - **Title galaxy picker** (`index.html`): `#title .galaxy-cards { width: min(1700px, 94vw) }` is sized so all cards fit one row on a wide desktop (title cards are `minmax(200px, 1fr)`; 8 cards need ~1700px). With more galaxies, raise that width and the `@media (min-width: 721px) and (max-width: 1810px) and (min-height: 501px)` upper bound (single swipeable row, `grid-auto-columns: 250px`, `width: 88vw`, scroll-snap) so the swipe row covers every width where they no longer fit. Phones (<=720px) use a stacked list. Verify at 1920, 1440, 1024 and 820 wide.
 - **Shop and collection galaxy tabs** (`.galaxy-tabs`): never wrap or truncate; they scroll sideways, and `renderKeepingTabs` (in `shop.js`, used by the shop and `renderBook`) preserves scroll position and reveals the active tab. Keep `position: relative` on `.galaxy-tabs` (the reveal math uses `offsetLeft`).
 - **Skin bar** (`#skins`): scrolls sideways; shows Classic, the current galaxy's creatures, then skins unlocked elsewhere. Number keys `1-9`, `0` map to the current galaxy's creatures.
+- **Level display** is the profile button itself (`#profile-btn`: avatar, `#lv-badge`, `#lv-fill`, `#lv-text`; tap = profile), so there is no separate level button. From 1300px wide it is a pill with the badge and bar beside the avatar (XP text from 1500px); narrower, and on phones, it stays a round avatar button with a small level tag and a thin bar along the bottom. `#xp-gain` (the floating "+N XP") is its own fixed element under the right-hand buttons. The right-hand group is the widest thing in the top row, so check it against the centred planet card.
 - **Corner buttons** (`#hud-left`: Menu, stardust, collection, shop; `#hud-right`: profile, settings, sound): the stardust/collection/shop buttons and the right-hand ones also show on the title screen (the Menu button hides there via `body.on-title`), so keep them tappable above the title layer.
 - **Top HUD** (`#hud-top`): between 721px and 1100px wide (tablets) the planet card is dropped below the corner buttons (`top: 72px`, with `#biome-label` and `#finds` pushed down). Phones and landscape phones have their own rules. Don't let HUD buttons overlap.
 
@@ -241,5 +243,5 @@ grep -rnE "[0-9]+ biomes|[0-9]+ galaxies|[0-9]+ cards|biome definitions" index.h
 ## 9. Analytics (GoatCounter)
 
 - `src/analytics.js` exports `track(name)`. GoatCounter has no event properties, so detail lives in the name (counted in its dashboard as paths). The `goatcounter` plugin in `vite.config.js` injects its script into every page (page views) only in builds with `VITE_GOATCOUNTER_URL` set (repo variable `GOATCOUNTER_URL`); dev and puppeteer runs send nothing.
-- Events: `find/<biome>/<name>` (every draw, in `drawFind`), `first-play`, `skin/<id>`, `galaxy-unlocked/<id>/<creatures|video>`, `planet-restored/<galaxy>`, `planet-new/<galaxy>`, `galaxy-entered/<id>`, `biome-restored/<biome>`, `creature-woken/<creature>`, `pack/<type>` and `pack/free-video`, `ad-offer/<pack|galaxy>`, `ad-watched/<pack|galaxy>`, `setting/<quality|colorblind|touch|autoroll>/<value>`, `coffee-click`.
+- Events: `find/<biome>/<name>` (every draw, in `drawFind`), `first-play`, `skin/<id>`, `galaxy-unlocked/<id>/<creatures|video>`, `planet-restored/<galaxy>`, `planet-new/<galaxy>`, `galaxy-entered/<id>`, `level-up/<n>`, `find-mastered/<biome>/<name>`, `biome-restored/<biome>`, `creature-woken/<creature>`, `pack/<type>` and `pack/free-video`, `ad-offer/<pack|galaxy>`, `ad-watched/<pack|galaxy>`, `setting/<quality|colorblind|touch|autoroll>/<value>`, `coffee-click`.
 - No cookies, no ids. If you add events or change what's sent, update `privacy.html` and README's Analytics section. Renaming a find or id splits its counts.
