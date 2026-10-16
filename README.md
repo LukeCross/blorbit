@@ -29,6 +29,9 @@ Can't wait? Every locked galaxy card also has **🎬 Watch a video to unlock**. 
 
 Travel between unlocked galaxies is **free**. Tap the galaxy icon next to the planet name or press `G`, or go **🏠 Menu** (top left, also on the planet-restored screen) to get back to the galaxy picker. Each galaxy keeps its own half-finished planet, so you can leave one and come back to it later. Your stardust, skins and collection are shared across every galaxy, so a cat can roll around Wildbloom.
 
+### First-time help
+A new player gets a three-card guide (screenshots from `public/guide/`, rebuilt with `node scripts/guide-shots.mjs` while the dev server runs) the first time they press play: look for glowing spots, roll over a whole spot, wake the creatures. Until they restore their first three spots the spot rings are bolder and pulse faster with a soft wash inside (the `uGuide` shader uniform fades out), and a "Roll onto a glowing spot" hint shows until the first one is done. Settings has a **Show guide** button to reopen it. Saved as `guideSeen` and `spotsDone`; saves from before this feature count as having seen it.
+
 ### Biomes and spots
 Every planet is split into **4 biomes**, picked at random from its galaxy:
 
@@ -121,6 +124,7 @@ Pick a galaxy on the title screen to start, or press `Enter` to jump back into t
 ### Settings
 - **Graphics:** *Auto* (default), *Smooth* or *Pretty*. See [Performance](#performance) below.
 - **Touch controls** (touch devices only): *Tap sides* or *Joystick*.
+- **How to play:** a *Show guide* button that reopens the first-time guide.
 - **Turning sensitivity:** a slider from 40% to 160% that scales how fast the blob turns.
 - **Master volume:** a slider from 0% to 100% for all sound (the speaker button, or M, still mutes). Saved as `volume`.
 - **Colorblind mode:** swaps meaningful colours to a blue/orange palette that stays distinct for protanopia, deuteranopia and tritanopia. It adds ✓ badges on finished biomes, a pulse on nearly-finished ones and ●/◆/▲/★ markers on uncommon/rare/epic/legendary finds, so nothing relies on colour alone. It also raises secondary text contrast above the WCAG AA guideline of 4.5:1.

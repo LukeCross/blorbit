@@ -67,12 +67,13 @@ src/analytics.js  track(name): anonymous GoatCounter events (see section 9); no-
 src/{blob,look,skyfx,particles,stardust,names,noise,quality,shadow}.js  Blob, sky, ambient particles, stardust, naming (planet names, the profile's quirky player names), PRNG, quality tiers
 src/emoji.css  GENERATED @font-face rules for the self-hosted emoji font (see section 5); public/fonts/emoji/ holds its woff2 files
 scripts/       Puppeteer helpers (screenshots, regression checks); scripts/og/ builds the share image and icons
+public/guide/  The three first-time guide screenshots (regenerate with `node scripts/guide-shots.mjs`; the `#guide` overlay is in index.html, logic near `start()` in main.js)
 public/        Static files: og-image.png (share image, also the About hero), favicon, icons, manifest
 ```
 
 Key facts:
 - A **planet** picks **4 biomes** (`NUM_REGIONS = 4` in `planet.js`) from one galaxy. Planets are deterministic from `seed + galaxy`; each planet only shuffles its own galaxy's biome list, so **adding a galaxy never changes existing planets** (but adding/removing a biome inside an existing galaxy does).
-- Saves: main save `blorbit-save-v1` (stardust, skins, finds, settings, profile `name`/`avatar`/`showcase` (three find keys), `xp` (total; level and find ranks are derived, never stored), current galaxy, restored counts, `unlocked` creature ids, `seenGalaxies`, `adUnlocked`); one planet save per galaxy `blorbit-planet-v1:<galaxy>`.
+- Saves: main save `blorbit-save-v1` (stardust, skins, finds, settings, profile `name`/`avatar`/`showcase` (three find keys), `xp` (total; level and find ranks are derived, never stored), current galaxy, restored counts, `unlocked` creature ids, `seenGalaxies`, `adUnlocked`, `guideSeen`, `spotsDone` (spots restored ever; the first-time guide and bolder spot rings use them, see `GUIDE_SPOTS` in `main.js`)); one planet save per galaxy `blorbit-planet-v1:<galaxy>`.
 - Galaxy unlock: `unlockedBy` (previous galaxy id) + `unlockAt` (0.8 = 80% of that galaxy's creatures woken). The chain today is a straight line. Players can also unlock one by watching a rewarded video (`save.adUnlocked`).
 - Unknown galaxy ids fall back to `'wild'` in `main.js` (`save.galaxy`, `bookTab`, planet-save migration). Don't change those.
 - `window.blorbit` (bottom of `main.js`) exposes `save, newPlanet, travelTo, enterGalaxy, planet(), completeRegion(i), completePatch(k), rollFind(biome, dir), addXp(save, n), galaxyOf(biomeId), blob, sound, shop, ...` for scripts.

@@ -30,13 +30,18 @@ import { initDebug } from './debug.js';
 // ---------------------------------------------------------------- save data
 
 const SAVE_KEY = 'blorbit-save-v1';
-if (!localStorage.getItem(SAVE_KEY)) track('first-play'); // a new player's first visit, for a new-players-per-day chart
+const GUIDE_SPOTS = 3; // spots restored before the bolder rings and the goal hint are gone
+const newPlayer = !localStorage.getItem(SAVE_KEY);
+if (newPlayer) track('first-play'); // a new player's first visit, for a new-players-per-day chart
 const save = Object.assign(
   { unlocked: ['classic'], equipped: 'classic', restored: 0, autoRoll: false, stardust: 0, finds: {}, v: 3 },
   JSON.parse(localStorage.getItem(SAVE_KEY) || '{}'),
 );
 if ((save.v || 0) < 3) Object.assign(save, { autoRoll: false, v: 3 }); // auto-roll is off by default (toggle with R)
 save.quality ??= 'auto';
+// first-time help: the how-to-play guide shows once, and spot rings stay bolder until a few spots are restored
+save.guideSeen ??= !newPlayer;
+save.spotsDone ??= newPlayer ? 0 : GUIDE_SPOTS;
 save.sensitivity ??= 1; // multiplies the blob's turn speed
 save.colorblind ??= false;
 save.volume ??= 1; // master volume, 0-1
@@ -161,7 +166,7 @@ let stardust = null;
 let creatures = [];
 let regions = [];
 let completed = 0;
-let state = 'title'; // title | play | finale
+let state = 'title'; // title | play | guide | finale
 let gameTime = 0;
 let hitstop = 0;
 let timeScale = 1;
@@ -361,7 +366,7 @@ window.addEventListener('keydown', (e) => {
     if (e.target instanceof HTMLInputElement) return;
     if (e.code === 'KeyB') toggleBook();
     if (e.code === 'KeyP') shop.toggle();
-    if (e.code === 'Escape') { shop.closeOffer(); shop.close(); $('book').classList.add('hidden'); closeSettings(); closeProfile(); }
+    if (e.code === 'Escape') { if (state === 'guide') closeGuide(); shop.closeOffer(); shop.close(); $('book').classList.add('hidden'); closeSettings(); closeProfile(); }
     return;
   }
   if (e.target instanceof HTMLInputElement) return; // arrow keys belong to a focused slider, not the blob
@@ -374,7 +379,7 @@ window.addEventListener('keydown', (e) => {
   if (e.code === 'KeyB') toggleBook();
   if (e.code === 'KeyP') shop.toggle();
   if (e.code === 'KeyN') $('new-planet').click();
-  if (e.code === 'Escape') { shop.closeOffer(); shop.close(); $('book').classList.add('hidden'); $('galaxies').classList.add('hidden'); closeSettings(); closeProfile(); }
+  if (e.code === 'Escape') { if (state === 'guide') closeGuide(); shop.closeOffer(); shop.close(); $('book').classList.add('hidden'); $('galaxies').classList.add('hidden'); closeSettings(); closeProfile(); }
   if (e.code === 'Minus' || e.code === 'NumpadSubtract') equip('classic');
   const digit = /^(?:Digit|Numpad)(\d)$/.exec(e.code);
   if (digit) equip(hereCreatures()[(Number(digit[1]) + 9) % 10]);
@@ -498,7 +503,42 @@ function start() {
   $('title').classList.add('hidden');
   ['hud-top', 'skins', 'biome-label', 'autoroll'].forEach((id) => $(id).classList.remove('hidden'));
   buildSkinBar();
-  if (tapSteer()) flashSteerHint();
+  if (!save.guideSeen) openGuide();
+  else if (tapSteer()) flashSteerHint();
+  updateGoalHint();
+}
+
+// ---------------------------------------------------------------- first-time guide
+let guideStep = 0;
+const GUIDE_STEPS = document.querySelectorAll('#guide .guide-step');
+function showGuideStep(i) {
+  guideStep = i;
+  GUIDE_STEPS.forEach((el, n) => el.classList.toggle('hidden', n !== i));
+  document.querySelectorAll('#guide-dots i').forEach((d, n) => d.classList.toggle('on', n === i));
+  $('guide-next').textContent = i === GUIDE_STEPS.length - 1 ? "Let's roll!" : 'Next';
+  $('guide-skip').classList.toggle('hidden', i === GUIDE_STEPS.length - 1);
+}
+function openGuide() {
+  showGuideStep(0);
+  $('guide').classList.remove('hidden');
+  if (state === 'play') state = 'guide'; // the blob waits while you read
+}
+function closeGuide() {
+  $('guide').classList.add('hidden');
+  if (state === 'guide') state = 'play';
+  if (!save.guideSeen) {
+    save.guideSeen = true;
+    persist();
+    if (tapSteer()) flashSteerHint();
+  }
+  updateGoalHint();
+}
+$('guide-next').addEventListener('click', () => (guideStep < GUIDE_STEPS.length - 1 ? showGuideStep(guideStep + 1) : closeGuide()));
+$('guide-skip').addEventListener('click', closeGuide);
+$('guide-open').addEventListener('click', () => { closeSettings(); openGuide(); });
+// a short goal line until the first spot is restored
+function updateGoalHint() {
+  $('goal-hint').classList.toggle('show', state === 'play' && save.guideSeen && save.spotsDone < 1);
 }
 // show both sides for a moment so it's obvious where to hold
 function flashSteerHint() {
@@ -822,6 +862,8 @@ function completePatch(k, silent = false) {
   planet.completePatch(k);
   if (silent) return;
   addXp(save, XP.patch);
+  save.spotsDone++;
+  updateGoalHint();
   const r = regions[patch.region];
   sound.patchPing(r.patchesDone++);
   blob.jiggle(0.8);
@@ -1648,6 +1690,8 @@ function frame() {
   gameTime += dt;
 
   updatePlay(dt);
+  updateGoalHint();
+  planet.uniforms.uGuide.value = Math.max(0, 1 - save.spotsDone / GUIDE_SPOTS);
   planet.update(dt, state === 'title' ? null : onPop);
   creatures.forEach((c) => c.update(dt, gameTime, blob.position));
   critters.update(dt);

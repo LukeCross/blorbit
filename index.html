@@ -404,6 +404,22 @@
       .skin.fresh { animation: pop 0.7s cubic-bezier(.3,1.8,.5,1), glow 1.6s ease-in-out 3; }
       .skin .key { position: absolute; right: -3px; bottom: -3px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 6px; font-size: 10px; box-shadow: none; }
 
+      /* first-time guide + goal hint */
+      #guide .guide-panel { width: min(560px, 94vw); text-align: center; }
+      #guide .guide-step img { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: cover; border-radius: var(--r); box-shadow: var(--shadow); background: rgba(61,53,96,0.08); }
+      #guide .guide-step h2 { font: 600 28px var(--font-display); margin: 16px 0 6px; }
+      #guide .guide-step p { margin: 0; font-size: 16px; line-height: 1.45; color: var(--ink-soft); }
+      #guide .guide-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; }
+      #guide-dots { display: flex; gap: 7px; }
+      #guide-dots i { width: 9px; height: 9px; border-radius: 50%; background: rgba(61,53,96,0.2); transition: background 0.2s, transform 0.2s; }
+      #guide-dots i.on { background: var(--lilac-deep); transform: scale(1.25); }
+      #goal-hint {
+        position: fixed; bottom: 92px; left: 50%; transform: translate(-50%, 8px); z-index: 2; max-width: 88vw; text-align: center;
+        padding: 10px 18px; border-radius: 99px; font: 600 16px var(--font-display); pointer-events: none;
+        opacity: 0; transition: opacity 0.4s, transform 0.4s;
+      }
+      #goal-hint.show { opacity: 1; transform: translate(-50%, 0); }
+
       /* toasts, popups, find cards */
       #toast {
         position: fixed; top: 26%; left: 50%; transform: translate(-50%, -50%) scale(0.7); z-index: 4;
@@ -1240,6 +1256,13 @@
           </div>
           <button class="toggle" id="colorblind" role="switch" aria-checked="false" aria-label="Colorblind mode"><span class="switch"></span></button>
         </div>
+        <div class="setting-row">
+          <div>
+            <b>How to play</b>
+            <small>A quick reminder of what to do on a planet.</small>
+          </div>
+          <button class="btn secondary small" id="guide-open">Show guide</button>
+        </div>
         <div class="setting-row stacked">
           <div>
             <b>Privacy</b>
@@ -1295,6 +1318,34 @@
     </div>
     <div id="pack-flash"></div>
     <div id="warp"></div>
+
+    <div id="goal-hint" class="glass">✨ Roll onto a glowing spot to bring it back to life</div>
+
+    <!-- first-time guide -->
+    <div id="guide" class="overlay hidden" role="dialog" aria-modal="true" aria-label="How to play">
+      <div class="panel guide-panel">
+        <div class="guide-step">
+          <img src="./guide/1.jpg" alt="A grey planet with glowing rings marking its spots" width="800" height="500" />
+          <h2>Look for the glowing spots</h2>
+          <p>Every biome has a few spots, marked with a soft glowing ring. They're the bits to bring back to life.</p>
+        </div>
+        <div class="guide-step hidden">
+          <img src="./guide/2.jpg" alt="The blob rolling slime across a spot" width="800" height="500" />
+          <h2>Roll over a whole spot</h2>
+          <p>Cover a spot in slime and it blooms. You don't have to clear the whole planet, just the spots.</p>
+        </div>
+        <div class="guide-step hidden">
+          <img src="./guide/3.jpg" alt="A restored biome with its creature awake" width="800" height="500" />
+          <h2>Wake the creatures</h2>
+          <p>Finish a biome's spots to wake its creature, collect cards and unlock new skins. No timers, no rush.</p>
+        </div>
+        <div class="guide-foot">
+          <button class="btn secondary small" id="guide-skip">Skip</button>
+          <div id="guide-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+          <button class="btn small" id="guide-next">Next</button>
+        </div>
+      </div>
+    </div>
 
     <!-- profile -->
     <div id="profile" class="overlay hidden">

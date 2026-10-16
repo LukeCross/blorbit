@@ -27,14 +27,14 @@ const vert = /* glsl */ `
   attribute vec3 aWaterCol;
   attribute vec4 aDyn;
   attribute float aWater;
-  attribute vec2 aEdge;
+  attribute vec3 aEdge;
   attribute float aPave;
   attribute float aCloud;
   attribute float aSea;
   varying vec3 vN, vP, vWorld, vDead, vAlive, vWaterCol;
   varying vec4 vDyn, vStyle;
   varying float vWater, vPave, vCloud, vSea;
-  varying vec2 vEdge;
+  varying vec3 vEdge;
   void main() {
     vN = normalize(normal);
     vP = position;
@@ -51,10 +51,11 @@ const frag = /* glsl */ `
   uniform vec3 uSlimeCol;
   uniform vec3 uSunDir;
   uniform float uDebug;
+  uniform float uGuide; // 1 for brand-new players (bolder spot rings), fading to 0 as they restore spots
   varying vec3 vN, vP, vWorld, vDead, vAlive, vWaterCol;
   varying vec4 vDyn, vStyle;
   varying float vWater, vPave, vCloud, vSea;
-  varying vec2 vEdge;
+  varying vec3 vEdge;
 
   float hash(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
   float vnoise(vec3 p) {
@@ -141,7 +142,9 @@ const frag = /* glsl */ `
     // borders: dashed biome edges and dotted patch outlines on not-yet-restored ground
     // soft glowing outlines (no hard dashes): faint biome seams, a gently breathing ring around each patch
     col = mix(col, col * 1.1 + 0.05, smoothstep(0.12, 0.45, vEdge.x) * 0.55 * (1.0 - life));
-    col += vec3(1.0, 0.97, 0.92) * smoothstep(0.1, 0.42, vEdge.y) * 0.2 * (1.0 - life) * (0.75 + 0.25 * sin(uTime * 2.0));
+    col += vec3(1.0, 0.97, 0.92) * smoothstep(0.1, 0.42, vEdge.y) * (0.2 + 0.6 * uGuide) * (1.0 - life) * (0.75 + 0.25 * sin(uTime * (2.0 + 1.5 * uGuide)));
+    // new players: spots also get a soft pulsing wash inside the ring
+    col += vec3(1.0, 0.82, 0.9) * smoothstep(0.3, 0.9, vEdge.z) * 0.22 * uGuide * (1.0 - life) * (0.6 + 0.4 * sin(uTime * 3.0));
 
     // leftover patches in a nearly-done area pulse so you can find them
     col += vec3(1.0, 0.78, 0.88) * glow * (0.55 + 0.45 * sin(uTime * 4.0)) * 0.35;
@@ -694,7 +697,7 @@ export class Planet {
     const cloud = new Float32Array(n); // 0..1 cloud sea on low ground (sky)
     const sea = new Float32Array(n); // 0..1 underwater look (seaglow)
     const waterCol = new Float32Array(n * 3);
-    const edge = new Float32Array(n * 2);
+    const edge = new Float32Array(n * 3); // biome seam, patch outline, inside a patch
     this.waterTarget = new Float32Array(n);
     this.water = new Float32Array(n);
     this.dyn = new Float32Array(n * 4);
@@ -749,18 +752,19 @@ export class Planet {
     for (let t = 0; t < idx.length; t += 3) {
       for (let k = 0; k < 3; k++) {
         const a = idx[t + k], b = idx[t + ((k + 1) % 3)];
-        if (this.region[a] !== this.region[b]) { edge[a * 2] = 1; edge[b * 2] = 1; }
+        if (this.region[a] !== this.region[b]) { edge[a * 3] = 1; edge[b * 3] = 1; }
         if (this.patchId[a] !== this.patchId[b]) {
-          if (this.patchId[a] >= 0) edge[a * 2 + 1] = 1;
-          if (this.patchId[b] >= 0) edge[b * 2 + 1] = 1;
+          if (this.patchId[a] >= 0) edge[a * 3 + 1] = 1;
+          if (this.patchId[b] >= 0) edge[b * 3 + 1] = 1;
         }
       }
     }
+    for (let i = 0; i < n; i++) if (this.patchId[i] >= 0) edge[i * 3 + 2] = 1;
     // soften patch colour edges a little
     this.smooth(dead, 3, idx, 2);
     this.smooth(alive, 3, idx, 2);
     this.smooth(waterCol, 3, idx, 1);
-    this.smooth(edge, 2, idx, 2);
+    this.smooth(edge, 3, idx, 2);
 
     geo.computeVertexNormals();
     const attr = (arr, size, dynamic) => {
@@ -780,7 +784,7 @@ export class Planet {
     this.smooth(sea, 1, idx, 1);
     geo.setAttribute('aSea', attr(sea, 1));
     geo.setAttribute('aWaterCol', attr(waterCol, 3));
-    geo.setAttribute('aEdge', attr(edge, 2));
+    geo.setAttribute('aEdge', attr(edge, 3));
     this.dynAttr = attr(this.dyn, 4, true);
     this.waterAttr = attr(this.water, 1, true);
     geo.setAttribute('aDyn', this.dynAttr);
@@ -791,6 +795,7 @@ export class Planet {
       uSlimeCol: { value: new THREE.Color(0x8dffd6) },
       uSunDir: { value: new THREE.Vector3(1, 1, 1).normalize() },
       uDebug: groundDebug,
+      uGuide: { value: 0 },
     };
     this.mesh = new THREE.Mesh(geo, new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: frag, uniforms: this.uniforms }));
     this.group.add(this.mesh);
