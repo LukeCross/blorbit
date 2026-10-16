@@ -1,7 +1,7 @@
 import { BIOMES } from './biomes.js';
 import { GALAXIES, GALAXY_IDS, isGalaxyUnlocked, unlockProgress } from './galaxies.js';
 import { SKINS } from './skins.js';
-import { RARITY, RATES, TIERS, RANKS, rankInfo, rankStops, drawPack } from './collection.js';
+import { RARITY, RATES, TIERS, RANKS, rankInfo, rankStops, drawPack, masteredIn } from './collection.js';
 import { track } from './analytics.js';
 
 // Stardust shop: three card packs for every biome, each with better odds than the last.
@@ -116,9 +116,10 @@ export class Shop {
       <div class="pack-list">${GALAXIES[this.tab].biomes.map((b) => {
         const def = BIOMES[b];
         const found = def.finds.filter(([, n]) => this.save.finds[`${b}:${n}`]).length;
+        const mastered = masteredIn(this.save, [b]);
         return `<div class="pack-row">
           <span class="pack-icon">${SKINS[def.creature].emoji}</span>
-          <div class="pack-name"><b>${def.name}</b><button class="link" data-action="book" title="Open the collection">${found}/${def.finds.length} collected</button></div>
+          <div class="pack-name"><b>${def.name}</b><button class="link" data-action="book" title="Open the collection">${found}/${def.finds.length} collected</button><button class="link" data-action="book" title="Open the collection">${mastered}/${def.finds.length} mastered</button></div>
           ${this.adsOn() ? `<button class="buy free" data-action="free" data-id="${b}" title="Watch a video for a free Card pack" aria-label="Watch a video for a free ${def.name} Card pack">🎬 Free</button>` : ''}
           ${Object.entries(PACKS).map(([type, pk]) => `<button class="buy ${BUY_CLASS[type]}" data-action="pack" data-id="${b}" data-type="${type}" title="${pk.name}" aria-label="${pk.name} for ${def.name}, ${pk.cost} stardust" ${dust < pk.cost ? 'disabled' : ''}>${pk.icon} ✨${pk.cost}</button>`).join('')}
         </div>`;
