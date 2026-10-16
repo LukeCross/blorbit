@@ -13,7 +13,7 @@ const CHORDS = [
 
 // weather bed per kind: filter centre, Q, level, and how much the level swells
 const WEATHER_SOUND = {
-  rain: { f: 5200, q: 0.5, g: 0.03 },
+  rain: { f: 3800, q: 0.5, g: 0.02 },
   snow: { f: 900, q: 0.5, g: 0.006, swell: 0.004 },
   wisps: { f: 500, q: 0.6, g: 0.01, swell: 0.006 },
   dust: { f: 1100, q: 0.8, g: 0.02, swell: 0.012 },
@@ -289,7 +289,7 @@ export class Sound {
     const pan = Math.random() * 1.6 - 0.8;
     switch (this.weatherKind) {
       case 'rain':
-        if (r < 0.4) this.tone({ type: 'sine', f: 2200 + Math.random() * 2200, dur: 0.04, vol: 0.008, verb: 0.4, pan });
+        if (r < 0.4) this.tone({ type: 'sine', f: 1800 + Math.random() * 1800, dur: 0.04, vol: 0.006, verb: 0.4, pan });
         break;
       case 'bubbles': {
         if (r < 0.3) {
