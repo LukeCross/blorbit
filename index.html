@@ -709,6 +709,10 @@
       .danger-zone > div:first-child { flex: 1; }
       .danger-zone b { display: block; font: 600 16px var(--font-display); }
       .danger-zone small { display: block; color: var(--ink-soft); font-size: 13px; line-height: 1.5; margin-top: 2px; }
+      .danger-zone.warn { flex-direction: column; align-items: stretch; background: rgba(255, 226, 140, 0.4); border-color: rgba(230, 180, 40, 0.55); }
+      .danger-zone.warn { margin-bottom: 14px; }
+      .btn.warn { background: linear-gradient(135deg, #ffe9a3, #ffd05c); box-shadow: 0 6px 18px rgba(240, 180, 40, 0.35), var(--highlight); }
+      .danger-zone.warn .privacy-note { color: #8a6200 !important; }
       .danger-zone.confirm { flex-direction: column; align-items: stretch; background: rgba(255, 180, 196, 0.5); animation: rise 0.25s ease; }
       .confirm-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; }
       .btn.danger { background: linear-gradient(135deg, #ffb3c7, #ff8fa8); box-shadow: 0 6px 18px rgba(255, 120, 150, 0.35), var(--highlight); }
@@ -1253,6 +1257,18 @@
             <small>Blorbit is free, with no timers and no pressure. It's made by one person in their spare time. If it's made you smile, a coffee helps cover hosting and fuels new galaxies, creatures and finds. Thank you for playing!</small>
           </div>
           <a class="btn small support-btn" href="https://buymeacoffee.com/lukecross" target="_blank" rel="noopener">☕ Buy me a coffee</a>
+        </div>
+        <div class="danger-zone warn">
+          <div>
+            <b>Move your profile</b>
+            <small>Export everything (collection, stardust, skins, planets and settings) as one file, then import it on another device. Importing replaces the progress on this device.</small>
+            <small class="privacy-note hidden" id="transfer-note" role="status"></small>
+          </div>
+          <div class="privacy-actions">
+            <button class="btn warn small" id="export-btn">Export profile</button>
+            <button class="btn warn small" id="import-btn">Import profile</button>
+            <input type="file" id="import-file" accept="application/json,.json" hidden>
+          </div>
         </div>
         <div class="danger-zone" id="reset-start">
           <div>

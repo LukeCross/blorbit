@@ -1031,6 +1031,50 @@ function closeSettings() {
 }
 $('settings-btn').addEventListener('click', openSettings);
 $('settings-close').addEventListener('click', closeSettings);
+// export/import: one JSON file holding the main save and every planet save
+const transferNote = (msg) => {
+  $('transfer-note').textContent = msg;
+  $('transfer-note').classList.remove('hidden');
+};
+$('export-btn').addEventListener('click', () => {
+  persist();
+  const planets = {};
+  GALAXY_IDS.forEach((g) => {
+    const raw = localStorage.getItem(planetKey(g));
+    if (raw) planets[g] = JSON.parse(raw);
+  });
+  const data = { game: 'blorbit', version: 1, exported: new Date().toISOString(), save, planets };
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new window.Blob([JSON.stringify(data)], { type: 'application/json' }));
+  a.download = `blorbit-profile-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  transferNote('Profile saved to a file. Import it on your other device to carry on.');
+});
+$('import-btn').addEventListener('click', () => $('import-file').click());
+$('import-file').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  let data;
+  try {
+    data = JSON.parse(await file.text());
+  } catch {
+    data = null;
+  }
+  const ok = data && data.game === 'blorbit' && data.save && typeof data.save === 'object' && Array.isArray(data.save.unlocked);
+  if (!ok) return transferNote("That doesn't look like a Blorbit profile file.");
+  if (!confirm('Import this profile? It replaces all the progress on this device.')) return;
+  resetting = true; // stop the running game writing the old progress back over the import
+  localStorage.setItem(SAVE_KEY, JSON.stringify(data.save));
+  GALAXY_IDS.forEach((g) => {
+    const p = data.planets && data.planets[g];
+    if (p && typeof p === 'object') localStorage.setItem(planetKey(g), JSON.stringify(p));
+    else localStorage.removeItem(planetKey(g));
+  });
+  $('warp').classList.add('on');
+  setTimeout(() => location.replace(location.pathname), 450);
+});
 $('reset-btn').addEventListener('click', () => {
   $('reset-start').classList.add('hidden');
   $('reset-confirm').classList.remove('hidden');
