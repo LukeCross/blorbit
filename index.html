@@ -354,12 +354,15 @@
       @keyframes lvpop { 50% { transform: scale(1.12); box-shadow: 0 0 18px rgba(168,124,245,0.9); } }
       /* "+N XP" floats just under the profile button */
       .xp-gain {
-        position: fixed; right: 14px; top: 64px; z-index: 2; padding: 8px 16px; border-radius: var(--r); white-space: nowrap; opacity: 0; pointer-events: none;
+        position: fixed; right: 14px; top: 64px; z-index: 2; padding: 8px 16px; border-radius: var(--r); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.4s, transform 0.4s;
         font: 600 16px var(--font-display); font-style: normal; color: var(--ink); font-variant-numeric: tabular-nums;
         background: var(--glass-strong); -webkit-backdrop-filter: blur(18px) saturate(1.5); backdrop-filter: blur(18px) saturate(1.5); border: 1px solid var(--glass-border); box-shadow: var(--shadow), var(--highlight);
       }
-      .xp-gain.go { animation: xpgain 1.8s ease-out; }
-      @keyframes xpgain { 0% { opacity: 0; transform: translateY(-8px) scale(0.8); } 12% { opacity: 1; transform: translateY(0) scale(1.12); } 22% { transform: scale(1); } 75% { opacity: 1; } 100% { opacity: 0; transform: translateY(6px); } }
+      /* same entrance and exit as the find cards, mirrored because it sits on the right */
+      .xp-gain.show { opacity: 1; }
+      .xp-gain.go { animation: slidein-right 0.5s cubic-bezier(.3,1.6,.5,1); }
+      .xp-gain.out { opacity: 0; transform: translateX(30px); }
+      @keyframes slidein-right { from { opacity: 0; transform: translateX(40px) scale(0.85); } }
       #shop-btn.bump, #book-btn.bump { animation: pop 0.35s cubic-bezier(.3,1.8,.5,1); }
       #book-btn.bump { animation: pop 0.6s cubic-bezier(.3,1.8,.5,1), glow 1.2s ease-in-out 2; }
 
@@ -514,7 +517,8 @@
       .offer-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
       .finale-card h2 { font: 700 clamp(36px, 6vw, 58px) var(--font-display); margin: 0 0 6px; background: linear-gradient(90deg, #6fd8b8, #9d86f5, #ff8fc4); -webkit-background-clip: text; background-clip: text; color: transparent; }
       .finale-card p { color: var(--ink-soft); margin: 4px 0; }
-      .finale-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 14px; }
+      .finale-actions { display: flex; flex-direction: column; gap: 10px; width: min(100%, 320px); margin: 14px auto 0; }
+      .finale-actions .btn { margin: 0; }
       .finale-dust { margin-left: 6px; padding: 2px 10px; border-radius: 99px; background: rgba(255, 255, 255, 0.7); font-size: 0.9em; }
       .big-emoji { font-size: 46px; letter-spacing: 10px; margin: 14px 0 20px; }
 
@@ -914,8 +918,7 @@
         .tagline { font-size: 16px; margin: 8px 0 20px; }
         .controls { gap: 10px 14px; font-size: 13px; }
         .finale-card { width: min(92vw, 420px); padding: 26px 20px; }
-        .finale-actions { flex-direction: column; gap: 8px; }
-        .finale-card .btn { display: block; width: 100%; margin: 0; }
+        .finale-actions { gap: 8px; }
         .big-emoji { font-size: 34px; letter-spacing: 6px; }
 
         .pack-box { width: 170px; height: 240px; }
@@ -1132,11 +1135,11 @@
         <p>Everyone's awake and the whole world is in bloom.</p>
         <div class="big-emoji" id="finale-creatures"></div>
         <div class="finale-actions">
-          <button class="btn" id="next-planet">Next planet</button>
+          <button class="btn" id="next-planet">Next Planet</button>
           <button class="btn hidden" id="finale-galaxy"></button>
-          <button class="btn secondary" id="finale-menu">🏠 Back to main menu</button>
-          <button class="btn secondary" id="finale-shop">🛍️ Open some packs <span class="finale-dust">✨ <span id="finale-dust">0</span></span></button>
-          <button class="btn secondary" id="keep-rolling">Keep rolling here</button>
+          <button class="btn secondary" id="keep-rolling">Keep Rolling Here</button>
+          <button class="btn secondary" id="finale-shop">🛍️ Open Some Packs <span class="finale-dust">✨ <span id="finale-dust">0</span></span></button>
+          <button class="btn secondary" id="finale-menu">🏠 Back to Main Menu</button>
         </div>
       </div>
     </div>

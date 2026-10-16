@@ -915,7 +915,7 @@ function showLevelUp() {
   b.classList.add('up');
 }
 setInterval(showLevelUp, 500);
-let xpShown = 0, xpShownAt = -Infinity;
+let xpShown = 0, xpShownAt = -Infinity, xpHide = 0;
 onXp(({ amount, level, levels, dust }) => {
   refreshLevel();
   refreshDust();
@@ -924,9 +924,13 @@ onXp(({ amount, level, levels, dust }) => {
   xpShown = performance.now() - xpShownAt < 1500 ? xpShown + amount : amount;
   xpShownAt = performance.now();
   g.textContent = `+${xpShown} XP`;
-  g.classList.remove('go');
+  g.classList.remove('go', 'out');
+  g.classList.add('show');
   void g.offsetWidth;
   g.classList.add('go');
+  // leaves like a find card: held for 3.2s, then fades and slides away
+  clearTimeout(xpHide);
+  xpHide = setTimeout(() => g.classList.add('out'), 3200);
   if (levels) pendingLevel = { level, dust: dust + (pendingLevel?.dust || 0) };
   if (!$('profile').classList.contains('hidden')) renderProfile();
 });
