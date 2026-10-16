@@ -779,11 +779,12 @@
       .card.l .card-front { background: linear-gradient(170deg, #fffdf2, #ffe08a); box-shadow: 0 0 56px rgba(245,201,74,0.95), var(--shadow-lg); }
       .card.l.flipped .card-front::after { content: ''; position: absolute; inset: -50%; background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.85) 50%, transparent 60%); animation: sweep 1.6s ease-in-out infinite; }
       .card.flipped.l { animation: legend 0.8s 0.3s ease-out; }
-      .rank-box { display: flex; flex-direction: column; align-items: stretch; gap: 4px; width: 78%; margin-top: 4px; text-align: center; }
+      /* pinned to the bottom so the bar sits in the same place on every card, however many lines the heading takes */
+      .rank-box { position: absolute; left: 11%; bottom: 14px; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; gap: 4px; width: 78%; text-align: center; }
+      .card-front { padding-bottom: 58px; }
       .rank-head { font: 900 12px var(--font); font-style: normal; color: var(--ink); text-transform: uppercase; letter-spacing: 0.05em; }
       .rank-head.up { color: var(--lilac-deep); }
       .rank-box.gold .rank-head { color: #d79a00; }
-      .rank-box small { font-size: 11px; font-weight: 800; color: var(--ink-soft); text-transform: none; }
       .profile-level { display: flex; align-items: center; gap: 12px; margin: 18px 0 4px; padding: 12px 16px; border-radius: var(--r); background: rgba(255,255,255,0.75); box-shadow: var(--shadow-sm); }
       .profile-level .lv-badge { min-width: 40px; height: 40px; font-size: 20px; }
       .profile-level > div { flex: 1; min-width: 0; }
@@ -958,8 +959,15 @@
         .pack-box .pack-emoji { font-size: 66px; }
         .cards { gap: 10px; }
         .card { width: min(29vw, 130px); height: min(41vw, 184px); }
-        .card-emoji { font-size: min(13vw, 58px); }
-        .card-front b { font-size: 14px; padding: 0 6px; text-align: center; }
+        .card-emoji { font-size: min(10vw, 44px); }
+        .card-front { gap: 2px; }
+        .card-front b { font-size: 12px; line-height: 1.1; padding: 0 5px; text-align: center; }
+        .card-front small { font-size: 8px; letter-spacing: 0.08em; }
+        .rank-box { left: 6%; width: 88%; bottom: 10px; gap: 2px; }
+        .card-front { padding-bottom: 38px; }
+        .rank-head { font-size: 9px; letter-spacing: 0.02em; line-height: 1.1; }
+        .rank-box .rank-bar { height: 4px; }
+        .dupe { top: 8px; right: 9px; font-size: 11px; }
         .ribbon { font-size: 9px; padding: 3px 30px; right: -34px; top: 10px; }
         #pack-actions .btn { margin: 4px; }
       }
@@ -1005,6 +1013,7 @@
         .controls { margin-top: 12px; }
         .calm { display: none; }
         .card { width: 112px; height: 158px; }
+        .card-emoji { font-size: 34px; }
         .pack-box { width: 140px; height: 196px; }
       }
       /* mouse users get no swipe gesture and macOS hides overlay scrollbars, so draw a visible one on the sideways-scrolling rows */

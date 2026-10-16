@@ -136,7 +136,7 @@ Pick a galaxy on the title screen to start, or press `Enter` to jump back into t
 
 ## Running it locally
 
-You'll need [Node.js](https://nodejs.org/) 20+.
+You'll need [Node.js](https://nodejs.org/) 20.19+ (or 22.12+, which is what Vite 8 requires).
 
 ```bash
 npm install      # install dependencies
@@ -144,6 +144,10 @@ npm run dev      # start the Vite dev server (http://localhost:5173)
 npm run build    # production build into dist/
 npm run preview  # serve the production build locally
 ```
+
+Handy URL parameters (dev or live):
+- `?seed=12345` loads that exact planet (in your current galaxy), and `&galaxy=<id>` picks the galaxy (`wild`, `city`, `sky`, `safari`, `sea`, `feast`, `gloom` or `stomp`).
+- `?debug` shows an on-screen panel with the GPU, its limits and any shader or console errors, for devices with no console. Run `npx vite --host` to reach the dev server from a phone or tablet on your network.
 
 The `dist/` folder is fully static. Drop it on any static host (GitHub Pages, Netlify, Vercel, S3, etc.).
 
@@ -224,7 +228,7 @@ You can also build locally with them set, e.g. `VITE_GAM_REWARDED_UNIT=/1234567/
 - **Web Audio API** for all sound. There are **no audio files**: every blorp, chime, bell and ambient soundscape is synthesised live.
 - **Plain HTML and CSS** for the UI, with no framework. It's a pastel glass design system built on CSS variables, `backdrop-filter`, the Fredoka and Nunito fonts, and inline SVG icons.
 - **localStorage** for saving progress.
-- **Puppeteer** (dev only) for automated headless screenshot checks of the game on desktop and mobile viewports.
+- **Puppeteer** (dev only) for automated headless screenshot checks of the game on desktop and mobile viewports, and for rendering the social advert (which also uses `ffmpeg`).
 
 There are no models, textures or sound assets. Everything you see and hear is generated in code.
 
@@ -275,6 +279,8 @@ Touch devices also get touch-specific hints instead of keyboard shortcuts.
 ```
 index.html          UI markup and all CSS (design tokens, HUD, panels, responsive layout), plus SEO/share tags
 about.html          About & how to play page
+vite.config.js      Build config: relative paths, robots.txt/sitemap, ads.txt, GoatCounter and the monetization switch
+site.config.js      The `MONETIZED` flag
 privacy.html        The privacy policy page
 src/
   main.js           Game loop, state, input, UI, saving and orchestration
@@ -301,9 +307,38 @@ src/
   names.js          Planet and player name generators, and time-based seeds
   noise.js          Seeded noise and PRNG
   shadow.js         Soft contact shadows
+  debug.js          The `?debug` on-screen GPU/shader panel
+  emoji.css         Generated @font-face rules for the self-hosted emoji font
 public/             Static files copied as-is: share image, favicon and app icons, web app manifest
-scripts/            Puppeteer screenshot and regression checks used during development (scripts/og/ makes the share image and icons)
+scripts/            Dev-only Puppeteer helpers: screenshots, regression checks, the share image (scripts/og/) and the social advert (see "Development scripts")
 ```
+
+## Development scripts
+
+Everything in `scripts/` is dev-only and needs the dev server running (`npm run dev`, port 5173) and macOS Chrome at `/Applications/Google Chrome.app`. Each script's first lines say what it does and how to run it. A few you'll use most:
+
+| Script | What it does |
+| --- | --- |
+| `BIOME=<id> node scripts/biome.mjs` | Screenshots one biome dead and restored into `/tmp` |
+| `node scripts/shot.mjs [outDir]` | General screenshots of the game |
+| `node scripts/galaxycheck.mjs [mobile] [travel]` | Galaxy picker, saves, unlocking and travel |
+| `node scripts/mobilecheck.mjs [portrait\|landscape]` | Phone layouts |
+| `node scripts/guide-shots.mjs` | Rebuilds the three first-time guide images in `public/guide/` |
+| `node scripts/og/compose.mjs` | Rebuilds the share image (see [Search & sharing](#search--sharing-seo)) |
+
+There are about thirty more, mostly older regression checks for one feature each (shop, saves, consent, ads, accessibility, quality tiers...). They are run by hand, so one may drift out of date as the UI changes.
+
+### Making the social advert
+`scripts/advert*` builds a 20-second vertical (1080×1920) video: the dead meadow blooming, a pack opening, the collection book, a creature waking and the skins, then an end card with the logo and blorbit.io. It needs [ffmpeg](https://ffmpeg.org) and a connection (the captions load Google Fonts). With the dev server running:
+
+```bash
+node scripts/advert-capture.mjs   # renders each gameplay clip to PNG frames in /tmp/ad (about 7 minutes)
+node scripts/advert-overlays.mjs  # captions, logo pill and end card
+node scripts/advert-audio.mjs     # soundtrack, built with the game's own sound engine
+./scripts/advert.sh               # stitches it all into /tmp/ad/blorbit-advert.mp4
+```
+
+The game runs on a virtual clock while recording, so the frames are smooth no matter how slow your machine is. The frames and soundtrack in `/tmp/ad` aren't committed; the latest finished video is kept at `scripts/advert/blorbit-advert.mp4`. The copy, clip order and timings live in `scripts/advert/overlay.html`, `scripts/advert.sh`, `scripts/advert-capture.mjs` and `scripts/advert-audio.mjs`; `AGENTS.md` explains how they fit together.
 
 ## Credits
 

@@ -1,0 +1,70 @@
+<!doctype html>
+<!-- Dev helper: 1080x1920 transparent overlays for the vertical advert (see scripts/advert.mjs). ?s=<scene> -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/emoji.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=block" rel="stylesheet" />
+    <style>
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; }
+      body { position: relative; font-family: 'Fredoka', 'Blorbit Emoji', sans-serif; color: #3d3560; }
+      .cap {
+        position: absolute; left: 50%; top: 240px; transform: translateX(-50%); width: 900px; text-align: center;
+        font: 700 76px / 1.12 'Fredoka', 'Blorbit Emoji', sans-serif; color: #fff; letter-spacing: -0.01em;
+        text-shadow: 0 5px 0 rgba(90, 60, 190, 0.85), 0 10px 28px rgba(40, 20, 110, 0.55);
+        -webkit-text-stroke: 2px rgba(90, 60, 190, 0.35); paint-order: stroke fill;
+      }
+      /* over the book, whose sheet starts about 230px down: sit in the free strip above it on a pill */
+      .cap.top { top: 50px; width: 860px; font-size: 62px; padding: 18px 20px; border-radius: 48px; background: rgba(106, 79, 216, 0.88); text-shadow: 0 3px 0 rgba(60, 35, 150, 0.6); -webkit-text-stroke: 0; box-shadow: 0 10px 30px rgba(60, 40, 140, 0.35); }
+      .cap small { display: block; margin-top: 18px; font: 800 40px 'Nunito', sans-serif; letter-spacing: 0.01em; opacity: 0.96; -webkit-text-stroke: 0; }
+      .cap .icons { display: block; margin-top: 16px; font-size: 64px; letter-spacing: 0.08em; text-shadow: none; -webkit-text-stroke: 0; }
+      /* small logo + url that stays up through the clips, in the TikTok/Reels-safe middle */
+      .mark {
+        position: absolute; left: 50%; top: 1500px; transform: translateX(-50%); display: flex; align-items: center; gap: 18px;
+        padding: 14px 34px; border-radius: 99px; background: rgba(255, 255, 255, 0.88); box-shadow: 0 10px 30px rgba(60, 40, 140, 0.3);
+        font: 700 46px 'Fredoka', sans-serif; color: #6a4fd8; white-space: nowrap;
+      }
+      .mark b { background: linear-gradient(180deg, #5fd6b0, #8b78ff 60%, #ff7fc0); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 56px; }
+      .mark span { font: 800 34px 'Nunito', sans-serif; color: #6a4fd8; }
+      /* end card is opaque */
+      .end { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 38%, #f6eaff 0%, #e2d4ff 48%, #c9b6ff 100%); text-align: center; }
+      .end .planet {
+        position: absolute; left: 50%; top: 790px; width: 940px; height: 940px; transform: translate(-50%, -50%);
+        background: url('/scripts/og/planet.png') center / 1800px auto no-repeat; filter: saturate(1.3) contrast(1.08);
+        -webkit-mask-image: radial-gradient(circle, #000 50%, transparent 69%); mask-image: radial-gradient(circle, #000 50%, transparent 69%);
+      }
+      .end .logo {
+        position: absolute; left: 0; right: 0; top: 250px; font: 700 250px / 1 'Fredoka', sans-serif; letter-spacing: -0.02em;
+        background: linear-gradient(180deg, #8fe8cc 0%, #a99bff 55%, #ff9fd0 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+        filter: drop-shadow(0 10px 0 rgba(255, 255, 255, 0.95)) drop-shadow(0 26px 40px rgba(120, 100, 220, 0.4));
+      }
+      .end .tag { position: absolute; left: 0; right: 0; top: 1130px; font: 600 64px / 1.2 'Fredoka', sans-serif; color: #4a4170; }
+      .end .cta {
+        position: absolute; left: 50%; top: 1320px; transform: translateX(-50%); padding: 30px 80px; border-radius: 99px; white-space: nowrap;
+        background: linear-gradient(180deg, #8b78ff, #6a4fd8); color: #fff; font: 700 84px 'Fredoka', sans-serif;
+        box-shadow: 0 14px 0 #4a35b0, 0 30px 50px rgba(80, 50, 200, 0.35);
+      }
+      .end .sub { position: absolute; left: 0; right: 0; top: 1560px; font: 800 44px 'Nunito', 'Blorbit Emoji', sans-serif; color: #6a4fd8; letter-spacing: 0.02em; }
+      .end .sparkle { position: absolute; color: #fff; text-shadow: 0 0 20px rgba(255, 255, 255, 0.9); font-size: 60px; }
+    </style>
+  </head>
+  <body>
+    <script>
+      const SCENES = {
+        c1: '<div class="cap">This little world<br>has lost its colour…</div>',
+        c2: '<div class="cap">Roll your slime blob<br>to bring it back to life</div>',
+        c3: '<div class="cap">Earn stardust and<br>open card packs</div>',
+        c4: '<div class="cap top">Complete your collection</div>',
+        c5: '<div class="cap">8 galaxies to explore<small>No timers. No fail states.</small></div>',
+        c6: '<div class="cap">Wake the creatures<br>to unlock them as skins</div>',
+        mark: '<div class="mark"><b>Blorbit</b><span>blorbit.io</span></div>',
+        end: `<div class="end"><div class="planet"></div>
+          <span class="sparkle" style="left:140px;top:210px">✦</span><span class="sparkle" style="left:900px;top:330px;font-size:44px">✦</span>
+          <span class="sparkle" style="left:880px;top:1010px">✦</span><span class="sparkle" style="left:170px;top:980px;font-size:40px">✦</span>
+          <div class="logo">Blorbit</div><div class="tag">Bring tiny dead worlds<br>back to life</div>
+          <div class="cta">Play free</div><div class="sub">blorbit.io · in your browser</div></div>`,
+      };
+      document.body.innerHTML = SCENES[new URLSearchParams(location.search).get('s')];
+    </script>
+  </body>
+</html>

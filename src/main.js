@@ -1741,4 +1741,4 @@ document.addEventListener('click', (e) => e.target.closest?.('a[href*="buymeacof
 // handy for debugging from the console
 refreshDust();
 refreshLevel();
-window.blorbit = { atmosphere, shop, ads, save, newPlanet, travelTo, enterGalaxy, planetKey, galaxyOf: galaxyOfBiome, CAM, camera, backdrop, planet: () => planet, rollFind, addXp, toggleBook, completeRegion, completePatch, blob, sound, keys };
+window.blorbit = { atmosphere, shop, ads, save, newPlanet, travelTo, enterGalaxy, planetKey, galaxyOf: galaxyOfBiome, CAM, camera, backdrop, planet: () => planet, rollFind, addXp, toggleBook, completeRegion, completePatch, buildSkinBar, blob, sound, keys };

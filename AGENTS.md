@@ -11,6 +11,8 @@ Blorbit is a cosy 3D browser game: a wobbly slime blob rolls around tiny planets
 - **Three.js** (r186) for rendering, **Vite** for dev/build, plain HTML/CSS UI (no framework), Web Audio API (all sound is synthesised), `localStorage` saves.
 - **Puppeteer** (`puppeteer-core`, dev only) for screenshot/regression scripts in `scripts/`. They launch macOS Chrome at `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome` with SwiftShader flags.
 
+Needs Node 20.19+ (or 22.12+), which is what Vite 8 requires.
+
 ```bash
 npm install
 npm run dev        # http://localhost:5173 (needed by every scripts/*.mjs check)
@@ -46,6 +48,7 @@ Deploys: pushing to `main` runs `.github/workflows/deploy.yml` (GitHub Pages, si
 ## 3. Architecture map
 
 ```
+vite.config.js / site.config.js  Build: relative paths, robots/sitemap, ads.txt, GoatCounter and `data-monetized` plugins; `MONETIZED` flag
 index.html     All CSS (design tokens, HUD, panels, responsive rules), UI markup, SEO/share tags
 about.html     About & how-to-play page (static HTML, galaxy cards + counts are hand-written)
 privacy.html   Privacy policy
@@ -59,6 +62,7 @@ src/creature.js  Sleeping/waking creature placed in each biome (uses skins)
 src/critters.js  Ambient wandering critters (KINDS)
 src/atmosphere.js  Per-galaxy look: ATMOSPHERES (space colours, light, signature weather), BIOME_WEATHER overrides, Weather (one cheap particle draw call)
 src/audio.js   Synthesised sound: per-biome ambient cases + rolling timbre
+src/debug.js   On-screen GPU/shader debug panel, only with `?debug` in the URL (see section 8)
 src/shop.js    Card pack shop, galaxy tabs (galaxyTabs, renderKeepingTabs)
 src/collection.js  Finds, rarities, pack rates (totals are computed, not hard-coded), duplicate ranks (`RANKS`, `rankFor`, `rankInfo`, `rankStops` for the segmented ring/bar colours; the fifth rank, Mastered, is the top), `estimateXp` for old saves. `drawFind`/`drawPack` pay out XP themselves
 src/xp.js      XP values (`XP`), the endless level curve (`levelInfo`), titles, level-up stardust, `addXp(save, n)` + `onXp` listener (main.js drives the HUD badge/bar and the level-up toast from it)
@@ -67,6 +71,7 @@ src/analytics.js  track(name): anonymous GoatCounter events (see section 9); no-
 src/{blob,look,skyfx,particles,stardust,names,noise,quality,shadow}.js  Blob, sky, ambient particles, stardust, naming (planet names, the profile's quirky player names), PRNG, quality tiers
 src/emoji.css  GENERATED @font-face rules for the self-hosted emoji font (see section 5); public/fonts/emoji/ holds its woff2 files
 scripts/       Puppeteer helpers (screenshots, regression checks); scripts/og/ builds the share image and icons
+               scripts/advert*.{mjs,sh} + scripts/advert/ build the vertical social advert (frame-stepped capture on a virtual clock, overlays, game-engine soundtrack, ffmpeg stitch); see the header of each; output goes to /tmp/ad
 public/guide/  The three first-time guide screenshots (regenerate with `node scripts/guide-shots.mjs`; the `#guide` overlay is in index.html, logic near `start()` in main.js)
 public/        Static files: og-image.png (share image, also the About hero), favicon, icons, manifest
 ```
@@ -76,7 +81,7 @@ Key facts:
 - Saves: main save `blorbit-save-v1` (stardust, skins, finds, settings, profile `name`/`avatar`/`showcase` (three find keys), `xp` (total; level and find ranks are derived, never stored), current galaxy, restored counts, `unlocked` creature ids, `seenGalaxies`, `adUnlocked`, `guideSeen`, `spotsDone` (spots restored ever; the first-time guide and bolder spot rings use them, see `GUIDE_SPOTS` in `main.js`)); one planet save per galaxy `blorbit-planet-v1:<galaxy>`.
 - Galaxy unlock: `unlockedBy` (previous galaxy id) + `unlockAt` (0.8 = 80% of that galaxy's creatures woken). The chain today is a straight line. Players can also unlock one by watching a rewarded video (`save.adUnlocked`).
 - Unknown galaxy ids fall back to `'wild'` in `main.js` (`save.galaxy`, `bookTab`, planet-save migration). Don't change those.
-- `window.blorbit` (bottom of `main.js`) exposes `save, newPlanet, travelTo, enterGalaxy, planet(), completeRegion(i), completePatch(k), rollFind(biome, dir), addXp(save, n), galaxyOf(biomeId), blob, sound, shop, ...` for scripts.
+- `window.blorbit` (bottom of `main.js`) exposes `save, newPlanet, travelTo, enterGalaxy, planet(), completeRegion(i), completePatch(k), buildSkinBar(), rollFind(biome, dir), addXp(save, n), galaxyOf(biomeId), blob, sound, shop, ...` for scripts.
 
 ---
 
@@ -194,7 +199,7 @@ After adding a galaxy, update ALL of these (numbers are galaxies / biomes / card
 | --- | --- |
 | `index.html` | **4 occurrences** of "Bring N biomes back to life ... collect N cards." in `meta description`, `og:description`, `twitter:description` and the JSON-LD `description` (lines ~8, 21, 29, 40). |
 | `about.html` | `meta description` and `og:description` ("restore N biomes across N galaxies ... collect N cards"); add a new `<div class="galaxy">` card (emoji + name, one-line blurb, `<ul>` of 5 biomes with creature emojis) after the last one; the "There are **N cards**" sentence in the Collecting section. |
-| `README.md` | Galaxies bullet list (add a bullet with name, biome themes, "5 creatures and 40 finds", the unlock sentence); the biome/creature table (add two columns "X biome \| Creature" and fill the first five rows; keep the separator row's column count in step); the Finds sentence ("80 in Wildbloom, 40 each in ..."); the `biomes.js` line in the project structure ("The N biome definitions"). Also stale: "About 60 procedurally modelled prop types" (there are 170 now). |
+| `README.md` | Galaxies bullet list (add a bullet with name, biome themes, "5 creatures and 40 finds", the unlock sentence); the biome/creature table (add two columns "X biome \| Creature" and fill the first five rows; keep the separator row's column count in step); the Finds sentence ("80 in Wildbloom, 40 each in ..."); the `biomes.js` line in the project structure ("The N biome definitions"). |
 | `scripts/og/compose.html` | The chips line: "N galaxies", "N biomes", "N cards to collect". |
 | `public/og-image.png` | **Regenerate** after editing compose.html: start `npm run dev`, then `node scripts/og/compose.mjs` (writes `public/og-image.png`; also the About page hero). To also change the planet photo, run `node scripts/og/capture.mjs`, copy a frame to `scripts/og/planet.png`, then compose. |
 | `scripts/biome.mjs` | Its test save's `unlocked` array must include every creature of the earlier galaxies so the new galaxy isn't locked when you screenshot it (add the previous galaxy's 5 creature ids) and update its comment. |
@@ -225,6 +230,41 @@ grep -rnE "[0-9]+ biomes|[0-9]+ galaxies|[0-9]+ cards|biome definitions" index.h
 5. Other helpers in `scripts/` (many are older, galaxy-specific regression checks): `galaxycheck.mjs`, `shot.mjs`, `mobilecheck.mjs [portrait|landscape]`, `propbooth.mjs` (props restored vs withered), `creaturebooth.mjs` / `skinbooth.mjs` (creature skins up close), `shopcheck.mjs`, `resetcheck.mjs`, `consentcheck.mjs`, `accesscheck.mjs`. Read each file's header comment for usage.
 6. Honest reporting: say what you rendered and what you did not (sound, close-up skins, real devices).
 
+### 7.1 The `scripts/` directory
+
+Everything in `scripts/` is a dev-only Puppeteer helper; none of it ships (Vite only bundles what `index.html` imports). Every script starts with a header comment giving its purpose and usage, so read that before running it.
+
+Shared conventions (copy them for a new script):
+- Needs the dev server on `:5173`; launch macOS Chrome from `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome` with `headless: 'new'`, and `--use-angle=swiftshader --enable-unsafe-swiftshader` when WebGL is needed (the OG and overlay scripts only render HTML, so they skip it).
+- Seed a save through `localStorage.setItem('blorbit-save-v1', JSON.stringify({ unlocked: [...], guideSeen: true, v: 3 }))`, then reload. `unlocked` must list the earlier galaxies' creatures or later galaxies stay locked. `scripts/biome.mjs` has the list to copy. Put `guideSeen: true` in so the first-time guide doesn't cover the screen.
+- Wait for `#title-galaxies .galaxy-card`, then drive the game through `window.blorbit` (`newPlanet(seed, galaxy)`, `enterGalaxy`, `completeRegion(i)`, `blob.placeAt(pos, dir)`, `keys.up = true`...). Hold keys by setting `window.blorbit.keys`; `page.keyboard` works too.
+- Add `page.on('pageerror', ...)` so a runtime error is visible. Output goes to `/tmp`, never into the repo.
+- Scripts must live in `scripts/` so Node resolves `puppeteer-core`. Throwaway scripts: write, run, delete.
+
+Groups:
+- **Screenshots of one thing**: `biome.mjs`, `shot.mjs`, `propbooth.mjs`, `creaturebooth.mjs`, `skinbooth.mjs`, `guide-shots.mjs` (the only one that writes into the repo, `public/guide/`).
+- **Regression checks** (older, each tied to a feature): `galaxycheck`, `shopcheck`, `finaleshopcheck`, `resetcheck`, `resumecheck`, `consentcheck`, `adcheck`, `galaxyadcheck`, `privacycheck`, `accesscheck`, `mobilecheck`, `tapsteercheck`, `menucheck`, `loadercheck`, `qualitycheck`, `raritycheck`, `rollcheck`, `spotcheck`, `warpcheck`, `skycheck`/`skycheck2`, `camcheck`, `polishcheck`, `tipcheck`, `titletimeline`. They need no output beyond their own logging, but they are not run automatically, so they can drift; treat a failure as "check whether the script is stale" before assuming the game broke. A static check of the element ids they use found none missing at the time of writing.
+- **Share image and icons**: `og/` (see README, "Regenerating the share image").
+- **Build tooling**: `emoji-font.py` (section 5).
+- **Social advert** (vertical 20s video): `advert-capture.mjs`, `advert-overlays.mjs`, `advert-audio.mjs`, `advert.sh`, `advert/overlay.html`. See below.
+
+#### The advert pipeline
+Needs `ffmpeg` (`brew install ffmpeg`) and network access (the overlays load Google Fonts). With the dev server up:
+```bash
+node scripts/advert-capture.mjs [clip ...]   # a pack book skins b; no args = all (~7 min). Frames: /tmp/ad/<clip>/%04d.png
+node scripts/advert-overlays.mjs             # captions, logo pill, end card -> /tmp/ad/ov-*.png (transparent 1080x1920)
+node scripts/advert-audio.mjs                # soundtrack -> /tmp/ad/advert.wav
+./scripts/advert.sh                          # stitches everything -> /tmp/ad/blorbit-advert.mp4
+```
+How it works, and the traps:
+- **Virtual clock.** `advert-capture.mjs` replaces `performance.now`, `requestAnimationFrame`, `setTimeout` and CSS animations with a clock that only moves when the script calls `__step(ms)`, then screenshots. Output is deterministic and independent of how slow SwiftShader is. The virtual `setTimeout`/animation part only turns on after the title is up (`__virtual()`), so the loader isn't affected. Anything that depends on real time (audio, video elements, `Date.now`) is not covered.
+- **Clips** are entries in `CLIPS`: `galaxy`/`biome` (a planet is searched by seed until it has that biome), `back` (how far behind the biome centre the blob starts), `hold` (seconds the up key is held), `region` (when `completeRegion` fires), `setup`/`actions`/`cleanup` (JS strings run in the page at given times) and `show` (HUD ids to keep visible; the rest of the HUD is hidden so captions have room). The pack and book clips use the real shop and collection UI; the pack's three cards are hand-picked via `__cards`, and the book is pre-filled via `__fillSea`.
+- **Timing is duplicated on purpose in three places**: clip start offsets and caption fades in `advert.sh`, in-clip action/restore times in `advert-capture.mjs`, and cue times in `advert-audio.mjs` (which runs the game's own `Sound` class from `src/audio.js` on an `OfflineAudioContext`, with `sound.now` overridden so each sound can be scheduled). Change a clip length or offset and update all three. Beat-grid cues sit on `2.8 + 0.5k` seconds.
+- **Captions** sit in the sky above the planet (`top: 240px`); the book clip needs the `.cap.top` pill because its sheet fills the screen.
+- **Hide anything that isn't ours to advertise**: the "🎬 Free" video buttons are hidden in the capture, and find pop-ups (`#finds`) are hidden because they clutter the corner. `window.blorbit.buildSkinBar` is exposed only for this.
+- The clips are not byte-for-byte reproducible when re-rendered (the game uses `Math.random` for particles and critters).
+- Only the scripts and the latest finished video (`scripts/advert/blorbit-advert.mp4`, copy a new render over it when the advert changes) are committed; frames, overlays and audio in `/tmp/ad` are not.
+
 ---
 
 ## 8. Gotchas collected so far
@@ -237,7 +277,7 @@ grep -rnE "[0-9]+ biomes|[0-9]+ galaxies|[0-9]+ cards|biome definitions" index.h
 - Shader hygiene for iOS/iPad GPUs (a black ground was reported there): keep `smoothstep` edges in ascending order and never pass `pow` a possibly negative base (clamp it).
 - The ground fragment shader (`planet.js`) deliberately keeps its `uDebug` branch and `s1..s9` snapshots: with them removed the planet rendered black on an iPad, with identical maths. Don't strip them without testing on an iPad.
 - Debugging on a device with no console: open the game with `?debug` (e.g. `http://<lan-ip>:5173/?debug`) for an on-screen panel (`src/debug.js`) showing the GPU, its limits, any console/shader errors, and a button that cycles the ground shader through single inputs. Run the dev server with `npx vite --host` to reach it from another device.
-- Don't commit generated screenshots from `/tmp`; the only committed generated asset is `public/og-image.png` (and `scripts/og/planet.png`).
+- Don't commit generated screenshots from `/tmp`; the committed generated assets are `public/og-image.png`, `scripts/og/planet.png` and the advert video `scripts/advert/blorbit-advert.mp4`.
 
 ---
 

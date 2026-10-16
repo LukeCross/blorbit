@@ -289,13 +289,12 @@ export class Shop {
     }));
   }
 
-  // rank name, a progress bar and what's left to the next rank; a rank-up or mastery gets a headline
+  // rank name and a progress bar; a rank-up or mastery gets a headline
   rankHtml(c) {
     const r = rankInfo(c.rarity, c.count);
-    const head = c.mastered ? 'Mastered!' : c.rankUp ? `Rank up: ${r.name}!` : r.name;
+    const head = c.mastered ? 'Mastered!' : c.rankUp ? `Rank up!<br>${r.name}` : r.name;
     return `<div class="rank-box${c.mastered ? ' gold' : ''}"><em class="rank-head${c.rankUp ? ' up' : ''}">${head}</em>`
-      + `<i class="rank-bar" style="background:linear-gradient(90deg, ${rankStops(c.rarity, c.count, 100, 3, '%')})"></i>`
-      + `<small>${r.text}</small></div>`;
+      + `<i class="rank-bar" style="background:linear-gradient(90deg, ${rankStops(c.rarity, c.count, 100, 3, '%')})"></i></div>`;
   }
 
   packDone(biomeId, type, opts = {}) {
