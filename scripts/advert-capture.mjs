@@ -12,6 +12,9 @@ const ALL_UNLOCKED = ['classic', 'bunny', 'frog', 'fox', 'penguin', 'moth', 'sna
 const CLIPS = {
   // dead world, blob rolls up and the whole biome blooms
   a: { galaxy: 'wild', biome: 'meadow', secs: 5.5, back: 0.34, hold: [[0.3, 5.5]], region: 2.8 },
+  // the whole Wildbloom planet restored, for the app store hero shot (not part of the video); the finale card
+  // pops 3.4s after a restore, so stay under that
+  hero: { galaxy: 'wild', biome: 'meadow', secs: 1.3, back: 0.2, hold: [], setup: 'blorbit.planet().biomes.forEach((_, i) => blorbit.completeRegion(i))' },
   // a quick Seaglow bloom for the "8 galaxies" beat
   b: { galaxy: 'sea', biome: 'reef', secs: 2.4, back: 0.3, hold: [[0, 2.4]], region: 0.9 },
   // shop, then tap the pack and flip three cards (the draw is hand-picked so the clip always ends on a legendary)

@@ -263,7 +263,7 @@ How it works, and the traps:
 - **Captions** sit in the sky above the planet (`top: 240px`); the book clip needs the `.cap.top` pill because its sheet fills the screen.
 - **Hide anything that isn't ours to advertise**: the "🎬 Free" video buttons are hidden in the capture, and find pop-ups (`#finds`) are hidden because they clutter the corner. `window.blorbit.buildSkinBar` is exposed only for this.
 - The clips are not byte-for-byte reproducible when re-rendered (the game uses `Math.random` for particles and critters).
-- Only the scripts and the latest finished video (`scripts/advert/blorbit-advert.mp4`, copy a new render over it when the advert changes) are committed; frames, overlays and audio in `/tmp/ad` are not.
+- Only the scripts, the latest finished video (`scripts/advert/blorbit-advert.mp4`) and the eight app store screenshots (`scripts/advert/screenshots/`, built by `scripts/store-shots.sh`, which writes to `/tmp/ad/store`) are committed; copy new renders over them when the advert changes. Frames, overlays and audio in `/tmp/ad` are not.
 
 ---
 
@@ -277,7 +277,7 @@ How it works, and the traps:
 - Shader hygiene for iOS/iPad GPUs (a black ground was reported there): keep `smoothstep` edges in ascending order and never pass `pow` a possibly negative base (clamp it).
 - The ground fragment shader (`planet.js`) deliberately keeps its `uDebug` branch and `s1..s9` snapshots: with them removed the planet rendered black on an iPad, with identical maths. Don't strip them without testing on an iPad.
 - Debugging on a device with no console: open the game with `?debug` (e.g. `http://<lan-ip>:5173/?debug`) for an on-screen panel (`src/debug.js`) showing the GPU, its limits, any console/shader errors, and a button that cycles the ground shader through single inputs. Run the dev server with `npx vite --host` to reach it from another device.
-- Don't commit generated screenshots from `/tmp`; the committed generated assets are `public/og-image.png`, `scripts/og/planet.png` and the advert video `scripts/advert/blorbit-advert.mp4`.
+- Don't commit generated screenshots from `/tmp`; the committed generated assets are `public/og-image.png`, `scripts/og/planet.png`, the advert video `scripts/advert/blorbit-advert.mp4` and the store screenshots in `scripts/advert/screenshots/`.
 
 ---
 

@@ -338,7 +338,7 @@ node scripts/advert-audio.mjs     # soundtrack, built with the game's own sound 
 ./scripts/advert.sh               # stitches it all into /tmp/ad/blorbit-advert.mp4
 ```
 
-The game runs on a virtual clock while recording, so the frames are smooth no matter how slow your machine is. The frames and soundtrack in `/tmp/ad` aren't committed; the latest finished video is kept at `scripts/advert/blorbit-advert.mp4`. The copy, clip order and timings live in `scripts/advert/overlay.html`, `scripts/advert.sh`, `scripts/advert-capture.mjs` and `scripts/advert-audio.mjs`; `AGENTS.md` explains how they fit together.
+The game runs on a virtual clock while recording, so the frames are smooth no matter how slow your machine is. The frames and soundtrack in `/tmp/ad` aren't committed; the latest finished video is kept at `scripts/advert/blorbit-advert.mp4`, and eight 1080×1920 app store screenshots made from the same frames (`scripts/store-shots.sh`) are in `scripts/advert/screenshots/`. The copy, clip order and timings live in `scripts/advert/overlay.html`, `scripts/advert.sh`, `scripts/advert-capture.mjs` and `scripts/advert-audio.mjs`; `AGENTS.md` explains how they fit together.
 
 ## Credits
 
