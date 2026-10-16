@@ -1116,8 +1116,8 @@ function renderShowcase() {
   $('showcase').innerHTML = save.showcase.map((k, i) => {
     const sel = i === pickSlot ? ' picking' : '';
     if (!k) return `<button class="slot empty${sel}" data-i="${i}" title="Choose a find to show off" aria-label="Empty showcase slot ${i + 1}">+</button>`;
-    const f = FIND_INDEX.get(k), n = save.finds[k];
-    return `<button class="slot ${f.rarity}${sel}" data-i="${i}" title="${findTitle(k)}" aria-label="${findTitle(k)}">${f.emoji}${n > 1 ? `<i>×${n}</i>` : ''}</button>`;
+    const f = FIND_INDEX.get(k);
+    return `<button class="slot ${f.rarity}${sel}" data-i="${i}" title="${findTitle(k)}" aria-label="${findTitle(k)}">${f.emoji}</button>`;
   }).join('');
   const any = foundCount(save) > 0;
   const rarest = rarestFinds(save);
@@ -1136,8 +1136,7 @@ function renderShowcasePicker() {
     const rows = GALAXIES[pickTab].biomes.map((b) => {
       const items = BIOMES[b].finds.filter(([, name]) => save.finds[`${b}:${name}`]).map(([emoji, name, rarity]) => {
         const k = `${b}:${name}`;
-        const n = save.finds[k];
-        return `<button class="slot ${rarity} ${k === cur ? 'chosen' : ''}" data-key="${k}" title="${findTitle(k)}" aria-label="${findTitle(k)}">${emoji}${n > 1 ? `<i>×${n}</i>` : ''}</button>`;
+        return `<button class="slot ${rarity} ${k === cur ? 'chosen' : ''}" data-key="${k}" title="${findTitle(k)}" aria-label="${findTitle(k)}">${emoji}</button>`;
       }).join('');
       return items ? `<div class="book-row"><div class="book-head"><b>${BIOMES[b].name}</b></div><div class="slots">${items}</div></div>` : '';
     }).join('');
