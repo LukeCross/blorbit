@@ -54,5 +54,41 @@ export function initDebug(renderer) {
     const progs = renderer.info.programs || [];
     log(`programs compiled: ${progs.length}, draw calls: ${renderer.info.render.calls}, triangles: ${renderer.info.render.triangles}`);
     log(`gl error: ${gl.getError()}`);
+    logEmoji(log);
   }, 4000);
+}
+
+// the bundled emoji font (src/emoji.css, src/emojifont.js): which build is in use, and does it draw?
+function logEmoji(log) {
+  const tech = (t) => (CSS.supports?.(`font-tech(${t})`) ? 'yes' : 'no');
+  log(`emoji font: supports COLRv1 ${tech('color-COLRv1')}, SVG ${tech('color-SVG')}; :heading ${CSS.supports?.('selector(:heading)') ? 'yes (Safari 27+ swap)' : 'no'}`);
+  const faces = [...document.fonts].filter((f) => f.family === 'Blorbit Emoji' || f.family === '"Blorbit Emoji"');
+  log(`emoji faces: ${faces.map((f) => f.status).join(' ') || 'none'}`);
+  const files = performance.getEntriesByType('resource').filter((r) => r.name.includes('/fonts/emoji/'));
+  log(`emoji files: ${files.map((r) => r.name.split('/').pop()).join(', ') || 'none'}`);
+  // canvas pixel counts (a blank glyph gives ~0), though Safari 27 draws SVG emoji on a canvas but not in text
+  const colourful = (text, font) => {
+    const c = document.createElement('canvas');
+    c.width = c.height = 64;
+    const g = c.getContext('2d', { willReadFrequently: true });
+    g.font = font;
+    g.fillText(text, 4, 52);
+    const d = g.getImageData(0, 0, 64, 64).data;
+    let n = 0;
+    for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 128 && Math.max(d[i], d[i + 1], d[i + 2]) - Math.min(d[i], d[i + 1], d[i + 2]) > 60) n++;
+    return n;
+  };
+  for (const e of ['✨', '🌸', '❄️', '🐸']) log(`  ${e} bundled ${colourful(e, '48px "Blorbit Emoji"')} px, system ${colourful(e, '48px system-ui')} px`);
+  // page text: the font as the game uses it, the system emoji, and each build loaded on its own
+  const builds = { svg: 'Blorbit Emoji Svg', colr: 'Blorbit Emoji Colr' };
+  for (const [kind, family] of Object.entries(builds)) {
+    const face = new FontFace(family, `url(/fonts/emoji/${kind}-7.woff2)`);
+    document.fonts.add(face);
+    face.load().then(() => log(`${kind} build alone: canvas ${colourful('🌸', `48px "${family}"`)} px`), (e) => log(`${kind} build alone: failed ${e}`));
+  }
+  const row = document.createElement('div');
+  row.style.cssText = 'position:fixed;left:8px;bottom:calc(45vh + 12px);z-index:99999;padding:6px 10px;border-radius:8px;background:#fff;color:#000;font:14px monospace';
+  const cell = (label, family) => `<div>${label} <span style="font:400 26px ${family}, monospace">🌸🐸</span></div>`;
+  row.innerHTML = cell('A page', "'Blorbit Emoji'") + cell('B system', "'Apple Color Emoji', system-ui") + cell('C svg', `'${builds.svg}'`) + cell('D colr', `'${builds.colr}'`);
+  document.body.append(row);
 }

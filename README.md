@@ -147,7 +147,7 @@ npm run preview  # serve the production build locally
 
 Handy URL parameters (dev or live):
 - `?seed=12345` loads that exact planet (in your current galaxy), and `&galaxy=<id>` picks the galaxy (`wild`, `city`, `sky`, `safari`, `sea`, `feast`, `gloom` or `stomp`).
-- `?debug` shows an on-screen panel with the GPU, its limits and any shader or console errors, for devices with no console. Run `npx vite --host` to reach the dev server from a phone or tablet on your network.
+- `?debug` shows an on-screen panel with the GPU, its limits, any shader or console errors and which emoji font build is in use (with test rows for each build), for devices with no console. Run `npx vite --host` to reach the dev server from a phone or tablet on your network.
 
 The `dist/` folder is fully static. Drop it on any static host (GitHub Pages, Netlify, Vercel, S3, etc.).
 
@@ -307,8 +307,9 @@ src/
   names.js          Planet and player name generators, and time-based seeds
   noise.js          Seeded noise and PRNG
   shadow.js         Soft contact shadows
-  debug.js          The `?debug` on-screen GPU/shader panel
+  debug.js          The `?debug` on-screen GPU/shader/emoji font panel
   emoji.css         Generated @font-face rules for the self-hosted emoji font
+  emojifont.js      Points Safari 27+ at the emoji font build it can draw
 public/             Static files copied as-is: share image, favicon and app icons, web app manifest
 scripts/            Dev-only Puppeteer helpers: screenshots, regression checks, the share image (scripts/og/) and the social advert (see "Development scripts")
 ```

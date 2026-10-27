@@ -18,6 +18,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <!-- system fonts only (plus our own self-hosted emoji), so this page doesn't contact any third party -->
     <link rel="stylesheet" href="./src/emoji.css" />
+    <script type="module">import { fixEmojiFont } from './src/emojifont.js'; fixEmojiFont();</script>
     <style>
       :root { --ink: #3d3560; --ink-soft: rgba(61, 53, 96, 0.8); }
       * { box-sizing: border-box; }

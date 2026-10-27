@@ -6,8 +6,9 @@ usage (from the repo root; needs fonttools, brotli + lxml, e.g. in a throwaway v
   /tmp/fv/bin/python scripts/emoji-font.py
 
 It finds every emoji used in src/*.js, index.html and about.html, downloads Google's current chunks of the font
-(the COLRv1 build for Chrome/Firefox, the OpenType-SVG build for Safari), trims each chunk to just those emojis and
-writes public/fonts/emoji/*.woff2 (with the font's OFL.txt) plus src/emoji.css. Re-run it whenever you add an emoji; commit the output.
+(the COLRv1 build for Chrome/Firefox, the OpenType-SVG build for Safari; src/emojifont.js moves Safari 27+ onto
+COLRv1), trims each chunk to just those emojis and writes public/fonts/emoji/*.woff2 (with the font's OFL.txt) plus
+src/emoji.css. Re-run it whenever you add an emoji; commit the output.
 Text symbols (arrows, ticks, play triangles) are left out on purpose, so they keep their normal look.
 """
 import glob, re, sys, urllib.request

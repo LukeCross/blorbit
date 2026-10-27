@@ -62,7 +62,7 @@ src/creature.js  Sleeping/waking creature placed in each biome (uses skins)
 src/critters.js  Ambient wandering critters (KINDS)
 src/atmosphere.js  Per-galaxy look: ATMOSPHERES (space colours, light, signature weather), BIOME_WEATHER overrides, Weather (one cheap particle draw call)
 src/audio.js   Synthesised sound: per-biome ambient cases + rolling timbre
-src/debug.js   On-screen GPU/shader debug panel, only with `?debug` in the URL (see section 8)
+src/debug.js   On-screen GPU/shader/emoji font debug panel, only with `?debug` in the URL (see section 8)
 src/shop.js    Card pack shop, galaxy tabs (galaxyTabs, renderKeepingTabs)
 src/collection.js  Finds, rarities, pack rates (totals are computed, not hard-coded), duplicate ranks (`RANKS`, `rankFor`, `rankInfo`, `rankStops` for the segmented ring/bar colours; the fifth rank, Mastered, is the top), `estimateXp` for old saves. `drawFind`/`drawPack` pay out XP themselves
 src/xp.js      XP values (`XP`), the endless level curve (`levelInfo`), titles, level-up stardust, `addXp(save, n)` + `onXp` listener (main.js drives the HUD badge/bar and the level-up toast from it)
@@ -70,6 +70,7 @@ src/ads.js     Rewarded video ads (Google Ad Manager)
 src/analytics.js  track(name): anonymous GoatCounter events (see section 9); no-op without VITE_GOATCOUNTER_URL
 src/{blob,look,skyfx,particles,stardust,names,noise,quality,shadow}.js  Blob, sky, ambient particles, stardust, naming (planet names, the profile's quirky player names), PRNG, quality tiers
 src/emoji.css  GENERATED @font-face rules for the self-hosted emoji font (see section 5); public/fonts/emoji/ holds its woff2 files
+src/emojifont.js  fixEmojiFont(): on Safari 27+ swaps the emoji faces to the COLRv1 build (its SVG glyphs draw blank in text); used by main.js and about.html
 scripts/       Puppeteer helpers (screenshots, regression checks); scripts/og/ builds the share image and icons
                scripts/advert*.{mjs,sh} + scripts/advert/ build the vertical social advert (frame-stepped capture on a virtual clock, overlays, game-engine soundtrack, ffmpeg stitch); see the header of each; output goes to /tmp/ad
 public/guide/  The three first-time guide screenshots (regenerate with `node scripts/guide-shots.mjs`; the `#guide` overlay is in index.html, logic near `start()` in main.js)
@@ -127,7 +128,7 @@ print([w for w in want if st(w) in U])           # must print []
   python3 -m venv /tmp/fv && /tmp/fv/bin/pip install fonttools brotli lxml   # once
   /tmp/fv/bin/python scripts/emoji-font.py
   ```
-  An emoji missing from the subset silently falls back to the device's own emoji font (not broken, just inconsistent). Text symbols (arrows, ticks, ▶) are deliberately excluded. Browsers download COLRv1 (Chrome/Firefox) or OpenType-SVG (Safari) builds, ~450 KB / ~1 MB for everything. Safari/iOS rendering has not been verified from this machine.
+  An emoji missing from the subset silently falls back to the device's own emoji font (not broken, just inconsistent). Text symbols (arrows, ticks, ▶) are deliberately excluded. Browsers download COLRv1 (Chrome/Firefox, and Safari 27+ via `src/emojifont.js`) or OpenType-SVG (Safari 26 and older) builds, ~450 KB / ~1 MB for everything. macOS Safari 26.6 was verified (SVG build) via `safaridriver` (needs Safari > Settings > Developer > Allow remote automation). Safari 27 (iOS 27) draws the SVG build blank in page text (canvas still works, so a canvas check can't catch it) but draws COLRv1 while `font-tech(color-COLRv1)` says no; Safari 26 is the reverse. So `src/emojifont.js` detects Safari 27 with `CSS.supports('selector(:heading)')` and replaces the emoji `@font-face` rules with COLRv1 `FontFace`s (Chrome treats `@font-face` rules as read-only from script). Any new page that uses `emoji.css` must call `fixEmojiFont()` too. The `?debug` panel shows which build is in use, with test rows for each build.
 - Multi-codepoint emojis (ZWJ sequences like 🏴‍☠️) work but check they render and compare after stripping `️`.
 
 ---
@@ -276,7 +277,7 @@ How it works, and the traps:
 - The README and about page are hand-maintained marketing/docs: counts there do not update themselves.
 - Shader hygiene for iOS/iPad GPUs (a black ground was reported there): keep `smoothstep` edges in ascending order and never pass `pow` a possibly negative base (clamp it).
 - The ground fragment shader (`planet.js`) deliberately keeps its `uDebug` branch and `s1..s9` snapshots: with them removed the planet rendered black on an iPad, with identical maths. Don't strip them without testing on an iPad.
-- Debugging on a device with no console: open the game with `?debug` (e.g. `http://<lan-ip>:5173/?debug`) for an on-screen panel (`src/debug.js`) showing the GPU, its limits, any console/shader errors, and a button that cycles the ground shader through single inputs. Run the dev server with `npx vite --host` to reach it from another device.
+- Debugging on a device with no console: open the game with `?debug` (e.g. `http://<lan-ip>:5173/?debug`) for an on-screen panel (`src/debug.js`) showing the GPU, its limits, any console/shader errors, a button that cycles the ground shader through single inputs, and the emoji font's state (which build loaded, plus page-text test rows for the bundled, system, SVG and COLRv1 fonts). Run the dev server with `npx vite --host` to reach it from another device.
 - Don't commit generated screenshots from `/tmp`; the committed generated assets are `public/og-image.png`, `scripts/og/planet.png`, the advert video `scripts/advert/blorbit-advert.mp4` and the store screenshots in `scripts/advert/screenshots/`.
 
 ---

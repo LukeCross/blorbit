@@ -26,6 +26,9 @@ import { RewardedAds } from './ads.js';
 import { track } from './analytics.js';
 import { planetName, timeSeed, blobName } from './names.js';
 import { initDebug } from './debug.js';
+import { fixEmojiFont } from './emojifont.js';
+
+fixEmojiFont();
 
 // ---------------------------------------------------------------- save data
 
